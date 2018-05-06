@@ -1,0 +1,5 @@
+.idea
+vendor/
+!/vendor/vendor.json
+
+gingob-admin/
