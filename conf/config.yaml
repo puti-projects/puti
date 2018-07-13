@@ -15,3 +15,9 @@ log:
   log_rotate_size: 1024 # rotate 转存大小，配合 rollingPolicy: size 使用
   log_backup_count: 7 # 当日志文件达到转存标准时，log 系统会将该日志文件进行压缩备份，这里指定了备份文件的最大个数
 
+db:
+  name: db_gingob
+  addr: 12.0.0.1:3306
+  username: root
+  password: 123456
+
