@@ -48,7 +48,6 @@ func main() {
 
 	log.Infof("Start to listening the incoming requests on http address: %s", viper.GetString("addr"))
 	log.Info(http.ListenAndServe(viper.GetString("addr"), g).Error())
-
 }
 
 // pingServer pings the http server to make sure the router is working.
