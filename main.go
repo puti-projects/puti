@@ -7,6 +7,7 @@ import (
 
 	"gingob/config"
 	"gingob/router"
+	"gingob/model"
 
 	"github.com/gin-gonic/gin"
 	"github.com/lexkong/log"
@@ -37,6 +38,10 @@ func main() {
 
 	// routes
 	router.Load(g, middlewares...)
+
+	// init db
+	model.DB.Init()
+	defer model.DB.Close()
 
 	// Ping the server to make sure the router is working.
 	go func() {

@@ -17,7 +17,7 @@ log:
 
 db:
   name: db_gingob
-  addr: 12.0.0.1:3306
+  addr: 127.0.0.1:3306
   username: root
   password: 123456
 

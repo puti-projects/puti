@@ -26,10 +26,10 @@ func Load(g *gin.Engine, mw ...gin.HandlerFunc) *gin.Engine {
 	u := g.Group("/v1/user")
 	{
 		u.POST("/:username", user.Create)
+		u.GET("/:username", user.Get)
 		u.DELETE("/:id", user.Delete)
 		u.PUT("/:id", user.Update)
 		u.GET("", user.List)
-		u.GET("/:username", user.Get)
 	}
 
 	// the health check handlers
