@@ -1,9 +1,10 @@
 package model
 
 import (
-	"apiserver_demos/demo07/pkg/constvar"
 	"fmt"
+
 	"gingob/pkg/auth"
+	"gingob/pkg/constvar"
 	"gingob/pkg/errno"
 )
 

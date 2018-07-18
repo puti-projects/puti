@@ -6,8 +6,9 @@ import (
 	"time"
 
 	"gingob/config"
-	"gingob/router"
 	"gingob/model"
+	"gingob/router"
+	"gingob/router/middleware"
 
 	"github.com/gin-gonic/gin"
 	"github.com/lexkong/log"
@@ -27,21 +28,21 @@ func main() {
 		panic(err)
 	}
 
+	// init db
+	model.DB.Init()
+	defer model.DB.Close()
+
 	// Set gin mode.
 	gin.SetMode(viper.GetString("runmode"))
 
 	// create the gin engine
 	g := gin.New()
 
-	// gin middlewares
-	middlewares := []gin.HandlerFunc{}
-
 	// routes
-	router.Load(g, middlewares...)
-
-	// init db
-	model.DB.Init()
-	defer model.DB.Close()
+	router.Load(g,
+		// Middiewares
+		middleware.RequestId(),
+	)
 
 	// Ping the server to make sure the router is working.
 	go func() {
@@ -50,6 +51,19 @@ func main() {
 		}
 		log.Info("The router has been deployed successfully.")
 	}()
+
+	// If open https, start listening https request
+	openHttps := viper.GetBool("tls.https_open")
+	if openHttps == true {
+		cert := viper.GetString("tls.cert")
+		key := viper.GetString("tls.key")
+		if cert != "" && key != "" {
+			go func() {
+				log.Infof("Start to listening the incoming requests on https address: %s", viper.GetString("tls.addr"))
+				log.Info(http.ListenAndServeTLS(viper.GetString("tls.addr"), cert, key, g).Error())
+			}()
+		}
+	}
 
 	log.Infof("Start to listening the incoming requests on http address: %s", viper.GetString("addr"))
 	log.Info(http.ListenAndServe(viper.GetString("addr"), g).Error())
