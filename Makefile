@@ -1,4 +1,3 @@
-# 这样编译会会编译失败，缺少包，需调整
 SHELL := /bin/bash
 BASEDIR = $(shell pwd)
 
