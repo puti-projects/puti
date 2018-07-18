@@ -1,12 +1,16 @@
 package main
 
 import (
+	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
+	"os"
 	"time"
 
 	"gingob/config"
 	"gingob/model"
+	v "gingob/pkg/version"
 	"gingob/router"
 	"gingob/router/middleware"
 
@@ -17,11 +21,25 @@ import (
 )
 
 var (
-	cfg = pflag.StringP("config", "c", "", "gingob config file path.")
+	cfg     = pflag.StringP("config", "c", "", "gingob config file path.")
+	version = pflag.BoolP("version", "v", false, "show version info.")
 )
 
 func main() {
 	pflag.Parse()
+
+	// Show version info
+	if *version {
+		v := v.Get()
+		marshalled, err := json.MarshalIndent(&v, "", "  ")
+		if err != nil {
+			fmt.Printf("%v\n", err)
+			os.Exit(1)
+		}
+
+		fmt.Println(string(marshalled))
+		return
+	}
 
 	// init config
 	if err := config.Init(*cfg); err != nil {
