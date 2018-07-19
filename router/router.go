@@ -10,7 +10,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// load loads the middlewares, routes, handles.
+// Load loads the middlewares, routes, handles.
 func Load(g *gin.Engine, mw ...gin.HandlerFunc) *gin.Engine {
 	g.Use(gin.Recovery())
 	g.Use(middleware.NoCache)
@@ -26,7 +26,7 @@ func Load(g *gin.Engine, mw ...gin.HandlerFunc) *gin.Engine {
 	// api for authentication functionalities
 	g.POST("/login", user.Login)
 
-	u := g.Group("/v1/user")
+	u := g.Group("/api/user")
 	u.Use(middleware.AuthMiddleware())
 	{
 		u.POST("/:username", user.Create)

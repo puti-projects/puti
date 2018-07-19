@@ -71,8 +71,8 @@ func main() {
 	}()
 
 	// If open https, start listening https request
-	openHttps := viper.GetBool("tls.https_open")
-	if openHttps == true {
+	openHTTPS := viper.GetBool("tls.https_open")
+	if openHTTPS == true {
 		cert := viper.GetString("tls.cert")
 		key := viper.GetString("tls.key")
 		if cert != "" && key != "" {
@@ -100,5 +100,5 @@ func pingServer() error {
 		log.Info("Waiting for the router, retry in 1 second.")
 		time.Sleep(time.Second)
 	}
-	return errors.New("Cannot connect to the router.")
+	return errors.New("Cannot connect to the router")
 }
