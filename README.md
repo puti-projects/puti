@@ -1,5 +1,8 @@
 # gingob
-Golang+Vue
+* Golang
+* gin
+* Vue.js
+* Nuxt.js
 
 # Build by Docker
 ## Using a MySQL in lcoal

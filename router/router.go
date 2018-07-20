@@ -23,6 +23,11 @@ func Load(g *gin.Engine, mw ...gin.HandlerFunc) *gin.Engine {
 		c.String(http.StatusNotFound, "The incorrect API route.")
 	})
 
+	// static resource
+	g.Static("/static", "backend/dist/static")
+	// g.StaticFS("/more_static", http.Dir("my_file_system"))
+	// g.StaticFile("/favicon.ico", "./resources/favicon.ico")
+
 	// api for authentication functionalities
 	g.POST("/login", user.Login)
 
@@ -44,6 +49,14 @@ func Load(g *gin.Engine, mw ...gin.HandlerFunc) *gin.Engine {
 		svcd.GET("/cpu", sd.CPUCheck)
 		svcd.GET("/ram", sd.RAMCheck)
 	}
+
+	// backend index
+	g.LoadHTMLFiles("backend/dist/index.html")
+	g.GET("/admin", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "index.html", gin.H{
+			"title": "Main website",
+		})
+	})
 
 	return g
 }
