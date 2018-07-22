@@ -44,12 +44,15 @@ func ListUser(username string, offset, limit int) ([]*model.UserInfo, uint64, er
 			userList.Lock.Lock()
 			defer userList.Lock.Unlock()
 			userList.IdMap[u.Id] = &model.UserInfo{
-				Id:        u.Id,
-				Username:  u.Username,
-				SayHello:  fmt.Sprintf("Hello %s", shortId),
-				Password:  u.Password,
-				CreatedAt: u.CreatedAt.Format("2006-01-02 15:04:05"),
-				UpdatedAt: u.UpdatedAt.Format("2006-01-02 15:04:05"),
+				Id:             u.Id,
+				Accout:         u.Username,
+				Nickname:       u.Nickname,
+				SayHello:       fmt.Sprintf("Hello %s", shortId),
+				Password:       u.Password,
+				Email:          u.Email,
+				RegisteredTime: u.RegisteredTime.Format("2006-01-02 15:04:05"),
+				Status:         u.Status,
+				Role:           u.Role,
 			}
 		}(u)
 	}

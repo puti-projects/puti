@@ -2,20 +2,29 @@ package model
 
 import (
 	"fmt"
+	"time"
 
 	"gingob/pkg/auth"
 	"gingob/pkg/constvar"
 	"gingob/pkg/errno"
 )
 
+// User model
 type UserModel struct {
-	BaseModel
-	Username string `json:"username" gorm:"column:username;not null" binding:"required" validate:"min=1,max=32"`
+	Id             uint64    `gorm:"primary_key;AUTO_INCREMENT;column:id" json:"-"`
+	Nickname       string    `gorm:"column:nickname;not null" json:"-"`
+	Email          string    `gorm:"column:email" json:"-"`
+	RegisteredTime time.Time `gorm:"column:registered_time" json:"-"`
+	Status         int       `gorm:"column:status" sql:"index" json:"-"`
+	Role           string    `gorm:"column:role" json:"-"`
+
+	Username string `json:"username" gorm:"column:account;not null" binding:"required" validate:"min=1,max=32"`
 	Password string `json:"password" gorm:"column:password;not null" binding:"required" validate:"min=5,max=128"`
 }
 
+// User table in db
 func (c *UserModel) TableName() string {
-	return "tb_users"
+	return "gb_users"
 }
 
 // create a new user account
@@ -32,13 +41,13 @@ func (u *UserModel) Encrypt() (err error) {
 // GetUser gets an user by the user identifier.
 func GetUser(username string) (*UserModel, error) {
 	u := &UserModel{}
-	d := DB.Local.Where("username = ?", username).First(&u)
+	d := DB.Local.Where("account = ?", username).First(&u)
 	return u, d.Error
 }
 
 func DeleteUser(id uint64) error {
 	user := UserModel{}
-	user.BaseModel.Id = id
+	user.Id = id
 	return DB.Local.Delete(&user).Error
 }
 
@@ -69,7 +78,7 @@ func ListUser(username string, offset, limit int) ([]*UserModel, uint64, error) 
 	users := make([]*UserModel, 0)
 	var count uint64
 
-	where := fmt.Sprintf("username like '%%%s%%'", username)
+	where := fmt.Sprintf("account like '%%%s%%'", username)
 	if err := DB.Local.Model(&UserModel{}).Where(where).Count(&count).Error; err != nil {
 		return users, count, err
 	}
