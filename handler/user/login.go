@@ -1,7 +1,7 @@
 package user
 
 import (
-	. "gingob/handler"
+	Response "gingob/handler"
 	"gingob/model"
 	"gingob/pkg/auth"
 	"gingob/pkg/errno"
@@ -10,29 +10,30 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// Login is the Login function
 func Login(c *gin.Context) {
-	var u model.UserModel
+	var u LoginRequest
 	if err := c.Bind(&u); err != nil {
-		SendResponse(c, errno.ErrBind, nil)
+		Response.SendResponse(c, errno.ErrBind, nil)
 		return
 	}
 
 	d, err := model.GetUser(u.Username)
 	if err != nil {
-		SendResponse(c, errno.ErrUserNotFound, nil)
+		Response.SendResponse(c, errno.ErrUserNotFound, nil)
 		return
 	}
 
 	if err := auth.Compare(d.Password, u.Password); err != nil {
-		SendResponse(c, errno.ErrPasswordIncorrect, nil)
+		Response.SendResponse(c, errno.ErrPasswordIncorrect, nil)
 		return
 	}
 
-	t, err := token.Sign(c, token.Context{ID: d.Id, Username: d.Username}, "")
+	t, err := token.Sign(c, token.Context{ID: d.ID, Username: d.Username}, "")
 	if err != nil {
-		SendResponse(c, errno.ErrToken, nil)
+		Response.SendResponse(c, errno.ErrToken, nil)
 		return
 	}
 
-	SendResponse(c, nil, model.Token{Token: t})
+	Response.SendResponse(c, nil, model.Token{Username: u.Username, Token: t})
 }

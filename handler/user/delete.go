@@ -3,20 +3,21 @@ package user
 import (
 	"strconv"
 
-	. "gingob/handler"
+	Response "gingob/handler"
 	"gingob/model"
 	"gingob/pkg/errno"
 
 	"github.com/gin-gonic/gin"
 )
 
+// Delete deletes the user by id
 func Delete(c *gin.Context) {
-	userId, _ := strconv.Atoi(c.Param("id"))
+	userID, _ := strconv.Atoi(c.Param("id"))
 
-	if err := model.DeleteUser(uint64(userId)); err != nil {
-		SendResponse(c, errno.ErrDatabase, nil)
+	if err := model.DeleteUser(uint64(userID)); err != nil {
+		Response.SendResponse(c, errno.ErrDatabase, nil)
 		return
 	}
 
-	SendResponse(c, nil, nil)
+	Response.SendResponse(c, nil, nil)
 }

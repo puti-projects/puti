@@ -1,13 +1,12 @@
 package service
 
 import (
-	"fmt"
 	"sync"
 
 	"gingob/model"
-	"gingob/util"
 )
 
+// ListUser show the user list in page
 func ListUser(username string, offset, limit int) ([]*model.UserInfo, uint64, error) {
 	infos := make([]*model.UserInfo, 0)
 	users, count, err := model.ListUser(username, offset, limit)
@@ -17,13 +16,13 @@ func ListUser(username string, offset, limit int) ([]*model.UserInfo, uint64, er
 
 	ids := []uint64{}
 	for _, user := range users {
-		ids = append(ids, user.Id)
+		ids = append(ids, user.ID)
 	}
 
 	wg := sync.WaitGroup{}
 	userList := model.UserList{
 		Lock:  new(sync.Mutex),
-		IdMap: make(map[uint64]*model.UserInfo, len(users)),
+		IDMap: make(map[uint64]*model.UserInfo, len(users)),
 	}
 
 	errChan := make(chan error, 1)
@@ -35,20 +34,12 @@ func ListUser(username string, offset, limit int) ([]*model.UserInfo, uint64, er
 		go func(u *model.UserModel) {
 			defer wg.Done()
 
-			shortId, err := util.GenShortId()
-			if err != nil {
-				errChan <- err
-				return
-			}
-
 			userList.Lock.Lock()
 			defer userList.Lock.Unlock()
-			userList.IdMap[u.Id] = &model.UserInfo{
-				Id:             u.Id,
+			userList.IDMap[u.ID] = &model.UserInfo{
+				ID:             u.ID,
 				Accout:         u.Username,
 				Nickname:       u.Nickname,
-				SayHello:       fmt.Sprintf("Hello %s", shortId),
-				Password:       u.Password,
 				Email:          u.Email,
 				RegisteredTime: u.RegisteredTime.Format("2006-01-02 15:04:05"),
 				Status:         u.Status,
@@ -69,7 +60,7 @@ func ListUser(username string, offset, limit int) ([]*model.UserInfo, uint64, er
 	}
 
 	for _, id := range ids {
-		infos = append(infos, userList.IdMap[id])
+		infos = append(infos, userList.IDMap[id])
 	}
 
 	return infos, count, nil

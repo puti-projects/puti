@@ -1,7 +1,7 @@
 package user
 
 import (
-	. "gingob/handler"
+	Response "gingob/handler"
 	"gingob/model"
 	"gingob/pkg/errno"
 
@@ -14,9 +14,9 @@ func Get(c *gin.Context) {
 	// Get the user by the `username` from the database.
 	user, err := model.GetUser(username)
 	if err != nil {
-		SendResponse(c, errno.ErrUserNotFound, nil)
+		Response.SendResponse(c, errno.ErrUserNotFound, nil)
 		return
 	}
 
-	SendResponse(c, nil, user)
+	Response.SendResponse(c, nil, user)
 }

@@ -9,6 +9,7 @@ import (
 	"github.com/spf13/viper"
 )
 
+// Database database struct
 type Database struct {
 	Local *gorm.DB
 }

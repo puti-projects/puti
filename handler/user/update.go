@@ -3,7 +3,7 @@ package user
 import (
 	"strconv"
 
-	. "gingob/handler"
+	Response "gingob/handler"
 	"gingob/model"
 	"gingob/pkg/errno"
 	"gingob/util"
@@ -17,35 +17,35 @@ import (
 func Update(c *gin.Context) {
 	log.Info("Update function called.", lager.Data{"X-Request-Id": util.GetReqID(c)})
 
-	userId, _ := strconv.Atoi(c.Param("id"))
+	userID, _ := strconv.Atoi(c.Param("id"))
 
 	// Binding the user data.
 	var u model.UserModel
 	if err := c.Bind(&u); err != nil {
-		SendResponse(c, errno.ErrBind, nil)
+		Response.SendResponse(c, errno.ErrBind, nil)
 		return
 	}
 
 	// We update the record based on the user id.
-	u.Id = uint64(userId)
+	u.ID = uint64(userID)
 
 	// check params
 	if err := u.Validate(); err != nil {
-		SendResponse(c, err, nil)
+		Response.SendResponse(c, err, nil)
 		return
 	}
 
 	// Encrypt the user password.
 	if err := u.Encrypt(); err != nil {
-		SendResponse(c, errno.ErrEncrypt, nil)
+		Response.SendResponse(c, errno.ErrEncrypt, nil)
 		return
 	}
 
 	// Save changed fields.
 	if err := u.Update(); err != nil {
-		SendResponse(c, errno.ErrDatabase, nil)
+		Response.SendResponse(c, errno.ErrDatabase, nil)
 		return
 	}
 
-	SendResponse(c, nil, nil)
+	Response.SendResponse(c, nil, nil)
 }
