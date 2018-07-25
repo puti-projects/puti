@@ -25,7 +25,7 @@ func Load(g *gin.Engine, mw ...gin.HandlerFunc) *gin.Engine {
 
 	// static resource
 	g.Static("/static", "backend/dist/static")
-	// g.StaticFS("/more_static", http.Dir("my_file_system"))
+	g.Static("/upload", "upload/")
 	// g.StaticFile("/favicon.ico", "./resources/favicon.ico")
 
 	// api for authentication functionalities

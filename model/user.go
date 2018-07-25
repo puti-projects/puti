@@ -16,6 +16,7 @@ type UserModel struct {
 	Password       string    `gorm:"column:password;not null" validate:"min=6,max=255" json:"-"`
 	Nickname       string    `gorm:"column:nickname;not null" json:"nickname"`
 	Email          string    `gorm:"column:email;unique" json:"email"`
+	Avatar         string    `gorm:"column:avatar" json:"avatar"`
 	RegisteredTime time.Time `gorm:"column:registered_time" json:"registered_time"`
 	Status         int       `gorm:"column:status" sql:"index" json:"status"`
 	Role           string    `gorm:"column:role" json:"role"`
