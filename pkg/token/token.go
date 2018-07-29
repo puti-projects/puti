@@ -13,6 +13,8 @@ import (
 var (
 	// ErrMissingHeader means the `Authorization` header was empty.
 	ErrMissingHeader = errors.New("The length of the `Authorization` header is zero.")
+	// ErrMigssing means the `token` params was empty.
+	ErrMissingToken = errors.New("Missing token")
 )
 
 // Context is the context of the JSON web token.
@@ -55,6 +57,18 @@ func Parse(tokenString string, secret string) (*Context, error) {
 	} else {
 		return ctx, err
 	}
+}
+
+// ParseToken directly parse the token
+func ParseToken(t string) (*Context, error) {
+	// Load the jwt secret from config
+	secret := viper.GetString("jwt_secret")
+
+	if len(t) == 0 {
+		return &Context{}, ErrMissingToken
+	}
+
+	return Parse(t, secret)
 }
 
 // ParseRequest gets the token from the header and

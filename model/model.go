@@ -19,7 +19,7 @@ type UserInfo struct {
 	Nickname       string `json:"nickname"`
 	Email          string `json:"email"`
 	RegisteredTime string `json:"registered_time"`
-	Role           string `json:"role"`
+	Roles          string `json:"roles"`
 	Status         int    `json:"status"`
 }
 

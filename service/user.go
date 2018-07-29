@@ -43,7 +43,7 @@ func ListUser(username string, offset, limit int) ([]*model.UserInfo, uint64, er
 				Email:          u.Email,
 				RegisteredTime: u.RegisteredTime.Format("2006-01-02 15:04:05"),
 				Status:         u.Status,
-				Role:           u.Role,
+				Roles:          u.Roles,
 			}
 		}(u)
 	}

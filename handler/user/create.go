@@ -36,7 +36,7 @@ func Create(c *gin.Context) {
 		Nickname:       r.Username,
 		Email:          "example@example.com",
 		Status:         0,
-		Role:           "administrator",
+		Roles:          "administrator",
 		RegisteredTime: time.Now(),
 	}
 

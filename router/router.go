@@ -28,10 +28,13 @@ func Load(g *gin.Engine, mw ...gin.HandlerFunc) *gin.Engine {
 	g.Static("/upload", "upload/")
 	// g.StaticFile("/favicon.ico", "./resources/favicon.ico")
 
-	// api for authentication functionalities
-	g.POST("/login", user.Login)
+	// Group for api
+	api := g.Group("/api")
 
-	u := g.Group("/api/user")
+	api.POST("/login", user.Login)
+	api.GET("/token", user.Info)
+
+	u := api.Group("/user")
 	u.Use(middleware.AuthMiddleware())
 	{
 		u.POST("/:username", user.Create)

@@ -19,7 +19,7 @@ type UserModel struct {
 	Avatar         string    `gorm:"column:avatar" json:"avatar"`
 	RegisteredTime time.Time `gorm:"column:registered_time" json:"registered_time"`
 	Status         int       `gorm:"column:status" sql:"index" json:"status"`
-	Role           string    `gorm:"column:role" json:"role"`
+	Roles          string    `gorm:"column:role" json:"roles"`
 }
 
 // TableName is the user table name in db
