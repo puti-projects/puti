@@ -1,6 +1,6 @@
 package user
 
-import "gingob/model"
+import "puti/model"
 
 // LoginRequest is the login request params struct
 type LoginRequest struct {

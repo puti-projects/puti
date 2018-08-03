@@ -8,11 +8,11 @@ import (
 	"os"
 	"time"
 
-	"gingob/config"
-	"gingob/model"
-	v "gingob/pkg/version"
-	"gingob/router"
-	"gingob/router/middleware"
+	"puti/config"
+	"puti/model"
+	v "puti/pkg/version"
+	"puti/router"
+	"puti/router/middleware"
 
 	"github.com/gin-gonic/gin"
 	"github.com/lexkong/log"
@@ -21,7 +21,7 @@ import (
 )
 
 var (
-	cfg     = pflag.StringP("config", "c", "", "gingob config file path.")
+	cfg     = pflag.StringP("config", "c", "", "puti config file path.")
 	version = pflag.BoolP("version", "v", false, "show version info.")
 )
 

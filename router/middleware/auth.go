@@ -1,9 +1,9 @@
 package middleware
 
 import (
-	"gingob/handler"
-	"gingob/pkg/errno"
-	"gingob/pkg/token"
+	"puti/handler"
+	"puti/pkg/errno"
+	"puti/pkg/token"
 
 	"github.com/gin-gonic/gin"
 )

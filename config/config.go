@@ -39,9 +39,9 @@ func (c *Config) initConfig() error {
 		viper.SetConfigName("config")
 	}
 
-	viper.SetConfigType("yaml")  // 设置配置文件格式为YAML
-	viper.AutomaticEnv()         // 读取匹配的环境变量
-	viper.SetEnvPrefix("GINGOB") //读取环境变量的前缀为GINGOB
+	viper.SetConfigType("yaml") // 设置配置文件格式为YAML
+	viper.AutomaticEnv()        // 读取匹配的环境变量
+	viper.SetEnvPrefix("PUTI")  //读取环境变量的前缀为PUTI
 
 	replacer := strings.NewReplacer(".", "_")
 	viper.SetEnvKeyReplacer(replacer)

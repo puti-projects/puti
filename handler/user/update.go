@@ -3,10 +3,10 @@ package user
 import (
 	"strconv"
 
-	Response "gingob/handler"
-	"gingob/model"
-	"gingob/pkg/errno"
-	"gingob/util"
+	Response "puti/handler"
+	"puti/model"
+	"puti/pkg/errno"
+	"puti/util"
 
 	"github.com/gin-gonic/gin"
 	"github.com/lexkong/log"

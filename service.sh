@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SERVER="gingob"
+SERVER="puti"
 BASE_DIR=$PWD
 INTERVAL=2
 

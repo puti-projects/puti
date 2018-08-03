@@ -5,23 +5,23 @@
  Source Server Type    : MySQL
  Source Server Version : 80011
  Source Host           : 127.0.0.1:3306
- Source Schema         : db_gingob
+ Source Schema         : db_puti
 
  Target Server Type    : MySQL
  Target Server Version : 80011
  File Encoding         : 65001
 
- Date: 20/07/2018 19:05:51
+ Date: 03/08/2018 12:51:05
 */
 
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
 
 -- ----------------------------
--- Table structure for gb_comment_meta
+-- Table structure for pt_comment_meta
 -- ----------------------------
-DROP TABLE IF EXISTS `gb_comment_meta`;
-CREATE TABLE `gb_comment_meta`  (
+DROP TABLE IF EXISTS `pt_comment_meta`;
+CREATE TABLE `pt_comment_meta`  (
   `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT,
   `comment_id` int(11) UNSIGNED NOT NULL DEFAULT 0,
   `meta_key` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
@@ -32,10 +32,10 @@ CREATE TABLE `gb_comment_meta`  (
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
--- Table structure for gb_comments
+-- Table structure for pt_comments
 -- ----------------------------
-DROP TABLE IF EXISTS `gb_comments`;
-CREATE TABLE `gb_comments`  (
+DROP TABLE IF EXISTS `pt_comments`;
+CREATE TABLE `pt_comments`  (
   `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '评论id',
   `parent_id` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '父评论id',
   `post_id` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '评论的文章或页面id',
@@ -52,17 +52,17 @@ CREATE TABLE `gb_comments`  (
   `agent` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '评论来源agent',
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `comment_post_ID`(`post_id`) USING BTREE,
-  INDEX `comment_approved_date_gmt`(`comment_date_gmt`, `approved`) USING BTREE,
   INDEX `comment_date_gmt`(`comment_date_gmt`) USING BTREE,
   INDEX `comment_parent`(`parent_id`) USING BTREE,
-  INDEX `comment_author_email`(`commenter_email`(10)) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+  INDEX `comment_author_email`(`commenter_email`(10)) USING BTREE,
+  INDEX `comment_approved_date_gmt`(`comment_date_gmt`, `approved`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
--- Table structure for gb_links
+-- Table structure for pt_links
 -- ----------------------------
-DROP TABLE IF EXISTS `gb_links`;
-CREATE TABLE `gb_links`  (
+DROP TABLE IF EXISTS `pt_links`;
+CREATE TABLE `pt_links`  (
   `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '链接id',
   `url` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '链接url',
   `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '链接名称',
@@ -78,13 +78,13 @@ CREATE TABLE `gb_links`  (
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `link_visible`(`visible`) USING BTREE,
   INDEX `link_owner_user`(`user_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
--- Table structure for gb_options
+-- Table structure for pt_options
 -- ----------------------------
-DROP TABLE IF EXISTS `gb_options`;
-CREATE TABLE `gb_options`  (
+DROP TABLE IF EXISTS `pt_options`;
+CREATE TABLE `pt_options`  (
   `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '配置id',
   `option_name` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '配置名称',
   `option_value` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '对应的值',
@@ -94,10 +94,10 @@ CREATE TABLE `gb_options`  (
 ) ENGINE = InnoDB AUTO_INCREMENT = 34 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
--- Table structure for gb_post_meta
+-- Table structure for pt_post_meta
 -- ----------------------------
-DROP TABLE IF EXISTS `gb_post_meta`;
-CREATE TABLE `gb_post_meta`  (
+DROP TABLE IF EXISTS `pt_post_meta`;
+CREATE TABLE `pt_post_meta`  (
   `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'id',
   `post_id` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'post_id',
   `meta_key` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '设置的key',
@@ -108,10 +108,10 @@ CREATE TABLE `gb_post_meta`  (
 ) ENGINE = InnoDB AUTO_INCREMENT = 34 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
--- Table structure for gb_posts
+-- Table structure for pt_posts
 -- ----------------------------
-DROP TABLE IF EXISTS `gb_posts`;
-CREATE TABLE `gb_posts`  (
+DROP TABLE IF EXISTS `pt_posts`;
+CREATE TABLE `pt_posts`  (
   `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'id',
   `user_id` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '发表人id',
   `post_type` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'article' COMMENT '类型：article，page',
@@ -131,18 +131,18 @@ CREATE TABLE `gb_posts`  (
   `comment_count` int(11) NOT NULL DEFAULT 0 COMMENT '评论数目',
   `view_count` int(11) NOT NULL DEFAULT 0 COMMENT '浏览量',
   PRIMARY KEY (`id`) USING BTREE,
-  INDEX `post_name`(`slug`(191)) USING BTREE,
-  INDEX `type_status_date`(`id`, `post_type`, `status`, `post_date`) USING BTREE,
   INDEX `post_parent`(`parent_id`) USING BTREE,
   INDEX `post_author`(`user_id`) USING BTREE,
+  INDEX `type_status_date`(`id`, `post_type`, `status`, `post_date`) USING BTREE,
+  INDEX `post_name`(`slug`(191)) USING BTREE,
   FULLTEXT INDEX `post_title`(`title`)
 ) ENGINE = InnoDB AUTO_INCREMENT = 87 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
--- Table structure for gb_resource_meta
+-- Table structure for pt_resource_meta
 -- ----------------------------
-DROP TABLE IF EXISTS `gb_resource_meta`;
-CREATE TABLE `gb_resource_meta`  (
+DROP TABLE IF EXISTS `pt_resource_meta`;
+CREATE TABLE `pt_resource_meta`  (
   `meta_id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'id',
   `resource_id` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '资源id',
   `meta_key` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '设置的key',
@@ -150,13 +150,13 @@ CREATE TABLE `gb_resource_meta`  (
   PRIMARY KEY (`meta_id`) USING BTREE,
   INDEX `resource_id`(`resource_id`) USING BTREE,
   INDEX `meta_key`(`meta_key`(191)) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
--- Table structure for gb_resources
+-- Table structure for pt_resources
 -- ----------------------------
-DROP TABLE IF EXISTS `gb_resources`;
-CREATE TABLE `gb_resources`  (
+DROP TABLE IF EXISTS `pt_resources`;
+CREATE TABLE `pt_resources`  (
   `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '资源id',
   `upload_user_id` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '拥有者id',
   `post_id` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '归属的post_id\r\n',
@@ -171,15 +171,15 @@ CREATE TABLE `gb_resources`  (
   `status` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'normal' COMMENT '资源状态',
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `resource_parent`(`post_id`) USING BTREE,
-  INDEX `resource_name`(`slug`(191)) USING BTREE,
-  INDEX `resource_type`(`id`, `upload_date`, `type`, `status`) USING BTREE
+  INDEX `resource_type`(`id`, `upload_date`, `type`, `status`) USING BTREE,
+  INDEX `resource_name`(`slug`(191)) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 236 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '资源表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
--- Table structure for gb_subject_relationships
+-- Table structure for pt_subject_relationships
 -- ----------------------------
-DROP TABLE IF EXISTS `gb_subject_relationships`;
-CREATE TABLE `gb_subject_relationships`  (
+DROP TABLE IF EXISTS `pt_subject_relationships`;
+CREATE TABLE `pt_subject_relationships`  (
   `object_id` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '附属于专题的项目id（一般是文章）',
   `subject_id` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '专题id',
   `order_num` int(11) NOT NULL DEFAULT 0 COMMENT '排序值',
@@ -188,10 +188,10 @@ CREATE TABLE `gb_subject_relationships`  (
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '专题关系表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
--- Table structure for gb_subjects
+-- Table structure for pt_subjects
 -- ----------------------------
-DROP TABLE IF EXISTS `gb_subjects`;
-CREATE TABLE `gb_subjects`  (
+DROP TABLE IF EXISTS `pt_subjects`;
+CREATE TABLE `pt_subjects`  (
   `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '专题 id',
   `parent_id` int(11) NOT NULL DEFAULT 0 COMMENT '父id',
   `name` varchar(256) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '专题名称',
@@ -207,10 +207,10 @@ CREATE TABLE `gb_subjects`  (
 ) ENGINE = InnoDB AUTO_INCREMENT = 29 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '专题表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
--- Table structure for gb_term_meta
+-- Table structure for pt_term_meta
 -- ----------------------------
-DROP TABLE IF EXISTS `gb_term_meta`;
-CREATE TABLE `gb_term_meta`  (
+DROP TABLE IF EXISTS `pt_term_meta`;
+CREATE TABLE `pt_term_meta`  (
   `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'id',
   `term_id` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '分类条目id',
   `meta_key` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '属性名称',
@@ -218,13 +218,13 @@ CREATE TABLE `gb_term_meta`  (
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `term_id`(`term_id`) USING BTREE,
   INDEX `meta_key`(`meta_key`(191)) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
--- Table structure for gb_term_relationships
+-- Table structure for pt_term_relationships
 -- ----------------------------
-DROP TABLE IF EXISTS `gb_term_relationships`;
-CREATE TABLE `gb_term_relationships`  (
+DROP TABLE IF EXISTS `pt_term_relationships`;
+CREATE TABLE `pt_term_relationships`  (
   `object_id` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '归属分类的对象id',
   `term_taxonomy_id` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '所属分类id',
   `term_order` int(11) NOT NULL DEFAULT 0 COMMENT '排序',
@@ -233,10 +233,10 @@ CREATE TABLE `gb_term_relationships`  (
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
--- Table structure for gb_term_taxonomy
+-- Table structure for pt_term_taxonomy
 -- ----------------------------
-DROP TABLE IF EXISTS `gb_term_taxonomy`;
-CREATE TABLE `gb_term_taxonomy`  (
+DROP TABLE IF EXISTS `pt_term_taxonomy`;
+CREATE TABLE `pt_term_taxonomy`  (
   `term_taxonomy_id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '分类方式id',
   `term_id` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'term_id',
   `parent_term_id` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '父term_id',
@@ -248,10 +248,10 @@ CREATE TABLE `gb_term_taxonomy`  (
 ) ENGINE = InnoDB AUTO_INCREMENT = 75 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
--- Table structure for gb_terms
+-- Table structure for pt_terms
 -- ----------------------------
-DROP TABLE IF EXISTS `gb_terms`;
-CREATE TABLE `gb_terms`  (
+DROP TABLE IF EXISTS `pt_terms`;
+CREATE TABLE `pt_terms`  (
   `term_id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '条件id',
   `name` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '条件名称',
   `slug` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '缩略名',
@@ -263,10 +263,10 @@ CREATE TABLE `gb_terms`  (
 ) ENGINE = InnoDB AUTO_INCREMENT = 75 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
--- Table structure for gb_user_meta
+-- Table structure for pt_user_meta
 -- ----------------------------
-DROP TABLE IF EXISTS `gb_user_meta`;
-CREATE TABLE `gb_user_meta`  (
+DROP TABLE IF EXISTS `pt_user_meta`;
+CREATE TABLE `pt_user_meta`  (
   `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'id',
   `user_id` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '用户id',
   `meta_key` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '设置的key',
@@ -277,15 +277,16 @@ CREATE TABLE `gb_user_meta`  (
 ) ENGINE = InnoDB AUTO_INCREMENT = 5 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
--- Table structure for gb_users
+-- Table structure for pt_users
 -- ----------------------------
-DROP TABLE IF EXISTS `gb_users`;
-CREATE TABLE `gb_users`  (
+DROP TABLE IF EXISTS `pt_users`;
+CREATE TABLE `pt_users`  (
   `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'id',
   `account` varchar(60) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '登录帐号',
-  `passpord` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '登录密码',
+  `password` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '登录密码',
   `nickname` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '昵称',
   `email` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '邮箱',
+  `avatar` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '头像',
   `page_url` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '主页链接',
   `registered_time` datetime(0) NOT NULL COMMENT '注册时间',
   `status` int(11) NOT NULL DEFAULT 0 COMMENT '状态.0激活1冻结',
@@ -296,6 +297,6 @@ CREATE TABLE `gb_users`  (
   INDEX `user_login_key`(`account`) USING BTREE,
   INDEX `user_nicename`(`nickname`) USING BTREE,
   INDEX `user_email`(`email`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 3 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 11 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
 
 SET FOREIGN_KEY_CHECKS = 1;

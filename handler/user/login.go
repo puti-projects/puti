@@ -1,11 +1,11 @@
 package user
 
 import (
-	Response "gingob/handler"
-	"gingob/model"
-	"gingob/pkg/auth"
-	"gingob/pkg/errno"
-	"gingob/pkg/token"
+	Response "puti/handler"
+	"puti/model"
+	"puti/pkg/auth"
+	"puti/pkg/errno"
+	"puti/pkg/token"
 
 	"github.com/gin-gonic/gin"
 )

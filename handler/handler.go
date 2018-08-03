@@ -3,7 +3,7 @@ package handler
 import (
 	"net/http"
 
-	"gingob/pkg/errno"
+	"puti/pkg/errno"
 
 	"github.com/gin-gonic/gin"
 )

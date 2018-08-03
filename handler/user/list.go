@@ -1,9 +1,9 @@
 package user
 
 import (
-	Response "gingob/handler"
-	"gingob/pkg/errno"
-	"gingob/service"
+	Response "puti/handler"
+	"puti/pkg/errno"
+	"puti/service"
 
 	"github.com/gin-gonic/gin"
 )

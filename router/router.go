@@ -3,9 +3,9 @@ package router
 import (
 	"net/http"
 
-	"gingob/handler/sd"
-	"gingob/handler/user"
-	"gingob/router/middleware"
+	"puti/handler/sd"
+	"puti/handler/user"
+	"puti/router/middleware"
 
 	"github.com/gin-gonic/gin"
 )

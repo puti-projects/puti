@@ -3,7 +3,7 @@ package service
 import (
 	"sync"
 
-	"gingob/model"
+	"puti/model"
 )
 
 // ListUser show the user list in page

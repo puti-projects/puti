@@ -1,9 +1,9 @@
 runmode: debug                 # 开发模式, debug, release, test
 addr: :8000                  # HTTP绑定端口
-name: gingob              # API Server的名字
+name: puti              # API Server的名字
 url: http://127.0.0.1:8000   # pingServer函数请求的API服务器的ip:port
 max_ping_count: 10           # pingServer函数try的次数
-jwt_secret: GingobdemojwtseCrect013keyideO
+jwt_secret: putidemojwtseCrect013keyideO
 
 tls:
   https_open: false
@@ -24,7 +24,7 @@ log:
 
 # 数据库配置
 db:
-  name: db_gingob
+  name: db_puti
   addr: 127.0.0.1:3306
   username: root
   password: 123456

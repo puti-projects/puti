@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"time"
 
-	"gingob/pkg/auth"
-	"gingob/pkg/constvar"
-	"gingob/pkg/errno"
+	"puti/pkg/auth"
+	"puti/pkg/constvar"
+	"puti/pkg/errno"
 )
 
 // UserModel user model
@@ -24,7 +24,7 @@ type UserModel struct {
 
 // TableName is the user table name in db
 func (c *UserModel) TableName() string {
-	return "gb_users"
+	return "pt_users"
 }
 
 // Create creates a new user account

@@ -2,10 +2,10 @@ package user
 
 import (
 	"fmt"
-	Response "gingob/handler"
-	"gingob/model"
-	"gingob/pkg/errno"
-	"gingob/util"
+	Response "puti/handler"
+	"puti/model"
+	"puti/pkg/errno"
+	"puti/util"
 	"time"
 
 	"github.com/gin-gonic/gin"
