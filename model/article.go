@@ -51,17 +51,28 @@ func (c *ArticleModel) TableName() string {
 }
 
 // ListArticle shows the articles in condition
-func ListArticle(title string, page, number int) ([]*ArticleModel, uint64, error) {
+func ListArticle(title string, page, number int, sort, status string) ([]*ArticleModel, uint64, error) {
 	articles := make([]*ArticleModel, 0)
 	var count uint64
 
 	where := fmt.Sprintf("title like '%%%s%%' AND post_type = 'post' AND parent_id = 0", title)
+	if status != "" {
+		where = fmt.Sprintf("%s AND status = '%s'", where, status)
+	}
+
 	if err := DB.Local.Model(&ArticleModel{}).Where(where).Count(&count).Error; err != nil {
 		return articles, count, err
 	}
 
 	offset := (page - 1) * number
-	if err := DB.Local.Where(where).Offset(offset).Limit(number).Order("id desc").Find(&articles).Error; err != nil {
+	var order string
+	if sort != "" {
+		order = "id " + sort
+	} else {
+		order = "id DESC"
+	}
+
+	if err := DB.Local.Where(where).Offset(offset).Limit(number).Order(order).Find(&articles).Error; err != nil {
 		return articles, count, err
 	}
 

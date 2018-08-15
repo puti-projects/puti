@@ -6,9 +6,9 @@ import (
 )
 
 // ListArticle checkout
-func ListArticle(title string, page, number int) ([]*model.ArticleInfo, uint64, error) {
+func ListArticle(title string, page, number int, sort, status string) ([]*model.ArticleInfo, uint64, error) {
 	infos := make([]*model.ArticleInfo, 0)
-	articles, count, err := model.ListArticle(title, page, number)
+	articles, count, err := model.ListArticle(title, page, number, sort, status)
 	if err != nil {
 		return nil, count, err
 	}

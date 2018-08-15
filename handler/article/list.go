@@ -22,7 +22,7 @@ func List(c *gin.Context) {
 		r.Number = constvar.DefaultLimit
 	}
 
-	infos, count, err := service.ListArticle(r.Title, r.Page, r.Number)
+	infos, count, err := service.ListArticle(r.Title, r.Page, r.Number, r.Sort, r.Status)
 	if err != nil {
 		Response.SendResponse(c, err, nil)
 		return
