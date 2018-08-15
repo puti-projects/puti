@@ -3,6 +3,7 @@ package router
 import (
 	"net/http"
 
+	"puti/handler/article"
 	"puti/handler/sd"
 	"puti/handler/user"
 	"puti/router/middleware"
@@ -42,6 +43,12 @@ func Load(g *gin.Engine, mw ...gin.HandlerFunc) *gin.Engine {
 		u.DELETE("/:id", user.Delete)
 		u.PUT("/:id", user.Update)
 		u.GET("", user.List)
+	}
+
+	a := api.Group("/article")
+	a.Use(middleware.AuthMiddleware())
+	{
+		a.GET("", article.List)
 	}
 
 	// the health check handlers

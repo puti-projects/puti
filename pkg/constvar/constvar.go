@@ -1,5 +1,5 @@
 package constvar
 
 const (
-	DefaultLimit = 50
+	DefaultLimit = 20
 )

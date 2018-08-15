@@ -2,12 +2,30 @@ package model
 
 import (
 	"fmt"
+	"sync"
 	"time"
 
 	"puti/pkg/auth"
 	"puti/pkg/constvar"
 	"puti/pkg/errno"
 )
+
+// UserInfo is the user struct for user list
+type UserInfo struct {
+	ID             uint64 `json:"id"`
+	Accout         string `json:"account"`
+	Nickname       string `json:"nickname"`
+	Email          string `json:"email"`
+	RegisteredTime string `json:"registered_time"`
+	Roles          string `json:"roles"`
+	Status         int    `json:"status"`
+}
+
+// UserList user list
+type UserList struct {
+	Lock  *sync.Mutex
+	IDMap map[uint64]*UserInfo
+}
 
 // UserModel user model
 type UserModel struct {
