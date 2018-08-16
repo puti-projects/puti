@@ -1,7 +1,6 @@
 package model
 
 import (
-	"fmt"
 	"sync"
 	"time"
 )
@@ -55,12 +54,19 @@ func ListArticle(title string, page, number int, sort, status string) ([]*Articl
 	articles := make([]*ArticleModel, 0)
 	var count uint64
 
-	where := fmt.Sprintf("title like '%%%s%%' AND post_type = 'post' AND parent_id = 0", title)
-	if status != "" {
-		where = fmt.Sprintf("%s AND status = '%s'", where, status)
+	where := "post_type = ? AND parent_id = ?"
+	whereArgs := []interface{}{"post", 0}
+	if "" != title {
+		where += " AND title LIKE ?"
+		whereArgs = append(whereArgs, "%"+title+"%")
 	}
 
-	if err := DB.Local.Model(&ArticleModel{}).Where(where).Count(&count).Error; err != nil {
+	if status != "" {
+		where += " AND status= ?"
+		whereArgs = append(whereArgs, status)
+	}
+
+	if err := DB.Local.Model(&ArticleModel{}).Where(where, whereArgs...).Count(&count).Error; err != nil {
 		return articles, count, err
 	}
 
@@ -72,7 +78,7 @@ func ListArticle(title string, page, number int, sort, status string) ([]*Articl
 		order = "id DESC"
 	}
 
-	if err := DB.Local.Where(where).Offset(offset).Limit(number).Order(order).Find(&articles).Error; err != nil {
+	if err := DB.Local.Where(where, whereArgs...).Offset(offset).Limit(number).Order(order).Find(&articles).Error; err != nil {
 		return articles, count, err
 	}
 

@@ -21,9 +21,11 @@ type CreateResponse struct {
 
 // ListRequest is the user list request struct
 type ListRequest struct {
-	Username string `json:"username"`
-	Offset   int    `json:"offset"`
-	Limit    int    `json:"limit"`
+	Username string `form:"username"`
+	Number   int    `form:"number"`
+	Page     int    `form:"page"`
+	Status   int    `form:"status"`
+	Role     string `form:"role"`
 }
 
 // ListResponse is the use list response struct

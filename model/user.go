@@ -1,7 +1,6 @@
 package model
 
 import (
-	"fmt"
 	"sync"
 	"time"
 
@@ -89,20 +88,37 @@ func (c *UserModel) Validate() error {
 }
 
 // ListUser List all users
-func ListUser(username string, offset, limit int) ([]*UserModel, uint64, error) {
-	if limit == 0 {
-		limit = constvar.DefaultLimit
+func ListUser(username, role string, number, page, status int) ([]*UserModel, uint64, error) {
+	if number == 0 {
+		number = constvar.DefaultLimit
 	}
 
 	users := make([]*UserModel, 0)
 	var count uint64
 
-	where := fmt.Sprintf("account like '%%%s%%'", username)
-	if err := DB.Local.Model(&UserModel{}).Where(where).Count(&count).Error; err != nil {
+	where := "1"
+	whereArgs := []interface{}{}
+	if username != "" {
+		where += " AND `nickname` LIKE ?"
+		whereArgs = append(whereArgs, "%"+username+"%")
+	}
+
+	if role != "" {
+		where += " AND `role` = ?"
+		whereArgs = append(whereArgs, role)
+	}
+
+	if status == 0 || status == 1 {
+		where += " AND `status` = ?"
+		whereArgs = append(whereArgs, status)
+	}
+
+	if err := DB.Local.Model(&UserModel{}).Where(where, whereArgs...).Count(&count).Error; err != nil {
 		return users, count, err
 	}
 
-	if err := DB.Local.Where(where).Offset(offset).Limit(limit).Order("id desc").Find(&users).Error; err != nil {
+	offset := (page - 1) * number
+	if err := DB.Local.Where(where, whereArgs...).Offset(offset).Limit(number).Order("id desc").Find(&users).Error; err != nil {
 		return users, count, err
 	}
 

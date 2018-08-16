@@ -16,7 +16,7 @@ func List(c *gin.Context) {
 		return
 	}
 
-	infos, count, err := service.ListUser(r.Username, r.Offset, r.Limit)
+	infos, count, err := service.ListUser(r.Username, r.Role, r.Number, r.Page, r.Status)
 	if err != nil {
 		Response.SendResponse(c, err, nil)
 		return

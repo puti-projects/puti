@@ -7,9 +7,9 @@ import (
 )
 
 // ListUser show the user list in page
-func ListUser(username string, offset, limit int) ([]*model.UserInfo, uint64, error) {
+func ListUser(username, role string, number, page, status int) ([]*model.UserInfo, uint64, error) {
 	infos := make([]*model.UserInfo, 0)
-	users, count, err := model.ListUser(username, offset, limit)
+	users, count, err := model.ListUser(username, role, number, page, status)
 	if err != nil {
 		return nil, count, err
 	}
