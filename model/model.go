@@ -4,15 +4,10 @@ import (
 	"time"
 )
 
-// BaseModel base model
-type BaseModel struct {
-	ID             uint64     `gorm:"primary_key;AUTO_INCREMENT;column:id" json:"-"`
-	RegisteredTime time.Time  `gorm:"column:registered_time" json:"-"`
-	Status         *time.Time `gorm:"column:status" sql:"index" json:"-"`
-}
-
-// Token represents a JSON web token.
-type Token struct {
-	Username string `json:"username"`
-	Token    string `json:"token"`
+// Model base model
+type Model struct {
+	ID        uint64     `gorm:"primary_key;AUTO_INCREMENT;column:id"`
+	CreatedAt time.Time  `gorm:"column:created_time;not null"`
+	UpdatedAt time.Time  `gorm:"column:updated_time;not null"`
+	DeletedAt *time.Time `gorm:"column:deleted_time;DEFAULT null" sql:"index"`
 }

@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"puti/handler/article"
+	"puti/handler/auth"
 	"puti/handler/sd"
 	"puti/handler/user"
 	"puti/router/middleware"
@@ -32,8 +33,8 @@ func Load(g *gin.Engine, mw ...gin.HandlerFunc) *gin.Engine {
 	// Group for api
 	api := g.Group("/api")
 
-	api.POST("/login", user.Login)
-	api.GET("/token", user.Info)
+	api.POST("/login", auth.Login)
+	api.GET("/token", auth.Info)
 
 	u := api.Group("/user")
 	u.Use(middleware.AuthMiddleware())

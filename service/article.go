@@ -1,13 +1,31 @@
 package service
 
 import (
+	"puti/config"
 	"puti/model"
 	"sync"
 )
 
+// ArticleInfo is article info for article list
+type ArticleInfo struct {
+	ID           uint64 `json:"id"`
+	UserID       uint64 `json:"userId"`
+	Title        string `json:"title"`
+	Status       string `json:"status"`
+	PostDate     string `json:"post_date"`
+	CommentCount uint64 `json:"comment_count"`
+	ViewCount    uint64 `json:"view_count"`
+}
+
+// ArticleList article list
+type ArticleList struct {
+	Lock  *sync.Mutex
+	IDMap map[uint64]*ArticleInfo
+}
+
 // ListArticle checkout
-func ListArticle(title string, page, number int, sort, status string) ([]*model.ArticleInfo, uint64, error) {
-	infos := make([]*model.ArticleInfo, 0)
+func ListArticle(title string, page, number int, sort, status string) ([]*ArticleInfo, uint64, error) {
+	infos := make([]*ArticleInfo, 0)
 	articles, count, err := model.ListArticle(title, page, number, sort, status)
 	if err != nil {
 		return nil, count, err
@@ -19,9 +37,9 @@ func ListArticle(title string, page, number int, sort, status string) ([]*model.
 	}
 
 	wg := sync.WaitGroup{}
-	articleList := model.ArticleList{
+	articleList := ArticleList{
 		Lock:  new(sync.Mutex),
-		IDMap: make(map[uint64]*model.ArticleInfo, len(articles)),
+		IDMap: make(map[uint64]*ArticleInfo, len(articles)),
 	}
 
 	errChan := make(chan error, 1)
@@ -35,12 +53,12 @@ func ListArticle(title string, page, number int, sort, status string) ([]*model.
 
 			articleList.Lock.Lock()
 			defer articleList.Lock.Unlock()
-			articleList.IDMap[u.ID] = &model.ArticleInfo{
+			articleList.IDMap[u.ID] = &ArticleInfo{
 				ID:           u.ID,
 				UserID:       u.UserID,
 				Title:        u.Title,
 				Status:       u.Status,
-				PostDate:     u.PostDate.Format("2006-01-02 15:04:05"),
+				PostDate:     u.PostDate.In(config.TimeLoc()).Format("2006-01-02 15:04"),
 				CommentCount: u.CommentCount,
 				ViewCount:    u.ViewCount,
 			}

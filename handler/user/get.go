@@ -2,8 +2,8 @@ package user
 
 import (
 	Response "puti/handler"
-	"puti/model"
 	"puti/pkg/errno"
+	"puti/service"
 
 	"github.com/gin-gonic/gin"
 )
@@ -12,7 +12,7 @@ import (
 func Get(c *gin.Context) {
 	username := c.Param("username")
 	// Get the user by the `username` from the database.
-	user, err := model.GetUser(username)
+	user, err := service.GetUser(username)
 	if err != nil {
 		Response.SendResponse(c, errno.ErrUserNotFound, nil)
 		return

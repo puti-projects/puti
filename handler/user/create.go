@@ -6,12 +6,28 @@ import (
 	"puti/model"
 	"puti/pkg/errno"
 	"puti/util"
-	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/lexkong/log"
 	"github.com/lexkong/log/lager"
 )
+
+// CreateRequest is the create user request params struct
+type CreateRequest struct {
+	Account       string `form:"account"`
+	Nickname      string `form:"nickname"`
+	Email         string `form:"email"`
+	Role          string `form:"role"`
+	Password      string `form:"password"`
+	PasswordAgain string `form:"passwordAgain"`
+	Website       string `form:"website"`
+}
+
+// CreateResponse is the create user request params struct
+type CreateResponse struct {
+	Account  string
+	Nickname string
+}
 
 // Create creates a user
 func Create(c *gin.Context) {
@@ -29,15 +45,19 @@ func Create(c *gin.Context) {
 		return
 	}
 
+	if "" == r.Nickname {
+		r.Nickname = r.Account
+	}
+
 	// TODO
 	u := model.UserModel{
-		Username:       r.Username,
-		Password:       r.Password,
-		Nickname:       r.Username,
-		Email:          "example@example.com",
-		Status:         0,
-		Roles:          "administrator",
-		RegisteredTime: time.Now(),
+		Username: r.Account,
+		Password: r.Password,
+		Nickname: r.Nickname,
+		Email:    r.Email,
+		PageURL:  r.Website,
+		Status:   0,
+		Roles:    r.Role,
 	}
 
 	// encrypt password
@@ -54,7 +74,8 @@ func Create(c *gin.Context) {
 	}
 
 	rsp := CreateResponse{
-		Username: r.Username,
+		Account:  r.Account,
+		Nickname: r.Nickname,
 	}
 
 	// Show the user information.
@@ -62,12 +83,32 @@ func Create(c *gin.Context) {
 }
 
 func (r *CreateRequest) checkParam() error {
-	if r.Username == "" {
-		return errno.New(errno.ErrValidation, nil).Add("username is empty.")
+	if r.Account == "" {
+		return errno.New(errno.ErrValidation, nil).Add("account is empty.")
 	}
 
 	if r.Password == "" {
 		return errno.New(errno.ErrValidation, nil).Add("password is empty.")
+	}
+
+	if r.PasswordAgain == "" {
+		return errno.New(errno.ErrValidation, nil).Add("check password is empty.")
+	}
+
+	if r.Password != r.PasswordAgain {
+		return errno.New(errno.ErrValidation, nil).Add("check password is incorrect.")
+	}
+
+	if r.Email == "" {
+		return errno.New(errno.ErrValidation, nil).Add("Email is empty.")
+	}
+
+	if r.Role == "" {
+		return errno.New(errno.ErrValidation, nil).Add("role is empty.")
+	}
+
+	if r.Role != "administrator" && r.Role != "writer" && r.Role != "subscriber" {
+		return errno.New(errno.ErrValidation, nil).Add("role is incorrect.")
 	}
 
 	return nil

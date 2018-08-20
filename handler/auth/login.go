@@ -1,4 +1,4 @@
-package user
+package auth
 
 import (
 	Response "puti/handler"
@@ -6,9 +6,16 @@ import (
 	"puti/pkg/auth"
 	"puti/pkg/errno"
 	"puti/pkg/token"
+	"puti/service"
 
 	"github.com/gin-gonic/gin"
 )
+
+// LoginRequest is the login request params struct
+type LoginRequest struct {
+	Username string `json:"username" binding:"required"`
+	Password string `json:"password" binding:"required"`
+}
 
 // Login is the Login function
 func Login(c *gin.Context) {
@@ -35,5 +42,5 @@ func Login(c *gin.Context) {
 		return
 	}
 
-	Response.SendResponse(c, nil, model.Token{Username: u.Username, Token: t})
+	Response.SendResponse(c, nil, service.Token{Username: u.Username, Token: t})
 }

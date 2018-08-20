@@ -11,7 +11,7 @@
  Target Server Version : 80011
  File Encoding         : 65001
 
- Date: 03/08/2018 12:51:05
+ Date: 20/08/2018 20:13:27
 */
 
 SET NAMES utf8mb4;
@@ -29,7 +29,7 @@ CREATE TABLE `pt_comment_meta`  (
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `comment_id`(`comment_id`) USING BTREE,
   INDEX `meta_key`(`meta_key`(191)) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for pt_comments
@@ -46,16 +46,18 @@ CREATE TABLE `pt_comments`  (
   `commenter_email` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '评论者email',
   `commenter_url` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '评论者链接',
   `commenter_ip` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '评论者ip',
-  `comment_date` datetime(0) NOT NULL ON UPDATE CURRENT_TIMESTAMP(0) COMMENT '评论时间',
-  `comment_date_gmt` datetime(0) NOT NULL ON UPDATE CURRENT_TIMESTAMP(0) COMMENT '评论GMT标准时间',
   `approved` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '1' COMMENT '是否通过(开启评论审核后，通过后显示)',
   `agent` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '评论来源agent',
+  `created_time` datetime(0) NOT NULL ON UPDATE CURRENT_TIMESTAMP(0) COMMENT '评论时间(UTC)',
+  `updated_time` datetime(0) NOT NULL ON UPDATE CURRENT_TIMESTAMP(0) COMMENT '更新时间(UTC)',
+  `deleted_time` datetime(0) NULL DEFAULT NULL COMMENT '删除时间(UTC)',
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `comment_post_ID`(`post_id`) USING BTREE,
-  INDEX `comment_date_gmt`(`comment_date_gmt`) USING BTREE,
+  INDEX `comment_date_gmt`(`updated_time`) USING BTREE,
   INDEX `comment_parent`(`parent_id`) USING BTREE,
   INDEX `comment_author_email`(`commenter_email`(10)) USING BTREE,
-  INDEX `comment_approved_date_gmt`(`comment_date_gmt`, `approved`) USING BTREE
+  INDEX `comment_approved_date_gmt`(`updated_time`, `approved`) USING BTREE,
+  INDEX `comment_deleted`(`deleted_time`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
@@ -91,7 +93,7 @@ CREATE TABLE `pt_options`  (
   `autoload` tinyint(1) NOT NULL DEFAULT 0 COMMENT '是否自动加载;默认0不自动加载',
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `option_name`(`option_name`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 34 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 33 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for pt_post_meta
@@ -105,7 +107,7 @@ CREATE TABLE `pt_post_meta`  (
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `post_id`(`post_id`) USING BTREE,
   INDEX `meta_key`(`meta_key`(191)) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 34 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 33 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for pt_posts
@@ -122,20 +124,21 @@ CREATE TABLE `pt_posts`  (
   `parent_id` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '父id（如果有）',
   `status` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'publish' COMMENT '状态',
   `comment_status` tinyint(20) NOT NULL DEFAULT 1 COMMENT '评论状态(是否开启);默认1开启；0关闭',
-  `post_date` datetime(0) NOT NULL COMMENT '发表时间（当地）',
-  `post_date_gmt` datetime(0) NOT NULL COMMENT '发表时GMT标准时间',
-  `post_modified` datetime(0) NOT NULL COMMENT '更新时间（当地）',
-  `post_modified_gmt` datetime(0) NOT NULL COMMENT '更新时GMT标准时间',
   `guid` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '唯一链接',
   `cover_picture` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '封面图片链接',
   `comment_count` int(11) NOT NULL DEFAULT 0 COMMENT '评论数目',
   `view_count` int(11) NOT NULL DEFAULT 0 COMMENT '浏览量',
+  `posted_time` datetime(0) NOT NULL COMMENT '发表时间（UTC）',
+  `created_time` datetime(0) NOT NULL COMMENT '创建时间（UTC）',
+  `updated_time` datetime(0) NOT NULL COMMENT '更新时间（UTC）',
+  `deleted_time` datetime(0) NULL DEFAULT NULL COMMENT '删除时间（UTC）',
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `post_parent`(`parent_id`) USING BTREE,
   INDEX `post_author`(`user_id`) USING BTREE,
-  INDEX `type_status_date`(`id`, `post_type`, `status`, `post_date`) USING BTREE,
+  INDEX `type_status_date`(`id`, `post_type`, `status`, `posted_time`) USING BTREE,
   INDEX `post_name`(`slug`(191)) USING BTREE,
-  FULLTEXT INDEX `post_title`(`title`)
+  FULLTEXT INDEX `post_title`(`title`),
+  INDEX `post_deleted`(`deleted_time`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 87 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
@@ -173,7 +176,7 @@ CREATE TABLE `pt_resources`  (
   INDEX `resource_parent`(`post_id`) USING BTREE,
   INDEX `resource_type`(`id`, `upload_date`, `type`, `status`) USING BTREE,
   INDEX `resource_name`(`slug`(191)) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 236 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '资源表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 235 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '资源表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for pt_subject_relationships
@@ -204,7 +207,7 @@ CREATE TABLE `pt_subjects`  (
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `subject_slug`(`slug`(191)) USING BTREE,
   INDEX `subkect_parent`(`parent_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 29 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '专题表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 28 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '专题表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for pt_term_meta
@@ -245,7 +248,7 @@ CREATE TABLE `pt_term_taxonomy`  (
   PRIMARY KEY (`term_taxonomy_id`) USING BTREE,
   UNIQUE INDEX `term_id_taxonomy`(`term_id`, `taxonomy`) USING BTREE,
   INDEX `taxonomy`(`taxonomy`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 75 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 74 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for pt_terms
@@ -260,7 +263,7 @@ CREATE TABLE `pt_terms`  (
   PRIMARY KEY (`term_id`) USING BTREE,
   INDEX `slug`(`slug`(191)) USING BTREE,
   INDEX `name`(`name`(191)) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 75 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 74 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for pt_user_meta
@@ -274,7 +277,7 @@ CREATE TABLE `pt_user_meta`  (
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `user_id`(`user_id`) USING BTREE,
   INDEX `meta_key`(`meta_key`(191)) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 5 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 4 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for pt_users
@@ -288,15 +291,18 @@ CREATE TABLE `pt_users`  (
   `email` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '邮箱',
   `avatar` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '头像',
   `page_url` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '主页链接',
-  `registered_time` datetime(0) NOT NULL COMMENT '注册时间',
   `status` int(11) NOT NULL DEFAULT 0 COMMENT '状态.0激活1冻结',
   `role` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'subscriber' COMMENT '用户角色',
+  `created_time` datetime(0) NOT NULL COMMENT '注册时间(UTC)',
+  `updated_time` datetime(0) NOT NULL COMMENT '更新时间(UTC)',
+  `deleted_time` datetime(0) NULL DEFAULT NULL COMMENT '删除时间(UTC)',
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `user_login`(`account`) USING BTREE,
   UNIQUE INDEX `user_email_2`(`email`) USING BTREE,
   INDEX `user_login_key`(`account`) USING BTREE,
   INDEX `user_nicename`(`nickname`) USING BTREE,
-  INDEX `user_email`(`email`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 11 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+  INDEX `user_email`(`email`) USING BTREE,
+  INDEX `user_delete`(`deleted_time`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 24 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
 
 SET FOREIGN_KEY_CHECKS = 1;

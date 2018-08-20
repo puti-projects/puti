@@ -1,42 +1,22 @@
 package model
 
 import (
-	"sync"
-	"time"
-
 	"puti/pkg/auth"
 	"puti/pkg/constvar"
-	"puti/pkg/errno"
 )
-
-// UserInfo is the user struct for user list
-type UserInfo struct {
-	ID             uint64 `json:"id"`
-	Accout         string `json:"account"`
-	Nickname       string `json:"nickname"`
-	Email          string `json:"email"`
-	RegisteredTime string `json:"registered_time"`
-	Roles          string `json:"roles"`
-	Status         int    `json:"status"`
-}
-
-// UserList user list
-type UserList struct {
-	Lock  *sync.Mutex
-	IDMap map[uint64]*UserInfo
-}
 
 // UserModel user model
 type UserModel struct {
-	ID             uint64    `gorm:"primary_key;AUTO_INCREMENT;column:id" json:"id"`
-	Username       string    `gorm:"column:account;unique;not null"  validate:"min=1,max=60" json:"username"`
-	Password       string    `gorm:"column:password;not null" validate:"min=6,max=255" json:"-"`
-	Nickname       string    `gorm:"column:nickname;not null" json:"nickname"`
-	Email          string    `gorm:"column:email;unique" json:"email"`
-	Avatar         string    `gorm:"column:avatar" json:"avatar"`
-	RegisteredTime time.Time `gorm:"column:registered_time" json:"registered_time"`
-	Status         int       `gorm:"column:status" sql:"index" json:"status"`
-	Roles          string    `gorm:"column:role" json:"roles"`
+	Model
+
+	Username string `gorm:"column:account;unique;not null"  validate:"min=1,max=60"`
+	Password string `gorm:"column:password;not null" validate:"min=6,max=255"`
+	Nickname string `gorm:"column:nickname;not null"`
+	Email    string `gorm:"column:email;unique"`
+	Avatar   string `gorm:"column:avatar"`
+	PageURL  string `gorm:"column:page_url"`
+	Status   int    `gorm:"column:status" sql:"index"`
+	Roles    string `gorm:"column:role"`
 }
 
 // TableName is the user table name in db
@@ -71,19 +51,14 @@ func DeleteUser(id uint64) error {
 
 // Update updates an user account information.
 func (c *UserModel) Update() error {
-	return DB.Local.Save(c).Error
+	var user UserModel
+	DB.Local.First(&user, c.ID)
+	return DB.Local.Model(user).Save(c).Error
 }
 
-// Validate checks the login params
+// Validate checks the update params
+// TODO
 func (c *UserModel) Validate() error {
-	if c.Username == "" {
-		return errno.New(errno.ErrValidation, nil).Add("username is empty.")
-	}
-
-	if c.Password == "" {
-		return errno.New(errno.ErrValidation, nil).Add("password is empty.")
-	}
-
 	return nil
 }
 

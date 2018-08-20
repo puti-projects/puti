@@ -13,6 +13,17 @@ import (
 	"github.com/lexkong/log/lager"
 )
 
+// UpdateRequest is the update user request params struct
+type UpdateRequest struct {
+	ID            uint64 `form:"id"`
+	Nickname      string `form:"nickname"`
+	Email         string `form:"email"`
+	Role          string `form:"role"`
+	Password      string `form:"password"`
+	PasswordAgain string `form:"passwordAgain"`
+	Website       string `form:"website"`
+}
+
 // Update user
 func Update(c *gin.Context) {
 	log.Info("Update function called.", lager.Data{"X-Request-Id": util.GetReqID(c)})
@@ -21,23 +32,44 @@ func Update(c *gin.Context) {
 
 	// Binding the user data.
 	var u model.UserModel
-	if err := c.Bind(&u); err != nil {
+	var r UpdateRequest
+	if err := c.Bind(&r); err != nil {
 		Response.SendResponse(c, errno.ErrBind, nil)
 		return
 	}
 
 	// We update the record based on the user id.
-	u.ID = uint64(userID)
+	r.ID = uint64(userID)
+
+	if r.Nickname != "" {
+		u.Nickname = r.Nickname
+	}
+
+	if r.Email != "" {
+		u.Email = r.Email
+	}
+
+	if r.Role != "" {
+		u.Roles = r.Role
+	}
+
+	if r.Password != "" {
+		u.Password = r.Password
+
+		// Encrypt the user password.
+		if err := u.Encrypt(); err != nil {
+			Response.SendResponse(c, errno.ErrEncrypt, nil)
+			return
+		}
+	}
+
+	if r.Website != "" {
+		u.PageURL = r.Website
+	}
 
 	// check params
 	if err := u.Validate(); err != nil {
 		Response.SendResponse(c, err, nil)
-		return
-	}
-
-	// Encrypt the user password.
-	if err := u.Encrypt(); err != nil {
-		Response.SendResponse(c, errno.ErrEncrypt, nil)
 		return
 	}
 

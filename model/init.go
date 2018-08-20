@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/jinzhu/gorm"
-	_ "github.com/jinzhu/gorm/dialects/mysql"
+	_ "github.com/jinzhu/gorm/dialects/mysql" // mysql for gorm
 	"github.com/lexkong/log"
 	"github.com/spf13/viper"
 )
@@ -14,18 +14,22 @@ type Database struct {
 	Local *gorm.DB
 }
 
+// DB definds the database
 var DB *Database
 
+// Init is the databases init function
 func (db *Database) Init() {
 	DB = &Database{
 		Local: GetLocalDB(),
 	}
 }
 
+// GetLocalDB gets the main DB
 func GetLocalDB() *gorm.DB {
 	return InitLocalDB()
 }
 
+// InitLocalDB inits the main DB
 func InitLocalDB() *gorm.DB {
 	return openDB(
 		viper.GetString("db.username"),
@@ -35,6 +39,8 @@ func InitLocalDB() *gorm.DB {
 	)
 }
 
+// openDB creates the DB connection
+// It sets the location to UTC time
 func openDB(username, password, addr, name string) *gorm.DB {
 	config := fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=utf8&parseTime=%t&loc=%s",
 		username,
@@ -42,7 +48,7 @@ func openDB(username, password, addr, name string) *gorm.DB {
 		addr,
 		name,
 		true,
-		"Local")
+		"UTC")
 
 	db, err := gorm.Open("mysql", config)
 	if err != nil {
@@ -55,12 +61,14 @@ func openDB(username, password, addr, name string) *gorm.DB {
 	return db
 }
 
+// setupDB sets the DB settings
 func setupDB(db *gorm.DB) {
 	db.LogMode(viper.GetBool("gormlog"))
 	//db.DB().SetMaxOpenConns(20000) // 用于设置最大打开的连接数，默认值为0表示不限制.设置最大的连接数，可以避免并发太高导致连接mysql出现too many connections的错误。
 	db.DB().SetMaxIdleConns(0) // 用于设置闲置的连接数.设置闲置的连接数则当开启的一个连接使用完成后可以放在池里等候下一次使用。
 }
 
+// Close close DB
 func (db *Database) Close() {
 	DB.Local.Close()
 }
