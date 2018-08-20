@@ -42,6 +42,13 @@ func GetUser(username string) (*UserModel, error) {
 	return u, d.Error
 }
 
+// GetUserByID gets an user by ID
+func GetUserByID(id uint64) (*UserModel, error) {
+	u := &UserModel{}
+	d := DB.Local.Model(&UserModel{}).Where("`id` = ?", id).Find(&u)
+	return u, d.Error
+}
+
 // DeleteUser deletes the user by id
 func DeleteUser(id uint64) error {
 	user := UserModel{}
@@ -50,10 +57,12 @@ func DeleteUser(id uint64) error {
 }
 
 // Update updates an user account information.
-func (c *UserModel) Update() error {
-	var user UserModel
-	DB.Local.First(&user, c.ID)
-	return DB.Local.Model(user).Save(c).Error
+func (c *UserModel) Update() (err error) {
+	if err = DB.Local.Model(&UserModel{}).Save(c).Error; err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // ListUser List all users
