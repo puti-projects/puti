@@ -6,6 +6,7 @@ import (
 	Response "puti/handler"
 	"puti/model"
 	"puti/pkg/errno"
+	"puti/service"
 	"puti/util"
 
 	"github.com/gin-gonic/gin"
@@ -15,13 +16,11 @@ import (
 
 // UpdateRequest is the update user request params struct
 type UpdateRequest struct {
-	ID            uint64 `form:"id"`
-	Nickname      string `form:"nickname"`
-	Email         string `form:"email"`
-	Role          string `form:"role"`
-	Password      string `form:"password"`
-	PasswordAgain string `form:"passwordAgain"`
-	Website       string `form:"website"`
+	ID       uint64 `form:"id"`
+	Nickname string `form:"nickname"`
+	Email    string `form:"email"`
+	Role     string `form:"role"`
+	Website  string `form:"website"`
 }
 
 // Update user
@@ -31,7 +30,6 @@ func Update(c *gin.Context) {
 	userID, _ := strconv.Atoi(c.Param("id"))
 
 	// Binding the user data.
-	var u model.UserModel
 	var r UpdateRequest
 	if err := c.Bind(&r); err != nil {
 		Response.SendResponse(c, errno.ErrBind, nil)
@@ -41,40 +39,17 @@ func Update(c *gin.Context) {
 	// We update the record based on the user id.
 	r.ID = uint64(userID)
 
-	if r.Nickname != "" {
-		u.Nickname = r.Nickname
+	user := &model.UserModel{
+		Model: model.Model{ID: r.ID},
+
+		Nickname: r.Nickname,
+		Email:    r.Email,
+		PageURL:  r.Website,
+		Roles:    r.Role,
 	}
 
-	if r.Email != "" {
-		u.Email = r.Email
-	}
-
-	if r.Role != "" {
-		u.Roles = r.Role
-	}
-
-	if r.Password != "" {
-		u.Password = r.Password
-
-		// Encrypt the user password.
-		if err := u.Encrypt(); err != nil {
-			Response.SendResponse(c, errno.ErrEncrypt, nil)
-			return
-		}
-	}
-
-	if r.Website != "" {
-		u.PageURL = r.Website
-	}
-
-	// check params
-	if err := u.Validate(); err != nil {
-		Response.SendResponse(c, err, nil)
-		return
-	}
-
-	// Save changed fields.
-	if err := u.Update(); err != nil {
+	// Update changed fields.
+	if err := service.UpdateUser(user); err != nil {
 		Response.SendResponse(c, errno.ErrDatabase, nil)
 		return
 	}

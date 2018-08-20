@@ -1,6 +1,7 @@
 package service
 
 import (
+	"strings"
 	"sync"
 
 	"puti/config"
@@ -106,4 +107,24 @@ func ListUser(username, role string, number, page, status int) ([]*UserInfo, uin
 	}
 
 	return infos, count, nil
+}
+
+// UpdateUser updates userinfo by id
+func UpdateUser(user *model.UserModel) (err error) {
+	// Get old user info
+	oldUser := &model.UserModel{}
+	if err = model.DB.Local.Model(&model.UserModel{}).Where("`id` = ?", user.ID).Find(oldUser).Error; err != nil {
+		return
+	}
+
+	oldUser.Nickname = strings.TrimSpace(user.Nickname)
+	oldUser.Email = strings.TrimSpace(user.Email)
+	oldUser.PageURL = strings.TrimSpace(user.PageURL)
+	oldUser.Roles = user.Roles
+
+	if err = model.DB.Local.Model(&model.UserModel{}).Save(oldUser).Error; err != nil {
+		return err
+	}
+
+	return nil
 }

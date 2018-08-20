@@ -56,12 +56,6 @@ func (c *UserModel) Update() error {
 	return DB.Local.Model(user).Save(c).Error
 }
 
-// Validate checks the update params
-// TODO
-func (c *UserModel) Validate() error {
-	return nil
-}
-
 // ListUser List all users
 func ListUser(username, role string, number, page, status int) ([]*UserModel, uint64, error) {
 	if number == 0 {
