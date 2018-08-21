@@ -4,8 +4,8 @@ import (
 	"strings"
 	"sync"
 
-	"puti/config"
 	"puti/model"
+	"puti/util"
 )
 
 // UserInfo is the user struct for user list
@@ -15,10 +15,11 @@ type UserInfo struct {
 	Nickname       string `json:"nickname"`
 	Email          string `json:"email"`
 	Avator         string `json:"avator"`
-	RegisteredTime string `json:"registered_time"`
 	Roles          string `json:"roles"`
 	Status         int    `json:"status"`
 	Website        string `json:"website"`
+	RegisteredTime string `json:"registered_time"`
+	DeletedTime    string `json:"deleted_time"`
 }
 
 // UserList user list
@@ -40,10 +41,11 @@ func GetUser(username string) (*UserInfo, error) {
 		Nickname:       u.Nickname,
 		Email:          u.Email,
 		Avator:         u.Avatar,
-		RegisteredTime: u.CreatedAt.In(config.TimeLoc()).Format("2006-01-02 15:04:05"),
 		Roles:          u.Roles,
 		Status:         u.Status,
 		Website:        u.PageURL,
+		RegisteredTime: util.GetFormatTime(&u.CreatedAt, "2006-01-02 15:04:05"),
+		DeletedTime:    util.GetFormatTime(u.DeletedAt, "2006-01-02 15:04:05"),
 	}
 
 	return userInfo, nil
@@ -84,10 +86,10 @@ func ListUser(username, role string, number, page, status int) ([]*UserInfo, uin
 				Accout:         u.Username,
 				Nickname:       u.Nickname,
 				Email:          u.Email,
-				RegisteredTime: u.CreatedAt.In(config.TimeLoc()).Format("2006-01-02 15:04:05"),
 				Status:         u.Status,
 				Roles:          u.Roles,
-			}
+				RegisteredTime: util.GetFormatTime(&u.CreatedAt, "2006-01-02 15:04:05"),
+				DeletedTime:    util.GetFormatTime(u.DeletedAt, "2006-01-02 15:04:05")}
 		}(u)
 	}
 
@@ -117,13 +119,36 @@ func UpdateUser(user *model.UserModel) (err error) {
 		return err
 	}
 
-	// set new values
-	oldUser.Nickname = strings.TrimSpace(user.Nickname)
+	// Set new values
+	user.Nickname = strings.TrimSpace(user.Nickname)
+	if user.Nickname == "" {
+		user.Nickname = oldUser.Username // Set nickname to account if nickname is empty
+	}
+	oldUser.Nickname = user.Nickname
+
 	oldUser.Email = strings.TrimSpace(user.Email)
 	oldUser.PageURL = strings.TrimSpace(user.PageURL)
 	oldUser.Roles = user.Roles
 
-	if err = oldUser.Update(); err != err {
+	if err = oldUser.Update(); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// UpdateUserStatus updates user status by id
+func UpdateUserStatus(user *model.UserModel) (err error) {
+	// Get old user info
+	oldUser, err := model.GetUserByID(user.ID)
+	if err != nil {
+		return err
+	}
+
+	// Set new status values
+	oldUser.Status = user.Status
+
+	if err = oldUser.Update(); err != nil {
 		return err
 	}
 

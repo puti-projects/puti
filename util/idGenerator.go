@@ -5,17 +5,19 @@ import (
 	"github.com/teris-io/shortid"
 )
 
-func GenShortId() (string, error) {
+// GenShortID ...
+func GenShortID() (string, error) {
 	return shortid.Generate()
 }
 
+// GetReqID ...
 func GetReqID(c *gin.Context) string {
 	v, ok := c.Get("X-Request-Id")
 	if !ok {
 		return ""
 	}
-	if requestId, ok := v.(string); ok {
-		return requestId
+	if requestID, ok := v.(string); ok {
+		return requestID
 	}
 	return ""
 }

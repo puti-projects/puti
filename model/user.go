@@ -38,7 +38,7 @@ func (c *UserModel) Encrypt() (err error) {
 // GetUser gets an user by the user identifier.
 func GetUser(username string) (*UserModel, error) {
 	u := &UserModel{}
-	d := DB.Local.Where("account = ?", username).First(&u)
+	d := DB.Local.Where("status = 1 AND deleted_time is null AND account = ?", username).First(&u)
 	return u, d.Error
 }
 
@@ -74,7 +74,7 @@ func ListUser(username, role string, number, page, status int) ([]*UserModel, ui
 	users := make([]*UserModel, 0)
 	var count uint64
 
-	where := "1"
+	where := "`deleted_time` is null"
 	whereArgs := []interface{}{}
 	if username != "" {
 		where += " AND `nickname` LIKE ?"
@@ -86,7 +86,7 @@ func ListUser(username, role string, number, page, status int) ([]*UserModel, ui
 		whereArgs = append(whereArgs, role)
 	}
 
-	if status == 0 || status == 1 {
+	if status != 0 {
 		where += " AND `status` = ?"
 		whereArgs = append(whereArgs, status)
 	}
