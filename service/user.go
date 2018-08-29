@@ -14,7 +14,7 @@ type UserInfo struct {
 	Accout         string `json:"account"`
 	Nickname       string `json:"nickname"`
 	Email          string `json:"email"`
-	Avator         string `json:"avator"`
+	Avatar         string `json:"avatar"`
 	Roles          string `json:"roles"`
 	Status         int    `json:"status"`
 	Website        string `json:"website"`
@@ -40,7 +40,7 @@ func GetUser(username string) (*UserInfo, error) {
 		Accout:         u.Username,
 		Nickname:       u.Nickname,
 		Email:          u.Email,
-		Avator:         u.Avatar,
+		Avatar:         u.Avatar,
 		Roles:          u.Roles,
 		Status:         u.Status,
 		Website:        u.PageURL,
@@ -147,6 +147,42 @@ func UpdateUserStatus(user *model.UserModel) (err error) {
 
 	// Set new status values
 	oldUser.Status = user.Status
+
+	if err = oldUser.Update(); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// UpdateUserPassword just reset user's password
+func UpdateUserPassword(user *model.UserModel) (err error) {
+	// Get old user info
+	oldUser, err := model.GetUserByID(user.ID)
+	if err != nil {
+		return err
+	}
+
+	// Set new password
+	oldUser.Password = user.Password
+
+	if err = oldUser.Update(); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// UpdateUserAvatar save the new avatar url
+func UpdateUserAvatar(user *model.UserModel) (err error) {
+	// Get old user info
+	oldUser, err := model.GetUserByID(user.ID)
+	if err != nil {
+		return err
+	}
+
+	// Set new password
+	oldUser.Avatar = user.Avatar
 
 	if err = oldUser.Update(); err != nil {
 		return err

@@ -46,6 +46,12 @@ func Load(g *gin.Engine, mw ...gin.HandlerFunc) *gin.Engine {
 		u.GET("", user.List)
 	}
 
+	av := api.Group("/avatar")
+	av.Use(middleware.AuthMiddleware())
+	{
+		av.POST("", user.Avatar)
+	}
+
 	a := api.Group("/article")
 	a.Use(middleware.AuthMiddleware())
 	{

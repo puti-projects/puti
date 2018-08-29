@@ -30,6 +30,13 @@ type UpdateStatusRequest struct {
 	Status int    `json:"status" binding:"required"`
 }
 
+// UpdatePasswordRequest user for reset user's password during the profile page
+type UpdatePasswordRequest struct {
+	ID            uint64 `json:"id"`
+	Password      string `json:"password" binding:"required"`
+	PasswordAgain string `json:"passwordAgain" binding:"required"`
+}
+
 // Update user
 func Update(c *gin.Context) {
 	log.Info("Update function called.", lager.Data{"X-Request-Id": util.GetReqID(c)})
@@ -39,6 +46,7 @@ func Update(c *gin.Context) {
 
 	var r UpdateRequest
 	var s UpdateStatusRequest
+	var p UpdatePasswordRequest
 
 	if err := c.ShouldBindBodyWith(&r, binding.JSON); err == nil {
 		// We update the record based on the user id.
@@ -73,6 +81,35 @@ func Update(c *gin.Context) {
 
 		// Update changed fields.
 		if errStatus := service.UpdateUserStatus(user); errStatus != nil {
+			Response.SendResponse(c, errno.ErrDatabase, nil)
+			return
+		}
+
+		Response.SendResponse(c, nil, nil)
+		return
+	} else if errPassword := c.ShouldBindBodyWith(&p, binding.JSON); errPassword == nil {
+		p.ID = uint64(userID)
+
+		// check two input password
+		if p.Password != p.PasswordAgain {
+			Response.SendResponse(c, errno.ErrValidation, nil)
+			return
+		}
+
+		user := &model.UserModel{
+			Model: model.Model{ID: p.ID},
+
+			Password: p.Password,
+		}
+
+		// encrypt password
+		if err := user.Encrypt(); err != nil {
+			Response.SendResponse(c, errno.ErrEncrypt, nil)
+			return
+		}
+
+		// Update changed fields.
+		if errPassword := service.UpdateUserPassword(user); errPassword != nil {
 			Response.SendResponse(c, errno.ErrDatabase, nil)
 			return
 		}

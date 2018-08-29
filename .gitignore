@@ -17,3 +17,7 @@
 
 # log
 log/
+
+# upload dir
+upload/*
+!upload/user/default.jpg

@@ -13,7 +13,7 @@ import (
 var (
 	// ErrMissingHeader means the `Authorization` header was empty.
 	ErrMissingHeader = errors.New("The length of the `Authorization` header is zero.")
-	// ErrMigssing means the `token` params was empty.
+	// ErrMissingToken means the `token` params was empty.
 	ErrMissingToken = errors.New("Missing token")
 )
 
