@@ -5,6 +5,7 @@ import (
 
 	"puti/handler/article"
 	"puti/handler/auth"
+	"puti/handler/media"
 	"puti/handler/sd"
 	"puti/handler/user"
 	"puti/router/middleware"
@@ -56,6 +57,13 @@ func Load(g *gin.Engine, mw ...gin.HandlerFunc) *gin.Engine {
 	a.Use(middleware.AuthMiddleware())
 	{
 		a.GET("", article.List)
+	}
+
+	m := api.Group("/media")
+	m.Use(middleware.AuthMiddleware())
+	{
+		m.GET("/:id", media.Detail)
+		m.GET("", media.List)
 	}
 
 	// the health check handlers
