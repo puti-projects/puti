@@ -1,7 +1,6 @@
 package user
 
 import (
-	"fmt"
 	Response "puti/handler"
 	"puti/model"
 	"puti/pkg/errno"
@@ -23,7 +22,7 @@ type CreateRequest struct {
 	Website       string `form:"website"`
 }
 
-// CreateResponse is the create user request params struct
+// CreateResponse is the create user request's response struct
 type CreateResponse struct {
 	Account  string
 	Nickname string
@@ -68,7 +67,6 @@ func Create(c *gin.Context) {
 
 	// Insert the user to the database. TODO 字段提示
 	if err := u.Create(); err != nil {
-		fmt.Print(err)
 		Response.SendResponse(c, errno.ErrDatabase, nil)
 		return
 	}

@@ -16,4 +16,7 @@ var (
 	ErrTokenInvalid      = &Errno{Code: 20103, Message: "The token was invalid."}
 	ErrPasswordIncorrect = &Errno{Code: 20104, Message: "The password was incorrect."}
 	ErrSaveAvatar        = &Errno{Code: 20105, Message: "Save file failed"}
+
+	// media errors
+	ErrUploadFile = &Errno{Code: 20106, Message: "Upload file failed"}
 )

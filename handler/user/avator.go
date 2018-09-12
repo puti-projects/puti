@@ -1,16 +1,13 @@
 package user
 
 import (
-	"mime"
-	"mime/multipart"
-	"path/filepath"
 	"strconv"
-	"strings"
 
 	Response "puti/handler"
 	"puti/model"
 	"puti/pkg/errno"
 	"puti/service"
+	"puti/util"
 
 	"github.com/gin-gonic/gin"
 )
@@ -23,7 +20,7 @@ func Avatar(c *gin.Context) {
 	userID := c.PostForm("userId")
 	file, _ := c.FormFile("img")
 
-	fileExt := getFileExt(file)
+	fileExt := util.GetFileExt(file)
 	newFileName := "user_" + userID + fileExt
 
 	// Upload the file to specific dst.
@@ -53,24 +50,4 @@ func Avatar(c *gin.Context) {
 	}
 
 	Response.SendResponse(c, nil, nil)
-}
-
-// getFileExt returns the file name extension
-// The extension is the suffix beginning at the final dot
-func getFileExt(file *multipart.FileHeader) string {
-	var ext string
-	// get by Ext func first
-	ext = filepath.Ext(file.Filename)
-	if ext == "" {
-		// get by content-type
-		typ := file.Header.Get("Content-Type")
-		exts, _ := mime.ExtensionsByType(typ)
-		if 0 < len(exts) {
-			ext = exts[0]
-		} else {
-			ext = "." + strings.Split(typ, "/")[1]
-		}
-	}
-
-	return ext
 }
