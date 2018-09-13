@@ -38,6 +38,13 @@ func (c *MediaModel) Create() error {
 	return DB.Local.Create(&c).Error
 }
 
+// DeleteMedia deletes the media info by id (not file)
+func DeleteMedia(id uint64) error {
+	media := MediaModel{}
+	media.ID = id
+	return DB.Local.Delete(&media).Error
+}
+
 // ListMedia returns the media list in condition
 func ListMedia(limit, page int) ([]*MediaModel, uint64, error) {
 	medias := make([]*MediaModel, 0)

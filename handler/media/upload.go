@@ -1,9 +1,13 @@
 package media
 
 import (
+	"bytes"
+	"crypto/md5"
+	"encoding/hex"
 	"fmt"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 
 	Response "puti/handler"
@@ -16,8 +20,8 @@ import (
 
 // UploadResponse is the upload media request's response struct
 type UploadResponse struct {
-	ID  uint64
-	url string
+	ID  uint64 `json:"id"`
+	URL string `json:"url"`
 }
 
 // savePathURI defines the media file save path uri
@@ -29,8 +33,6 @@ func Upload(c *gin.Context) {
 	userID := c.PostForm("userId")
 	file, _ := c.FormFile("file")
 
-	fileExt := util.GetFileExt(file)
-
 	// General the save path by upload time
 	savePath, err := getSavePath()
 	if err != nil {
@@ -38,9 +40,23 @@ func Upload(c *gin.Context) {
 		return
 	}
 
-	// Upload the file to specific dst.
-	pathName := savePath + file.Filename
+	// set variables
+	fileExt := util.GetFileExt(file)
+	fileNameWithoutExt := strings.TrimSuffix(file.Filename, fileExt)
+	unixTime := time.Now().Unix()
+
+	// set buf string
+	buf := bytes.NewBufferString(fileNameWithoutExt)
+	buf.Write([]byte(strconv.FormatInt(unixTime, 10))) // add a time string
+	// md5 encode
+	h := md5.New()
+	h.Write([]byte(buf.String())) // encode the buf.String()
+	newFileName := hex.EncodeToString(h.Sum(nil))
+
+	// final save path with file name
+	pathName := savePath + newFileName + fileExt
 	dst := "." + pathName
+	// Upload the file to specific dst.
 	if err := c.SaveUploadedFile(file, dst); err != nil {
 		Response.SendResponse(c, errno.ErrUploadFile, nil)
 		return
@@ -55,7 +71,7 @@ func Upload(c *gin.Context) {
 	media := &model.MediaModel{
 		UserID:   uint64(uID),
 		Title:    file.Filename,
-		Slug:     file.Filename,
+		Slug:     fileNameWithoutExt,
 		GUID:     pathName,
 		MimeType: util.GetFileMimeTypeByExt(fileExt),
 	}
@@ -68,7 +84,7 @@ func Upload(c *gin.Context) {
 
 	rsp := UploadResponse{
 		ID:  media.ID,
-		url: media.GUID,
+		URL: media.GUID,
 	}
 
 	Response.SendResponse(c, nil, rsp)
