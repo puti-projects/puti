@@ -18,5 +18,7 @@ var (
 	ErrSaveAvatar        = &Errno{Code: 20105, Message: "Save file failed"}
 
 	// media errors
-	ErrUploadFile = &Errno{Code: 20106, Message: "Upload file failed"}
+	ErrUploadFile    = &Errno{Code: 20201, Message: "Upload file failed"}
+	ErrMediaNotFound = &Errno{Code: 20202, Message: "The media was not found."}
+	ErrTitleEmpty    = &Errno{Code: 20203, Message: "Title can not be empty."}
 )

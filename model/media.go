@@ -38,6 +38,15 @@ func (c *MediaModel) Create() error {
 	return DB.Local.Create(&c).Error
 }
 
+// Update update media info
+func (c *MediaModel) Update() (err error) {
+	if err = DB.Local.Model(&MediaModel{}).Save(c).Error; err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // DeleteMedia deletes the media info by id (not file)
 func DeleteMedia(id uint64) error {
 	media := MediaModel{}
@@ -61,4 +70,11 @@ func ListMedia(limit, page int) ([]*MediaModel, uint64, error) {
 	}
 
 	return medias, count, nil
+}
+
+// GetMediaByID get media info by id
+func GetMediaByID(id uint64) (*MediaModel, error) {
+	m := &MediaModel{}
+	d := DB.Local.Where("status = 1 AND deleted_time is null AND id = ?", id).First(&m)
+	return m, d.Error
 }

@@ -66,6 +66,7 @@ func Load(g *gin.Engine, mw ...gin.HandlerFunc) *gin.Engine {
 		m.GET("", media.List)
 		m.POST("", media.Upload)
 		m.DELETE("/:id", media.Delete)
+		m.PUT("/:id", media.Update)
 	}
 
 	// the health check handlers

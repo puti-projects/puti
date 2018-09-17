@@ -16,10 +16,39 @@ type MediaInfo struct {
 	UploadTime string `json:"upload_time"`
 }
 
+// MediaDetail media info in detail inclue Mediainfo struct
+type MediaDetail struct {
+	MediaInfo
+	Slug        string `json:"slug"`
+	Description string `json:"description"`
+}
+
 // MediaList media list
 type MediaList struct {
 	Lock  *sync.Mutex
 	IDMap map[uint64]*MediaInfo
+}
+
+// GetMedia return media info if database select success
+func GetMedia(id uint64) (*MediaDetail, error) {
+	m, err := model.GetMediaByID(id)
+	if err != nil {
+		return nil, err
+	}
+
+	userInfo := &MediaDetail{
+		MediaInfo: MediaInfo{
+			ID:         m.ID,
+			Title:      m.Title,
+			GUID:       m.GUID,
+			Type:       m.Type,
+			UploadTime: m.CreatedAt.In(config.TimeLoc()).Format("2006-01-02 15:04:05"),
+		},
+		Slug:        m.Slug,
+		Description: m.Description,
+	}
+
+	return userInfo, nil
 }
 
 // ListMedia returns media list and media count
@@ -78,4 +107,24 @@ func ListMedia(limit, page int) ([]*MediaInfo, uint64, error) {
 	}
 
 	return infos, count, nil
+}
+
+// UpdateMedia update media info
+func UpdateMedia(media *model.MediaModel) (err error) {
+	// Get old media info
+	oldMedia, err := model.GetMediaByID(media.ID)
+	if err != nil {
+		return err
+	}
+
+	// Set new status values
+	oldMedia.Title = media.Title
+	oldMedia.Slug = media.Slug
+	oldMedia.Description = media.Description
+
+	if err = oldMedia.Update(); err != nil {
+		return err
+	}
+
+	return nil
 }
