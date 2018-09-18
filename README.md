@@ -1,8 +1,7 @@
 # Puti
-* Golang
-* gin
-* Vue.js
-* Nuxt.js
+* Golang + [gin](https://github.com/gin-gonic/gin)
+* [Vue.js](https://github.com/vuejs/vue) + [Element](https://github.com/ElemeFE/element) + [vue-element-admin](https://github.com/PanJiaChen/vue-element-admin)
+* MySQL
 
 # Build by Docker
 ## Using a MySQL in lcoal

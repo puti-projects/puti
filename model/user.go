@@ -21,7 +21,7 @@ type UserModel struct {
 
 // TableName is the user table name in db
 func (c *UserModel) TableName() string {
-	return "pt_users"
+	return "pt_user"
 }
 
 // Create creates a new user account

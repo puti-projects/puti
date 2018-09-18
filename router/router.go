@@ -7,6 +7,7 @@ import (
 	"puti/handler/auth"
 	"puti/handler/media"
 	"puti/handler/sd"
+	"puti/handler/taxonomy"
 	"puti/handler/user"
 	"puti/router/middleware"
 
@@ -57,6 +58,16 @@ func Load(g *gin.Engine, mw ...gin.HandlerFunc) *gin.Engine {
 	a.Use(middleware.AuthMiddleware())
 	{
 		a.GET("", article.List)
+	}
+
+	t := api.Group("/taxonomy")
+	t.Use(middleware.AuthMiddleware())
+	{
+		t.POST("/:name", taxonomy.Create)
+		t.GET("/:id", taxonomy.Get)
+		t.DELETE("/:id", taxonomy.Delete)
+		t.PUT("/:id", taxonomy.Update)
+		t.GET("", taxonomy.List)
 	}
 
 	m := api.Group("/media")

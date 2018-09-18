@@ -23,7 +23,7 @@ type MediaModel struct {
 
 // TableName is the resource table name in db
 func (c *MediaModel) TableName() string {
-	return "pt_resources"
+	return "pt_resource"
 }
 
 // BeforeCreate set values before create

@@ -21,4 +21,7 @@ var (
 	ErrUploadFile    = &Errno{Code: 20201, Message: "Upload file failed"}
 	ErrMediaNotFound = &Errno{Code: 20202, Message: "The media was not found."}
 	ErrTitleEmpty    = &Errno{Code: 20203, Message: "Title can not be empty."}
+
+	// taxonomy errors
+	ErrTypeEmpty = &Errno{Code: 20301, Message: "Taxonomy type can not be empty."}
 )

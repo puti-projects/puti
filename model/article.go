@@ -26,7 +26,7 @@ type ArticleModel struct {
 
 // TableName is the article table name in db
 func (c *ArticleModel) TableName() string {
-	return "pt_posts"
+	return "pt_post"
 }
 
 // ListArticle shows the articles in condition
