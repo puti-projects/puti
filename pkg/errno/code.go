@@ -23,5 +23,6 @@ var (
 	ErrTitleEmpty    = &Errno{Code: 20203, Message: "Title can not be empty."}
 
 	// taxonomy errors
-	ErrTypeEmpty = &Errno{Code: 20301, Message: "Taxonomy type can not be empty."}
+	ErrTypeEmpty    = &Errno{Code: 20301, Message: "Taxonomy type can not be empty."}
+	ErrTermNotFount = &Errno{Code: 20302, Message: "The term taxonomy was not found."}
 )

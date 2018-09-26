@@ -36,3 +36,16 @@ func GetAllTermsByType(taxomonyType string) ([]*TermTaxonomyModel, error) {
 
 	return termTaxonomys, result.Error
 }
+
+// GetTermsInfo get taxonomy terms info by term_id
+func GetTermsInfo(termID uint64) (*TermTaxonomyModel, error) {
+	termTaxonomy := &TermTaxonomyModel{}
+
+	model := DB.Local.Where("term_id = ?", termID).First(&termTaxonomy)
+	if model.Error != nil {
+		return nil, model.Error
+	}
+
+	result := DB.Local.Model(&termTaxonomy).Related(&termTaxonomy.Term, "TermID")
+	return termTaxonomy, result.Error
+}

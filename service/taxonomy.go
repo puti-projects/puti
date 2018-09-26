@@ -1,6 +1,19 @@
 package service
 
-import "puti/model"
+import (
+	"strconv"
+
+	"puti/model"
+)
+
+// TermInfo terms info
+type TermInfo struct {
+	ID          uint64 `json:"term_id"`
+	Name        string `json:"name"`
+	Slug        string `json:"slug"`
+	Description string `json:"description"`
+	Pid         uint64 `json:"parent_term_id"`
+}
 
 // TreeNode TaxonomyTree's node struct
 type TreeNode struct {
@@ -47,4 +60,24 @@ func GetTaxonomyTree(termTaxonomy []*model.TermTaxonomyModel, pid uint64) []*Tre
 	}
 
 	return tree
+}
+
+// GetTaxonomyInfo get term info by term_id
+func GetTaxonomyInfo(termID string) (*TermInfo, error) {
+	ID, _ := strconv.Atoi(termID)
+
+	info, err := model.GetTermsInfo(uint64(ID))
+	if err != nil {
+		return nil, err
+	}
+
+	termInfo := &TermInfo{
+		ID:          info.ID,
+		Name:        info.Term.Name,
+		Slug:        info.Term.Slug,
+		Description: info.Term.Description,
+		Pid:         info.ParentTermID,
+	}
+
+	return termInfo, nil
 }
