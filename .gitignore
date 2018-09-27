@@ -21,3 +21,6 @@ log/
 # upload dir
 upload/*
 !upload/user/default.jpg
+
+# 先不上传vendor
+vendor/*
