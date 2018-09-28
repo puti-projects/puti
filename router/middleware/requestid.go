@@ -5,7 +5,8 @@ import (
 	uuid "github.com/google/uuid"
 )
 
-func RequestId() gin.HandlerFunc {
+// RequestId middleware of set a X-Request-Id header by general a uuid
+func RequestID() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// check for incoming header, use it if exists
 		requestID := c.Request.Header.Get("X-Request-Id")

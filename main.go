@@ -59,7 +59,7 @@ func main() {
 	// routes
 	router.Load(g,
 		// Middiewares
-		middleware.RequestId(),
+		middleware.RequestID(),
 	)
 
 	// Ping the server to make sure the router is working.

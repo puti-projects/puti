@@ -8,6 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// AuthMiddleware middleware of token prase
 func AuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Prase the json web token

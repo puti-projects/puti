@@ -1,8 +1,9 @@
 package util
 
 import (
-	"puti/config"
 	"time"
+
+	"puti/config"
 )
 
 // GetFormatTime get format time include nil value
