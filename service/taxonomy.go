@@ -13,6 +13,7 @@ type TermInfo struct {
 	Slug        string `json:"slug"`
 	Description string `json:"description"`
 	Pid         uint64 `json:"parent_term_id"`
+	Level       uint64 `json:"level"`
 }
 
 // TreeNode TaxonomyTree's node struct
@@ -22,8 +23,9 @@ type TreeNode struct {
 	Slug         string      `json:"slug"`
 	Description  string      `json:"description"`
 	Count        uint64      `json:"count"`
-	TermID       uint64      `json:"termID"`
+	TermID       uint64      `json:"term_id"`
 	ParentTermID uint64      `json:"pid"`
+	Level        uint64      `json:"level"`
 	Children     []*TreeNode `json:"children"`
 }
 
@@ -53,6 +55,7 @@ func GetTaxonomyTree(termTaxonomy []*model.TermTaxonomyModel, pid uint64) []*Tre
 				Count:        v.Term.Count,
 				TermID:       v.TermID,
 				ParentTermID: v.ParentTermID,
+				Level:        v.Level,
 			}
 			treeNode.Children = GetTaxonomyTree(termTaxonomy, v.ID)
 			tree = append(tree, &treeNode)
@@ -77,6 +80,7 @@ func GetTaxonomyInfo(termID string) (*TermInfo, error) {
 		Slug:        info.Term.Slug,
 		Description: info.Term.Description,
 		Pid:         info.ParentTermID,
+		Level:       info.Level,
 	}
 
 	return termInfo, nil

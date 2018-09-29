@@ -6,6 +6,7 @@ type TermTaxonomyModel struct {
 	Term         TermModel `gorm:"foreignkey:TermID;association_foreignkey:ID"`
 	TermID       uint64    `gorm:"column:term_id;not null"`
 	ParentTermID uint64    `gorm:"column:parent_term_id;not null"`
+	Level        uint64    `gorm:"column:level;not null"`
 	Taxonomy     string    `gorm:"column:taxonomy;not null"`
 	TermGroup    uint64    `gorm:"column:term_group;default:0;not null"`
 }
