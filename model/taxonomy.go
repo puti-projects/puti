@@ -30,6 +30,16 @@ func (c *TermModel) TableName() string {
 	return "pt_term"
 }
 
+// Create creates a new taxonomy term
+func (c *TermModel) Create() error {
+	return DB.Local.Create(&c).Error
+}
+
+// Create creates a new taxonomy
+func (c *TermTaxonomyModel) Create() error {
+	return DB.Local.Create(&c).Error
+}
+
 // GetAllTermsByType gets terms and taxonomy_terms by type(category, tag)
 func GetAllTermsByType(taxomonyType string) ([]*TermTaxonomyModel, error) {
 	var termTaxonomys []*TermTaxonomyModel
@@ -49,4 +59,33 @@ func GetTermsInfo(termID uint64) (*TermTaxonomyModel, error) {
 
 	result := DB.Local.Model(&termTaxonomy).Related(&termTaxonomy.Term, "TermID")
 	return termTaxonomy, result.Error
+}
+
+// TaxonomyCheckNameExist check the taxonomy name if is already exist
+func TaxonomyCheckNameExist(name, taxonomy string) bool {
+	count := 0
+	DB.Local.Table("pt_term t").
+		Select("t.term_id, t.name").
+		Joins("inner join pt_term_taxonomy tt on tt.term_id = t.term_id").
+		Where("t.name = ? AND tt.taxonomy = ?", name, taxonomy).
+		Count(&count)
+
+	if count > 0 {
+		return true
+	}
+
+	return false
+}
+
+// GetCategoryLevel calculate the level
+func GetCategoryLevel(parentID uint64, taxonomy string) (level uint64, err error) {
+	if taxonomy == "category" && parentID != 0 {
+		// get parent level
+		termTaxonomy := &TermTaxonomyModel{}
+		d := DB.Local.Where("term_id = ? AND taxonomy = 'category'", parentID).First(&termTaxonomy)
+
+		return termTaxonomy.Level + 1, d.Error
+	}
+
+	return 1, nil
 }
