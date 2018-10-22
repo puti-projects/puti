@@ -23,8 +23,9 @@ var (
 	ErrTitleEmpty    = &Errno{Code: 20203, Message: "Title can not be empty."}
 
 	// taxonomy errors
-	ErrTypeEmpty         = &Errno{Code: 20301, Message: "Taxonomy type can not be empty."}
-	ErrTermNotFount      = &Errno{Code: 20302, Message: "The term taxonomy was not found."}
-	ErrTaxonomyNameExist = &Errno{Code: 20303, Message: "The term taxonomy name was already exist."}
-	ErrTaxonomyParentId  = &Errno{Code: 20304, Message: "Error parent id."}
+	ErrTypeEmpty                = &Errno{Code: 20301, Message: "Taxonomy type can not be empty."}
+	ErrTermNotFount             = &Errno{Code: 20302, Message: "The term taxonomy was not found."}
+	ErrTaxonomyNameExist        = &Errno{Code: 20303, Message: "The term taxonomy name was already exist."}
+	ErrTaxonomyParentId         = &Errno{Code: 20304, Message: "Error parent id."}
+	ErrTaxonomyParentCanNotSelf = &Errno{Code: 20305, Message: "Parent can not be itself."}
 )

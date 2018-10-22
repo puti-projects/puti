@@ -37,7 +37,7 @@ func Create(c *gin.Context) {
 		return
 	}
 
-	level, err := model.GetCategoryLevel(r.ParentID, r.Taxonomy)
+	level, err := model.GetTaxonomyLevel(r.ParentID, r.Taxonomy)
 	if err != nil {
 		Response.SendResponse(c, errno.ErrTaxonomyParentId, nil)
 		return
@@ -74,7 +74,7 @@ func Create(c *gin.Context) {
 
 func (r *CreateRequest) checkParam() error {
 	if r.Name == "" {
-		return errno.New(errno.ErrValidation, nil).Add("mame is empty.")
+		return errno.New(errno.ErrValidation, nil).Add("name is empty.")
 	}
 
 	if r.Taxonomy == "" {
