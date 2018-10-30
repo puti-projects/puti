@@ -162,8 +162,7 @@ func UpdateTaxonomy(term *model.TermModel, termTaxonomy *model.TermTaxonomyModel
 }
 
 // updateTaxonomyChildLevel update category's children level
-// TODO BUG here 最后层更新失败
-func updateTaxonomyChildLevel(tx *gorm.DB, termID, newLevel uint64, taxonomyType string) error {
+func updateTaxonomyChildLevel(tx *gorm.DB, termID, parentLevel uint64, taxonomyType string) error {
 	TermTaxonomy := []model.TermTaxonomyModel{}
 	tt := tx.Where("parent_term_id = ? AND taxonomy = ?", termID, taxonomyType).Find(&TermTaxonomy)
 	if tt.Error != nil {
@@ -173,10 +172,10 @@ func updateTaxonomyChildLevel(tx *gorm.DB, termID, newLevel uint64, taxonomyType
 	// update all children
 	t := &model.TermTaxonomyModel{}
 	tx.Table(t.TableName()).Where("parent_term_id = ?", termID).
-		Updates(map[string]interface{}{"level": newLevel + 1})
+		Updates(map[string]interface{}{"level": parentLevel + 1})
 
 	for _, item := range TermTaxonomy {
-		return updateTaxonomyChildLevel(tx, item.ID, item.Level, taxonomyType)
+		return updateTaxonomyChildLevel(tx, item.ID, parentLevel+1, taxonomyType)
 	}
 
 	return nil
@@ -223,4 +222,75 @@ func updateTaxonomyCount(tx *gorm.DB, termID uint64, countDiff uint64, taxonomyT
 	}
 
 	return nil
+}
+
+// IfTaxonomyHasChild check the taxonomy has children or not
+func IfTaxonomyHasChild(termID uint64, taxonomyType string) bool {
+	count := model.GetTermChildrenNumber(termID, taxonomyType)
+	if count > 0 {
+		return true
+	}
+
+	return false
+}
+
+// DeleteTaxonomy delete term directly
+func DeleteTaxonomy(termID uint64, taxonomyType string) error {
+	// begin transcation
+	tx := model.DB.Local.Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	// get term count
+	term := &model.TermModel{}
+	t := tx.Where("term_id = ?", termID).First(&term)
+	if t.Error != nil {
+		return t.Error
+	}
+	deletedCount := term.Count
+
+	// delete term
+	dTerm := tx.Where("term_id = ?", termID).Delete(model.TermModel{})
+	if err := dTerm.Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	// get term_taxonomy id (user for delete relationship)
+	termTaxonomy := &model.TermTaxonomyModel{}
+	tt := tx.Where("term_id = ?  AND taxonomy = ?", termID, taxonomyType).First(&termTaxonomy)
+	if tt.Error != nil {
+		tx.Rollback()
+		return tt.Error
+	}
+	termTaxonomyID := termTaxonomy.ID
+	parentID := termTaxonomy.ParentTermID
+
+	// delete term taxonomy
+	dTermTxonomy := tx.Where("term_taxonomy_id = ? AND term_id = ?", termTaxonomyID, termID).Delete(model.TermTaxonomyModel{})
+	if err := dTermTxonomy.Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	// delete relationship
+	dRelation := tx.Where("term_taxonomy_id = ?", termTaxonomyID).Delete(model.TermRelationshipsModel{})
+	if err := dRelation.Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	// update parent count number(if has parent)
+	if parentID > 0 {
+		if err := updateTaxonomyCount(tx, parentID, -deletedCount, taxonomyType); err != nil {
+			tx.Rollback()
+			return err
+		}
+	}
+
+	// commit
+	return tx.Commit().Error
 }

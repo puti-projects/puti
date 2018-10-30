@@ -14,6 +14,7 @@ import (
 	"github.com/lexkong/log/lager"
 )
 
+// UpdateRequest param struct to update taxonomy include category and tag
 type UpdateRequest struct {
 	ID          uint64 `form:"id"`
 	Name        string `form:"name"`
@@ -84,6 +85,10 @@ func (r *UpdateRequest) checkParam(termID uint64) error {
 
 	if r.Name == "" {
 		return errno.New(errno.ErrValidation, nil).Add("name is empty.")
+	}
+
+	if r.Slug == "" {
+		r.Slug = r.Name
 	}
 
 	return nil

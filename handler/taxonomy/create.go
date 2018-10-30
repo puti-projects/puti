@@ -73,12 +73,16 @@ func Create(c *gin.Context) {
 }
 
 func (r *CreateRequest) checkParam() error {
+	if r.Taxonomy != "category" && r.Taxonomy != "tag" {
+		return errno.New(errno.ErrValidation, nil).Add("error taxonomy.")
+	}
+
 	if r.Name == "" {
 		return errno.New(errno.ErrValidation, nil).Add("name is empty.")
 	}
 
-	if r.Taxonomy == "" {
-		return errno.New(errno.ErrValidation, nil).Add("taxonomy is empty.")
+	if r.Slug == "" {
+		r.Slug = r.Name
 	}
 
 	if ifExist := model.TaxonomyCheckNameExist(r.Name, r.Taxonomy); ifExist == true {
