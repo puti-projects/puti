@@ -35,7 +35,7 @@ func ListArticle(title string, page, number int, sort, status string) ([]*Articl
 	var count uint64
 
 	where := "post_type = ? AND parent_id = ?"
-	whereArgs := []interface{}{"post", 0}
+	whereArgs := []interface{}{"article", 0}
 	if "" != title {
 		where += " AND title LIKE ?"
 		whereArgs = append(whereArgs, "%"+title+"%")
