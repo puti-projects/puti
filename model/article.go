@@ -29,6 +29,13 @@ func (c *ArticleModel) TableName() string {
 	return "pt_post"
 }
 
+// GetArticle gets the article by article id
+func GetArticle(articleID uint64) (*ArticleModel, error) {
+	a := &ArticleModel{}
+	d := DB.Local.Where("id = ? AND post_type = 'article' AND deleted_time is null", articleID).First(&a)
+	return a, d.Error
+}
+
 // ListArticle shows the articles in condition
 func ListArticle(title string, page, number int, sort, status string) ([]*ArticleModel, uint64, error) {
 	articles := make([]*ArticleModel, 0)

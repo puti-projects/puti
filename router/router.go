@@ -58,6 +58,10 @@ func Load(g *gin.Engine, mw ...gin.HandlerFunc) *gin.Engine {
 	a.Use(middleware.AuthMiddleware())
 	{
 		a.GET("", article.List)
+		a.GET("/:id", article.Get)
+		a.POST("/:status", article.Create)
+		a.PUT("/:id", article.Update)
+		a.DELETE("/:id", article.Delete)
 	}
 
 	t := api.Group("/taxonomy")

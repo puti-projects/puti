@@ -3,6 +3,8 @@ package service
 import (
 	"puti/config"
 	"puti/model"
+	"puti/util"
+	"strconv"
 	"sync"
 )
 
@@ -23,7 +25,16 @@ type ArticleList struct {
 	IDMap map[uint64]*ArticleInfo
 }
 
-// ListArticle checkout
+// ArticleDetail struct for article detail info
+type ArticleDetail struct {
+	ID              uint64 `json:"id"`
+	Title           string `json:"title"`
+	ContentMarkdown string `json:"content_markdown"`
+	Status          string `json:"status"`
+	PostDate        string `json:"post_date"`
+}
+
+// ListArticle article list
 func ListArticle(title string, page, number int, sort, status string) ([]*ArticleInfo, uint64, error) {
 	infos := make([]*ArticleInfo, 0)
 	articles, count, err := model.ListArticle(title, page, number, sort, status)
@@ -81,4 +92,24 @@ func ListArticle(title string, page, number int, sort, status string) ([]*Articl
 	}
 
 	return infos, count, nil
+}
+
+// GetArticleDetail get article detail by id
+func GetArticleDetail(articleID string) (*ArticleDetail, error) {
+	ID, _ := strconv.Atoi(articleID)
+
+	a, err := model.GetArticle(uint64(ID))
+	if err != nil {
+		return nil, err
+	}
+
+	ArticleDetail := &ArticleDetail{
+		ID:              a.ID,
+		Title:           a.Title,
+		ContentMarkdown: a.ContentMarkdown,
+		Status:          a.Status,
+		PostDate:        util.GetFormatTime(&a.PostDate, "2006-01-02 15:04:05"),
+	}
+
+	return ArticleDetail, nil
 }

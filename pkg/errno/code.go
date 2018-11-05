@@ -28,4 +28,7 @@ var (
 	ErrTaxonomyNameExist        = &Errno{Code: 20303, Message: "The term taxonomy name was already exist."}
 	ErrTaxonomyParentId         = &Errno{Code: 20304, Message: "Error parent id."}
 	ErrTaxonomyParentCanNotSelf = &Errno{Code: 20305, Message: "Parent can not be itself."}
+
+	// Article errors
+	ErrArticleNotFount = &Errno{Code: 20401, Message: "The article was not found."}
 )
