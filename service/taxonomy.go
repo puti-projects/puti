@@ -294,3 +294,22 @@ func DeleteTaxonomy(termID uint64, taxonomyType string) error {
 	// commit
 	return tx.Commit().Error
 }
+
+// GetArticleTaxonomy get taxonomy and output by taxonomy type
+func GetArticleTaxonomy(articleID uint64) (map[string][]uint64, error) {
+	taxonomy, err := model.GetArticleTaxonomy(articleID)
+	if err != nil {
+		return nil, err
+	}
+
+	articleTaxonomy := make(map[string][]uint64)
+	for _, item := range taxonomy {
+		_, ok := articleTaxonomy[item.Taxonomy]
+		if !ok {
+			articleTaxonomy[item.Taxonomy] = make([]uint64, 0)
+		}
+		articleTaxonomy[item.Taxonomy] = append(articleTaxonomy[item.Taxonomy], item.TermID)
+	}
+
+	return articleTaxonomy, nil
+}

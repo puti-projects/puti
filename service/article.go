@@ -27,11 +27,14 @@ type ArticleList struct {
 
 // ArticleDetail struct for article detail info
 type ArticleDetail struct {
-	ID              uint64 `json:"id"`
-	Title           string `json:"title"`
-	ContentMarkdown string `json:"content_markdown"`
-	Status          string `json:"status"`
-	PostDate        string `json:"post_date"`
+	ID              uint64                 `json:"id"`
+	Title           string                 `json:"title"`
+	ContentMarkdown string                 `json:"content_markdown"`
+	Status          string                 `json:"status"`
+	PostDate        string                 `json:"post_date"`
+	MetaData        map[string]interface{} `json:"meta_date"`
+	Category        []uint64               `json:"category"`
+	Tag             []uint64               `json:"tag"`
 }
 
 // ListArticle article list
@@ -97,8 +100,16 @@ func ListArticle(title string, page, number int, sort, status string) ([]*Articl
 // GetArticleDetail get article detail by id
 func GetArticleDetail(articleID string) (*ArticleDetail, error) {
 	ID, _ := strconv.Atoi(articleID)
+	uID := uint64(ID)
 
-	a, err := model.GetArticle(uint64(ID))
+	// get article info
+	a, err := model.GetArticle(uID)
+	if err != nil {
+		return nil, err
+	}
+
+	// get extra data of article
+	am, err := model.GetArticleMetaData(uID)
 	if err != nil {
 		return nil, err
 	}
@@ -109,6 +120,22 @@ func GetArticleDetail(articleID string) (*ArticleDetail, error) {
 		ContentMarkdown: a.ContentMarkdown,
 		Status:          a.Status,
 		PostDate:        util.GetFormatTime(&a.PostDate, "2006-01-02 15:04:05"),
+		MetaData:        make(map[string]interface{}),
+	}
+
+	for _, meta := range am {
+		ArticleDetail.MetaData[meta.MetaKey] = meta.MetaValue
+	}
+
+	articleTaxonomy, err := GetArticleTaxonomy(uID)
+	category, categoryOk := articleTaxonomy["category"]
+	if categoryOk {
+		ArticleDetail.Category = category
+	}
+
+	tag, categoryOk := articleTaxonomy["tag"]
+	if categoryOk {
+		ArticleDetail.Tag = tag
 	}
 
 	return ArticleDetail, nil
