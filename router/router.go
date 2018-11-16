@@ -59,7 +59,7 @@ func Load(g *gin.Engine, mw ...gin.HandlerFunc) *gin.Engine {
 	{
 		a.GET("", article.List)
 		a.GET("/:id", article.Get)
-		a.POST("/:status", article.Create)
+		a.POST("", article.Create)
 		a.PUT("/:id", article.Update)
 		a.DELETE("/:id", article.Delete)
 	}

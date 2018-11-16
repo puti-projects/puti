@@ -14,11 +14,11 @@ import (
 
 // CreateRequest struct to crate taxonomy include category and tag
 type CreateRequest struct {
-	Name        string `form:"name"`
-	Slug        string `form:"slug"`
-	Description string `form:"description"`
-	ParentID    uint64 `form:"parentId"`
-	Taxonomy    string `form:"taxonomy"` // category or tag
+	Name        string `json:"name"`
+	Slug        string `json:"slug"`
+	Description string `json:"description"`
+	ParentID    uint64 `json:"parentId"`
+	Taxonomy    string `json:"taxonomy"` // category or tag
 }
 
 // Create create txonomy

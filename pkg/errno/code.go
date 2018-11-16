@@ -30,5 +30,6 @@ var (
 	ErrTaxonomyParentCanNotSelf = &Errno{Code: 20305, Message: "Parent can not be itself."}
 
 	// Article errors
-	ErrArticleNotFount = &Errno{Code: 20401, Message: "The article was not found."}
+	ErrArticleNotFount     = &Errno{Code: 20401, Message: "The article was not found."}
+	ErrArticleCreateFailed = &Errno{Code: 20402, Message: "Create article failed."}
 )

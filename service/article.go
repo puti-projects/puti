@@ -1,11 +1,12 @@
 package service
 
 import (
+	"strconv"
+	"sync"
+
 	"puti/config"
 	"puti/model"
 	"puti/util"
-	"strconv"
-	"sync"
 )
 
 // ArticleInfo is article info for article list
@@ -31,6 +32,10 @@ type ArticleDetail struct {
 	Title           string                 `json:"title"`
 	ContentMarkdown string                 `json:"content_markdown"`
 	Status          string                 `json:"status"`
+	CommentStatus   uint64                 `json:"comment_status"`
+	IfTop           uint64                 `json:"if_top"`
+	GUID            string                 `json:"guid"`
+	CoverPicture    string                 `json:"cover_picture"`
 	PostDate        string                 `json:"post_date"`
 	MetaData        map[string]interface{} `json:"meta_date"`
 	Category        []uint64               `json:"category"`
@@ -119,6 +124,10 @@ func GetArticleDetail(articleID string) (*ArticleDetail, error) {
 		Title:           a.Title,
 		ContentMarkdown: a.ContentMarkdown,
 		Status:          a.Status,
+		CommentStatus:   a.CommentStatus,
+		IfTop:           a.IfTop,
+		GUID:            a.GUID,
+		CoverPicture:    a.CoverPicture,
 		PostDate:        util.GetFormatTime(&a.PostDate, "2006-01-02 15:04:05"),
 		MetaData:        make(map[string]interface{}),
 	}

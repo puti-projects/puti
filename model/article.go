@@ -14,9 +14,10 @@ type ArticleModel struct {
 	ContentMarkdown string    `gorm:"column:content_markdown;not null"`
 	ContetnHTML     string    `gorm:"column:content_html;not null"`
 	Slug            string    `gorm:"column:slug;not null"`
-	ParentID        uint64    `gorm:"column:parent_id;not null"`
+	ParentID        uint64    `gorm:"column:parent_id;not null"` // set to 0 now, use for draft history feature in the future
 	Status          string    `gorm:"column:status;not null"`
 	CommentStatus   uint64    `gorm:"column:comment_status;not null"`
+	IfTop           uint64    `gorm:"column:if_top;not null"`
 	GUID            string    `gorm:"column:guid;not null"`
 	CoverPicture    string    `gorm:"column:cover_picture;not null"`
 	CommentCount    uint64    `gorm:"column:comment_count;not null"`

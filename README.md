@@ -1,5 +1,6 @@
 # Puti
-[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fputi-projects%2Fputi.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fputi-projects%2Fputi?ref=badge_shield)
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fputi-projects%2Fputi.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fputi-projects%2Fputi?ref=badge_shield)   
+This project is still developing.
 
 * Golang + [gin](https://github.com/gin-gonic/gin)
 * [Vue.js](https://github.com/vuejs/vue) + [Element](https://github.com/ElemeFE/element) + [vue-element-admin](https://github.com/PanJiaChen/vue-element-admin)

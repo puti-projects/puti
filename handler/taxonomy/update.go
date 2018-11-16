@@ -16,12 +16,12 @@ import (
 
 // UpdateRequest param struct to update taxonomy include category and tag
 type UpdateRequest struct {
-	ID          uint64 `form:"id"`
-	Name        string `form:"name"`
-	Slug        string `form:"slug"`
-	Description string `form:"description"`
-	ParentID    uint64 `form:"parentId"`
-	Taxonomy    string `form:"taxonomy"` // category or tag
+	ID          uint64 `json:"id"`
+	Name        string `json:"name"`
+	Slug        string `json:"slug"`
+	Description string `json:"description"`
+	ParentID    uint64 `json:"parentId"`
+	Taxonomy    string `json:"taxonomy"` // category or tag
 }
 
 // Update update taxonomy include category or tag
