@@ -20,8 +20,8 @@ puti
 logs/
 
 # upload dir
-# uploads/*
-# !uploads/users/default.jpg
+uploads/*
+!uploads/users/default.jpg
 
 # 先不上传vendor
 vendor/*
