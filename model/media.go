@@ -1,7 +1,7 @@
 package model
 
 import (
-	"puti/util"
+	"puti/utils"
 
 	"github.com/jinzhu/gorm"
 )
@@ -29,7 +29,7 @@ func (c *MediaModel) TableName() string {
 // BeforeCreate set values before create
 // Set file type by mime-type
 func (c *MediaModel) BeforeCreate(scope *gorm.Scope) error {
-	scope.SetColumn("Type", util.GetFileType(c.MimeType))
+	scope.SetColumn("Type", utils.GetFileType(c.MimeType))
 	return nil
 }
 

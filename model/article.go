@@ -57,6 +57,13 @@ func GetArticleMetaData(articleID uint64) ([]*ArticleMetaModel, error) {
 	return am, d.Error
 }
 
+// GetOneArticleMetaData get one specific meta by metakey and article id
+func GetOneArticleMetaData(articleID uint64, metaKey string) (*ArticleMetaModel, error) {
+	am := &ArticleMetaModel{}
+	d := DB.Local.Where("post_id = ? AND meta_key = ?", articleID, metaKey).First(&am)
+	return am, d.Error
+}
+
 // ListArticle shows the articles in condition
 func ListArticle(title string, page, number int, sort, status string) ([]*ArticleModel, uint64, error) {
 	articles := make([]*ArticleModel, 0)

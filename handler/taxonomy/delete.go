@@ -6,7 +6,7 @@ import (
 	Response "puti/handler"
 	"puti/pkg/errno"
 	"puti/service"
-	"puti/util"
+	"puti/utils"
 
 	"github.com/gin-gonic/gin"
 	"github.com/lexkong/log"
@@ -15,7 +15,7 @@ import (
 
 // Delete delete the taxonomy directly without soft delete
 func Delete(c *gin.Context) {
-	log.Info("Delete function called.", lager.Data{"X-Request-Id": util.GetReqID(c)})
+	log.Info("Delete function called.", lager.Data{"X-Request-Id": utils.GetReqID(c)})
 
 	ID, _ := strconv.Atoi(c.Param("id"))
 	taxonomyType := c.Query("taxonomy") // TODO

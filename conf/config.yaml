@@ -15,7 +15,7 @@ tls:
 log:
   writers: file,stdout
   logger_level: DEBUG
-  logger_file: log/server.log
+  logger_file: logs/server.log
   logger_format_text: false # true为json格式
   rollingPolicy: size # aily 和 size；daily 则根据天进行转存，如果是 size 则根据大小进行转存
   log_rotate_date: 1  # rotate 转存时间，配 合rollingPolicy: daily 使用

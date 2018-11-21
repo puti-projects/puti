@@ -4,7 +4,7 @@ import (
 	Response "puti/handler"
 	"puti/model"
 	"puti/pkg/errno"
-	"puti/util"
+	"puti/utils"
 
 	"github.com/gin-gonic/gin"
 	"github.com/lexkong/log"
@@ -30,7 +30,7 @@ type CreateResponse struct {
 
 // Create creates a user
 func Create(c *gin.Context) {
-	log.Info("User Create function called.", lager.Data{"X-request-Id": util.GetReqID(c)})
+	log.Info("User Create function called.", lager.Data{"X-request-Id": utils.GetReqID(c)})
 
 	var r CreateRequest
 	if err := c.Bind(&r); err != nil {

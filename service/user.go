@@ -5,7 +5,7 @@ import (
 	"sync"
 
 	"puti/model"
-	"puti/util"
+	"puti/utils"
 )
 
 // UserInfo is the user struct for user list
@@ -44,8 +44,8 @@ func GetUser(username string) (*UserInfo, error) {
 		Roles:          u.Roles,
 		Status:         u.Status,
 		Website:        u.PageURL,
-		RegisteredTime: util.GetFormatTime(&u.CreatedAt, "2006-01-02 15:04:05"),
-		DeletedTime:    util.GetFormatTime(u.DeletedAt, "2006-01-02 15:04:05"),
+		RegisteredTime: utils.GetFormatTime(&u.CreatedAt, "2006-01-02 15:04:05"),
+		DeletedTime:    utils.GetFormatTime(u.DeletedAt, "2006-01-02 15:04:05"),
 	}
 
 	return userInfo, nil
@@ -88,8 +88,8 @@ func ListUser(username, role string, number, page, status int) ([]*UserInfo, uin
 				Email:          u.Email,
 				Status:         u.Status,
 				Roles:          u.Roles,
-				RegisteredTime: util.GetFormatTime(&u.CreatedAt, "2006-01-02 15:04:05"),
-				DeletedTime:    util.GetFormatTime(u.DeletedAt, "2006-01-02 15:04:05")}
+				RegisteredTime: utils.GetFormatTime(&u.CreatedAt, "2006-01-02 15:04:05"),
+				DeletedTime:    utils.GetFormatTime(u.DeletedAt, "2006-01-02 15:04:05")}
 		}(u)
 	}
 

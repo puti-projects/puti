@@ -6,7 +6,7 @@ import (
 
 	"puti/config"
 	"puti/model"
-	"puti/util"
+	"puti/utils"
 )
 
 // ArticleInfo is article info for article list
@@ -128,8 +128,10 @@ func GetArticleDetail(articleID string) (*ArticleDetail, error) {
 		IfTop:           a.IfTop,
 		GUID:            a.GUID,
 		CoverPicture:    a.CoverPicture,
-		PostDate:        util.GetFormatTime(&a.PostDate, "2006-01-02 15:04:05"),
+		PostDate:        utils.GetFormatTime(&a.PostDate, "2006-01-02 15:04:05"),
 		MetaData:        make(map[string]interface{}),
+		Category:        make([]uint64, 0),
+		Tag:             make([]uint64, 0),
 	}
 
 	for _, meta := range am {
@@ -148,4 +150,59 @@ func GetArticleDetail(articleID string) (*ArticleDetail, error) {
 	}
 
 	return ArticleDetail, nil
+}
+
+// UpdateArticle update article info
+// In this version, article meta data just update description, it should be more than one choise.TODO
+func UpdateArticle(article *model.ArticleModel, description string, category []uint64, tag []uint64) (err error) {
+	tx := model.DB.Local.Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	if tx.Error != nil {
+		return err
+	}
+
+	// udapte article
+	oldArticle, err := model.GetArticle(article.ID)
+	if err != nil {
+		return err
+	}
+	oldArticle.Title = article.Title
+	oldArticle.ContentMarkdown = article.ContentMarkdown
+	oldArticle.ContetnHTML = article.ContetnHTML
+	oldArticle.Status = article.Status
+	oldArticle.CommentStatus = article.CommentStatus
+	oldArticle.IfTop = article.IfTop
+	oldArticle.CoverPicture = article.CoverPicture
+	oldArticle.PostDate = article.PostDate
+	if err = tx.Model(&model.ArticleModel{}).Save(oldArticle).Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	// update article meta data
+	oldArticleMeta, err := model.GetOneArticleMetaData(article.ID, "description")
+	if oldArticleMeta.MetaValue != description {
+		oldArticleMeta.MetaValue = description
+		if err = tx.Model(&model.ArticleMetaModel{}).Save(oldArticleMeta).Error; err != nil {
+			tx.Rollback()
+			return err
+		}
+	}
+
+	// update category and tag
+	// model.Get
+
+	// calculate category and tag
+	// TODO
+
+	return
+}
+
+func CalculateTaxonomyCount() {
+
 }

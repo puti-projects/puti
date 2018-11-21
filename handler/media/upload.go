@@ -13,7 +13,7 @@ import (
 	Response "puti/handler"
 	"puti/model"
 	"puti/pkg/errno"
-	"puti/util"
+	"puti/utils"
 
 	"github.com/gin-gonic/gin"
 )
@@ -25,7 +25,7 @@ type UploadResponse struct {
 }
 
 // savePathURI defines the media file save path uri
-const savePathURI string = "/upload/"
+const savePathURI string = "/uploads/"
 
 // Upload the function handle the file upload
 func Upload(c *gin.Context) {
@@ -41,7 +41,7 @@ func Upload(c *gin.Context) {
 	}
 
 	// set variables
-	fileExt := util.GetFileExt(file)
+	fileExt := utils.GetFileExt(file)
 	fileNameWithoutExt := strings.TrimSuffix(file.Filename, fileExt)
 	unixTime := time.Now().Unix()
 
@@ -73,7 +73,7 @@ func Upload(c *gin.Context) {
 		Title:    file.Filename,
 		Slug:     fileNameWithoutExt,
 		GUID:     pathName,
-		MimeType: util.GetFileMimeTypeByExt(fileExt),
+		MimeType: utils.GetFileMimeTypeByExt(fileExt),
 	}
 
 	// save file info
@@ -95,9 +95,9 @@ func getSavePath() (string, error) {
 	now := time.Now()
 
 	// handel year path
-	year := util.GetFormatTime(&now, "2006")
+	year := utils.GetFormatTime(&now, "2006")
 	yearPath := fmt.Sprintf(".%s%s", savePathURI, year)
-	yearExist, err := util.PathExists(yearPath)
+	yearExist, err := utils.PathExists(yearPath)
 	if err != nil {
 		return "", err
 	}
@@ -109,9 +109,9 @@ func getSavePath() (string, error) {
 	}
 
 	// handle month path
-	month := util.GetFormatTime(&now, "01")
+	month := utils.GetFormatTime(&now, "01")
 	monthPath := fmt.Sprintf(".%s%s/%s", savePathURI, year, month)
-	monthExist, err := util.PathExists(monthPath)
+	monthExist, err := utils.PathExists(monthPath)
 	if err != nil {
 		return "", err
 	}

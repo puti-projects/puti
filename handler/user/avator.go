@@ -7,20 +7,20 @@ import (
 	"puti/model"
 	"puti/pkg/errno"
 	"puti/service"
-	"puti/util"
+	"puti/utils"
 
 	"github.com/gin-gonic/gin"
 )
 
 // savePath defines the use avatar save path
-const savePath string = "/upload/users/"
+const savePath string = "/uploads/users/"
 
 // Avatar saves the upload avatar for user
 func Avatar(c *gin.Context) {
 	userID := c.PostForm("userId")
 	file, _ := c.FormFile("img")
 
-	fileExt := util.GetFileExt(file)
+	fileExt := utils.GetFileExt(file)
 	newFileName := "user_" + userID + fileExt
 
 	// Upload the file to specific dst.

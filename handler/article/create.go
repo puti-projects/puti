@@ -8,7 +8,7 @@ import (
 	Response "puti/handler"
 	"puti/model"
 	"puti/pkg/errno"
-	"puti/util"
+	"puti/utils"
 
 	"github.com/gin-gonic/gin"
 	"github.com/lexkong/log"
@@ -38,7 +38,7 @@ type CreateResponse struct {
 
 // Create create a new aricle(published or draft)
 func Create(c *gin.Context) {
-	log.Info("Article Create function called.", lager.Data{"X-request-Id": util.GetReqID(c)})
+	log.Info("Article Create function called.", lager.Data{"X-request-Id": utils.GetReqID(c)})
 
 	var r CreateRequest
 	if err := c.Bind(&r); err != nil {
@@ -85,7 +85,7 @@ func handleCreate(r *CreateRequest) (rsp *CreateResponse, err error) {
 		CoverPicture:    r.CoverPicture,
 		CommentCount:    0,
 		ViewCount:       0,
-		PostDate:        util.StringToTime("2006-01-02 15:04:05", r.PostedTime),
+		PostDate:        utils.StringToTime("2006-01-02 15:04:05", r.PostedTime),
 	}
 	if err := tx.Create(&article).Error; err != nil {
 		return rsp, err
@@ -132,6 +132,9 @@ func handleCreate(r *CreateRequest) (rsp *CreateResponse, err error) {
 		tx.Rollback()
 		return rsp, err
 	}
+
+	// calculate category and tag count
+	// TODO
 
 	rsp.ID = article.ID
 	rsp.GUID = article.GUID

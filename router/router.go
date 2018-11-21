@@ -29,7 +29,7 @@ func Load(g *gin.Engine, mw ...gin.HandlerFunc) *gin.Engine {
 
 	// static resource
 	g.Static("/static", "backend/dist/static")
-	g.Static("/upload", "upload/")
+	g.Static("/upload", "uploads/")
 	// g.StaticFile("/favicon.ico", "./resources/favicon.ico")
 
 	// Group for api

@@ -17,11 +17,11 @@ puti
 .idea
 
 # log
-log/
+logs/
 
 # upload dir
-upload/*
-!upload/user/default.jpg
+# uploads/*
+# !uploads/users/default.jpg
 
 # 先不上传vendor
 vendor/*

@@ -7,7 +7,7 @@ import (
 	"puti/model"
 	"puti/pkg/errno"
 	"puti/service"
-	"puti/util"
+	"puti/utils"
 
 	"github.com/gin-gonic/gin"
 	"github.com/lexkong/log"
@@ -24,7 +24,7 @@ type UpdateRequest struct {
 
 // Update update media info
 func Update(c *gin.Context) {
-	log.Info("Update function called.", lager.Data{"X-Request-Id": util.GetReqID(c)})
+	log.Info("Update function called.", lager.Data{"X-Request-Id": utils.GetReqID(c)})
 
 	// Get user id
 	userID, _ := strconv.Atoi(c.Param("id"))
