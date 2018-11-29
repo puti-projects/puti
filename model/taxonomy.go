@@ -118,6 +118,11 @@ func GetTermByID(termID uint64) (*TermModel, error) {
 // GetTermTaxonomy get term taxonomy by term_id and taxonomy type
 func GetTermTaxonomy(termID uint64, taxonomyType string) (*TermTaxonomyModel, error) {
 	m := &TermTaxonomyModel{}
+	if taxonomyType == "" {
+		d := DB.Local.Where("term_id = ?", termID).First(&m)
+		return m, d.Error
+	}
+
 	d := DB.Local.Where("term_id = ? AND taxonomy = ?", termID, taxonomyType).First(&m)
 	return m, d.Error
 }

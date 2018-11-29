@@ -313,3 +313,57 @@ func GetArticleTaxonomy(articleID uint64) (map[string][]uint64, error) {
 
 	return articleTaxonomy, nil
 }
+
+// UpdateTaxonomyCountByArticleChange update taxonomy article number count when editing the article
+// diffenet with updateTaxonomyCount
+// checkout taxonomy's parent and compare it with the term group is in need
+func UpdateTaxonomyCountByArticleChange(tx *gorm.DB, termIDGroup []uint64, countDiff int64) (err error) {
+	var parentTerms []uint64
+	for _, termID := range termIDGroup {
+		parentTerms, err = getTaxonomyParentTermID(tx, termID, parentTerms)
+		if err != nil {
+			return err
+		}
+	}
+
+	if len(parentTerms) != 0 {
+		for _, v := range parentTerms {
+			inGroup := false
+			for _, vv := range termIDGroup {
+				if vv == v {
+					inGroup = true
+				}
+			}
+
+			if inGroup == false {
+				termIDGroup = append(termIDGroup, v)
+			}
+		}
+	}
+
+	termModel := &model.TermModel{}
+	err = tx.Table(termModel.TableName()).Where("term_id IN (?)", termIDGroup).UpdateColumn("count", gorm.Expr("count + ?", countDiff)).Error
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func getTaxonomyParentTermID(tx *gorm.DB, termID uint64, parentTerm []uint64) (parentTermGroup []uint64, err error) {
+	termTaxonomy := &model.TermTaxonomyModel{}
+	err = tx.Where("term_id = ?", termID).First(&termTaxonomy).Error
+	if err != nil {
+		return nil, err
+	}
+
+	if termTaxonomy.ParentTermID != 0 {
+		parentTermGroup := append(parentTermGroup, termTaxonomy.ParentTermID)
+		parentTermGroup, err := getTaxonomyParentTermID(tx, termTaxonomy.ParentTermID, parentTermGroup)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return parentTermGroup, nil
+}

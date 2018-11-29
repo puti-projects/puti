@@ -8,6 +8,7 @@ import (
 	Response "puti/handler"
 	"puti/model"
 	"puti/pkg/errno"
+	"puti/service"
 	"puti/utils"
 
 	"github.com/gin-gonic/gin"
@@ -133,8 +134,12 @@ func handleCreate(r *CreateRequest) (rsp *CreateResponse, err error) {
 		return rsp, err
 	}
 
-	// calculate category and tag count
-	// TODO
+	// update taxonomy count
+	insertTaxonomy := append(r.Category, r.Tag...)
+	if err := service.UpdateTaxonomyCountByArticleChange(tx, insertTaxonomy, 1); err != nil {
+		tx.Rollback()
+		return nil, err
+	}
 
 	rsp.ID = article.ID
 	rsp.GUID = article.GUID

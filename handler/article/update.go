@@ -1,7 +1,6 @@
 package article
 
 import (
-	"fmt"
 	"strconv"
 
 	Response "puti/handler"
@@ -41,7 +40,6 @@ func Update(c *gin.Context) {
 		Response.SendResponse(c, errno.ErrBind, nil)
 		return
 	}
-	fmt.Println(r)
 
 	articleID := uint64(ID)
 

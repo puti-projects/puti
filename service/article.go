@@ -1,7 +1,9 @@
 package service
 
 import (
+	"fmt"
 	"strconv"
+	"strings"
 	"sync"
 
 	"puti/config"
@@ -144,8 +146,8 @@ func GetArticleDetail(articleID string) (*ArticleDetail, error) {
 		ArticleDetail.Category = category
 	}
 
-	tag, categoryOk := articleTaxonomy["tag"]
-	if categoryOk {
+	tag, tagOk := articleTaxonomy["tag"]
+	if tagOk {
 		ArticleDetail.Tag = tag
 	}
 
@@ -194,15 +196,70 @@ func UpdateArticle(article *model.ArticleModel, description string, category []u
 		}
 	}
 
-	// update category and tag
-	// model.Get
+	// get old and new taxonomy
+	articleTaxonomy, err := model.GetArticleTaxonomy(article.ID)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+	var oldTaxonomy []uint64
+	for _, item := range articleTaxonomy {
+		oldTaxonomy = append(oldTaxonomy, item.TermID)
+	}
+	newTaxonomy := append(category, tag...)
 
-	// calculate category and tag
-	// TODO
+	// delete all old relationship
+	dRelation := tx.Where("object_id = ?", article.ID).Delete(model.TermRelationshipsModel{})
+	if err := dRelation.Error; err != nil {
+		tx.Rollback()
+		return err
+	}
 
-	return
+	// insert all new relationship
+	valueStrings := make([]string, 0, len(newTaxonomy))
+	valueArgs := make([]interface{}, 0, len(newTaxonomy))
+	for _, item := range newTaxonomy {
+		termTaxonomy, _ := model.GetTermTaxonomy(item, "")
+		valueStrings = append(valueStrings, "(?, ?, ?)")
+		valueArgs = append(valueArgs, article.ID)      // object_id
+		valueArgs = append(valueArgs, termTaxonomy.ID) // term_taxonomy_id
+		valueArgs = append(valueArgs, 0)               // term_order
+	}
+	tb := &model.TermRelationshipsModel{}
+	stmt := fmt.Sprintf("INSERT INTO %s (object_id, term_taxonomy_id, term_order) VALUES %s", tb.TableName(), strings.Join(valueStrings, ","))
+	if err := tx.Exec(stmt, valueArgs...).Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	// calculate taxonomy diff
+	deleteTaxonomy := calSliceDiff(oldTaxonomy, newTaxonomy)
+	insertTaxonomy := calSliceDiff(newTaxonomy, oldTaxonomy)
+	// update count
+	if err := UpdateTaxonomyCountByArticleChange(tx, insertTaxonomy, 1); err != nil {
+		tx.Rollback()
+		return err
+	}
+	if err := UpdateTaxonomyCountByArticleChange(tx, deleteTaxonomy, -1); err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	return tx.Commit().Error
 }
 
-func CalculateTaxonomyCount() {
+func calSliceDiff(slice1, slice2 []uint64) (diffslice []uint64) {
+	for _, v := range slice1 {
+		inSlice2 := false
+		for _, vv := range slice2 {
+			if vv == v {
+				inSlice2 = true
+			}
+		}
 
+		if inSlice2 == false {
+			diffslice = append(diffslice, v)
+		}
+	}
+	return
 }
