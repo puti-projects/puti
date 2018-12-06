@@ -8,6 +8,7 @@ import (
 	Response "puti/handler"
 	"puti/model"
 	"puti/pkg/errno"
+	"puti/pkg/token"
 	"puti/service"
 	"puti/utils"
 
@@ -39,7 +40,11 @@ type CreateResponse struct {
 
 // Create create a new aricle(published or draft)
 func Create(c *gin.Context) {
-	log.Info("Article Create function called.", lager.Data{"X-request-Id": utils.GetReqID(c)})
+	log.Info("Article create function called.", lager.Data{"X-request-Id": utils.GetReqID(c)})
+
+	// get token and parse
+	t := c.Query("token")
+	userContext, err := token.ParseToken(t)
 
 	var r CreateRequest
 	if err := c.Bind(&r); err != nil {
@@ -54,7 +59,7 @@ func Create(c *gin.Context) {
 	}
 
 	// add article data
-	rsp, err := handleCreate(&r)
+	rsp, err := handleCreate(&r, userContext.ID)
 	if err != nil {
 		Response.SendResponse(c, errno.ErrArticleCreateFailed, nil)
 		return
@@ -63,7 +68,7 @@ func Create(c *gin.Context) {
 	Response.SendResponse(c, nil, rsp)
 }
 
-func handleCreate(r *CreateRequest) (rsp *CreateResponse, err error) {
+func handleCreate(r *CreateRequest, userID uint64) (rsp *CreateResponse, err error) {
 	rsp = new(CreateResponse)
 
 	tx := model.DB.Local.Begin()
@@ -75,6 +80,7 @@ func handleCreate(r *CreateRequest) (rsp *CreateResponse, err error) {
 
 	// main data
 	article := model.ArticleModel{
+		UserID:          userID,
 		PostType:        "article",
 		Title:           r.Title,
 		ContentMarkdown: r.Content,

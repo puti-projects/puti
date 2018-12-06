@@ -6,6 +6,7 @@ import (
 	"puti/handler/article"
 	"puti/handler/auth"
 	"puti/handler/media"
+	"puti/handler/page"
 	"puti/handler/sd"
 	"puti/handler/taxonomy"
 	"puti/handler/user"
@@ -62,6 +63,16 @@ func Load(g *gin.Engine, mw ...gin.HandlerFunc) *gin.Engine {
 		a.POST("", article.Create)
 		a.PUT("/:id", article.Update)
 		a.DELETE("/:id", article.Delete)
+	}
+
+	p := api.Group("/page")
+	p.Use(middleware.AuthMiddleware())
+	{
+		p.GET("", page.List)
+		p.GET("/:id", page.Get)
+		p.POST("", page.Create)
+		p.PUT("/:id", page.Update)
+		p.DELETE("/:id", page.Delete)
 	}
 
 	t := api.Group("/taxonomy")

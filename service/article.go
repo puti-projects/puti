@@ -263,3 +263,81 @@ func calSliceDiff(slice1, slice2 []uint64) (diffslice []uint64) {
 	}
 	return
 }
+
+// DeleteArticle delete article by soft delete
+// meta data was reserved
+func DeleteArticle(articleID uint64) error {
+	tx := model.DB.Local.Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	// get article taxonomy by type
+	articleTaxonomy, err := GetArticleTaxonomy(articleID)
+	if err != nil {
+		return err
+	}
+
+	// delete article relationship
+	dRelation := tx.Where("object_id = ?", articleID).Delete(model.TermRelationshipsModel{})
+	if err := dRelation.Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	// recount and update taxonomy count
+	taxonomy := append(articleTaxonomy["category"], articleTaxonomy["tag"]...)
+	if len(taxonomy) != 0 {
+		// update category count
+		err := UpdateTaxonomyCountByArticleChange(tx, taxonomy, -1)
+		if err != nil {
+			tx.Rollback()
+			return err
+		}
+	}
+
+	// delete article
+	dArticle := tx.Where("id = ?", articleID).Delete(model.ArticleModel{})
+	if err := dArticle.Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	return tx.Commit().Error
+}
+
+// TrashArticle put the article into the trash by "delete" button
+// The different between DeleteArticle and TrashArticle is that TrashArticle just set the status to deleted
+func TrashArticle(articleID uint64) error {
+	oldArticle, err := model.GetArticle(articleID)
+	if err != nil {
+		return err
+	}
+
+	oldArticle.Status = "deleted"
+
+	if err = model.DB.Local.Model(&model.ArticleModel{}).Save(oldArticle).Error; err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// RestoreArticle restore the article which had been put to the trash
+// this restore action will set the article as a draft status
+func RestoreArticle(articleID uint64) error {
+	oldArticle, err := model.GetArticle(articleID)
+	if err != nil {
+		return err
+	}
+
+	oldArticle.Status = "draft"
+
+	if err = model.DB.Local.Model(&model.ArticleModel{}).Save(oldArticle).Error; err != nil {
+		return err
+	}
+
+	return nil
+}

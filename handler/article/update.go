@@ -14,6 +14,7 @@ import (
 	"github.com/lexkong/log/lager"
 )
 
+// UpdateRequest struct for update article
 type UpdateRequest struct {
 	ID            uint64   `json:"id"`
 	Status        string   `json:"status"`
@@ -29,8 +30,10 @@ type UpdateRequest struct {
 	Tag           []uint64 `json:"tag"`
 }
 
+// Update update article
+// Delete and restore article are also in this function and it depends on the 'status'
 func Update(c *gin.Context) {
-	log.Info("Update function called.", lager.Data{"X-Request-Id": utils.GetReqID(c)})
+	log.Info("Article update function called.", lager.Data{"X-Request-Id": utils.GetReqID(c)})
 
 	// Get term id
 	ID, _ := strconv.Atoi(c.Param("id"))
@@ -49,22 +52,34 @@ func Update(c *gin.Context) {
 		return
 	}
 
-	article := &model.ArticleModel{
-		Model:           model.Model{ID: r.ID},
-		Title:           r.Title,
-		ContentMarkdown: r.Content,
-		ContetnHTML:     r.ContentHTML,
-		Status:          r.Status,
-		CommentStatus:   r.CommentStatus,
-		IfTop:           r.IfTop,
-		CoverPicture:    r.CoverPicture,
-		PostDate:        utils.StringToTime("2006-01-02 15:04:05", r.PostedTime),
-	}
+	if r.Status == "deleted" {
+		if err := service.TrashArticle(articleID); err != nil {
+			Response.SendResponse(c, errno.ErrDatabase, nil)
+			return
+		}
+	} else if r.Status == "restore" {
+		if err := service.RestoreArticle(articleID); err != nil {
+			Response.SendResponse(c, errno.ErrDatabase, nil)
+			return
+		}
+	} else {
+		article := &model.ArticleModel{
+			Model:           model.Model{ID: r.ID},
+			Title:           r.Title,
+			ContentMarkdown: r.Content,
+			ContetnHTML:     r.ContentHTML,
+			Status:          r.Status,
+			CommentStatus:   r.CommentStatus,
+			IfTop:           r.IfTop,
+			CoverPicture:    r.CoverPicture,
+			PostDate:        utils.StringToTime("2006-01-02 15:04:05", r.PostedTime),
+		}
 
-	// Update changed fields.
-	if err := service.UpdateArticle(article, r.Description, r.Category, r.Tag); err != nil {
-		Response.SendResponse(c, errno.ErrDatabase, nil)
-		return
+		// Update changed fields.
+		if err := service.UpdateArticle(article, r.Description, r.Category, r.Tag); err != nil {
+			Response.SendResponse(c, errno.ErrDatabase, nil)
+			return
+		}
 	}
 
 	Response.SendResponse(c, nil, nil)
@@ -78,6 +93,14 @@ func (r *UpdateRequest) checkParam(articleID uint64) error {
 
 	if r.ID != articleID {
 		return errno.New(errno.ErrValidation, nil).Add("error id.")
+	}
+
+	if r.Status == "" {
+		return errno.New(errno.ErrValidation, nil).Add("need status.")
+	}
+
+	if r.Status != "publish" && r.Status != "draft" && r.Status != "deleted" && r.Status != "restore" {
+		return errno.New(errno.ErrValidation, nil).Add("error status.")
 	}
 
 	return nil
