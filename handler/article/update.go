@@ -35,7 +35,7 @@ type UpdateRequest struct {
 func Update(c *gin.Context) {
 	log.Info("Article update function called.", lager.Data{"X-Request-Id": utils.GetReqID(c)})
 
-	// Get term id
+	// Get article id
 	ID, _ := strconv.Atoi(c.Param("id"))
 
 	var r UpdateRequest
@@ -53,17 +53,17 @@ func Update(c *gin.Context) {
 	}
 
 	if r.Status == "deleted" {
-		if err := service.TrashArticle(articleID); err != nil {
+		if err := service.TrashPost(articleID); err != nil {
 			Response.SendResponse(c, errno.ErrDatabase, nil)
 			return
 		}
 	} else if r.Status == "restore" {
-		if err := service.RestoreArticle(articleID); err != nil {
+		if err := service.RestorePost(articleID); err != nil {
 			Response.SendResponse(c, errno.ErrDatabase, nil)
 			return
 		}
 	} else {
-		article := &model.ArticleModel{
+		article := &model.PostModel{
 			Model:           model.Model{ID: r.ID},
 			Title:           r.Title,
 			ContentMarkdown: r.Content,

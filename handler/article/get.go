@@ -12,11 +12,11 @@ import (
 func Get(c *gin.Context) {
 	articleID := c.Param("id")
 
-	Article, err := service.GetArticleDetail(articleID)
+	article, err := service.GetArticleDetail(articleID)
 	if err != nil {
 		Response.SendResponse(c, errno.ErrArticleNotFount, nil)
 		return
 	}
 
-	Response.SendResponse(c, nil, Article)
+	Response.SendResponse(c, nil, article)
 }

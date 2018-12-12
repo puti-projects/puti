@@ -79,7 +79,7 @@ func handleCreate(r *CreateRequest, userID uint64) (rsp *CreateResponse, err err
 	}()
 
 	// main data
-	article := model.ArticleModel{
+	article := model.PostModel{
 		UserID:          userID,
 		PostType:        "article",
 		Title:           r.Title,
@@ -100,13 +100,13 @@ func handleCreate(r *CreateRequest, userID uint64) (rsp *CreateResponse, err err
 
 	// set GUID
 	article.GUID = fmt.Sprintf("/article/%s.html", strconv.FormatUint(article.ID, 10))
-	if err := tx.Model(&model.ArticleModel{}).Save(article).Error; err != nil {
+	if err := tx.Model(&model.PostModel{}).Save(article).Error; err != nil {
 		tx.Rollback()
 		return rsp, err
 	}
 
 	// set metadata
-	articleMeta := model.ArticleMetaModel{
+	articleMeta := model.PostMetaModel{
 		PostID:    article.ID,
 		MetaKey:   "description",
 		MetaValue: r.Description,

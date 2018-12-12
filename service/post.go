@@ -9,10 +9,12 @@ import (
 	"puti/config"
 	"puti/model"
 	"puti/utils"
+
+	"github.com/jinzhu/gorm"
 )
 
-// ArticleInfo is article info for article list
-type ArticleInfo struct {
+// PostInfo is post info for post list
+type PostInfo struct {
 	ID           uint64 `json:"id"`
 	UserID       uint64 `json:"userId"`
 	Title        string `json:"title"`
@@ -22,13 +24,13 @@ type ArticleInfo struct {
 	ViewCount    uint64 `json:"view_count"`
 }
 
-// ArticleList article list
-type ArticleList struct {
+// PostList post list
+type PostList struct {
 	Lock  *sync.Mutex
-	IDMap map[uint64]*ArticleInfo
+	IDMap map[uint64]*PostInfo
 }
 
-// ArticleDetail struct for article detail info
+// ArticleDetail struct for article info detail
 type ArticleDetail struct {
 	ID              uint64                 `json:"id"`
 	Title           string                 `json:"title"`
@@ -44,37 +46,52 @@ type ArticleDetail struct {
 	Tag             []uint64               `json:"tag"`
 }
 
-// ListArticle article list
-func ListArticle(title string, page, number int, sort, status string) ([]*ArticleInfo, uint64, error) {
-	infos := make([]*ArticleInfo, 0)
-	articles, count, err := model.ListArticle(title, page, number, sort, status)
+// PageDetail struct for page info detail
+type PageDetail struct {
+	ID              uint64                 `json:"id"`
+	Title           string                 `json:"title"`
+	ContentMarkdown string                 `json:"content_markdown"`
+	Slug            string                 `json:"slug"`
+	ParentID        uint64                 `json:"parent_id"`
+	Status          string                 `json:"status"`
+	CommentStatus   uint64                 `json:"comment_status"`
+	GUID            string                 `json:"guid"`
+	CoverPicture    string                 `json:"cover_picture"`
+	PostDate        string                 `json:"post_date"`
+	MetaData        map[string]interface{} `json:"meta_date"`
+}
+
+// ListPost post list
+func ListPost(postType, title string, page, number int, sort, status string) ([]*PostInfo, uint64, error) {
+	infos := make([]*PostInfo, 0)
+	posts, count, err := model.ListPost(postType, title, page, number, sort, status)
 	if err != nil {
 		return nil, count, err
 	}
 
 	ids := []uint64{}
-	for _, article := range articles {
-		ids = append(ids, article.ID)
+	for _, post := range posts {
+		ids = append(ids, post.ID)
 	}
 
 	wg := sync.WaitGroup{}
-	articleList := ArticleList{
+	postList := PostList{
 		Lock:  new(sync.Mutex),
-		IDMap: make(map[uint64]*ArticleInfo, len(articles)),
+		IDMap: make(map[uint64]*PostInfo, len(posts)),
 	}
 
 	errChan := make(chan error, 1)
 	finished := make(chan bool, 1)
 
 	// Improve query efficiency in parallel
-	for _, u := range articles {
+	for _, u := range posts {
 		wg.Add(1)
-		go func(u *model.ArticleModel) {
+		go func(u *model.PostModel) {
 			defer wg.Done()
 
-			articleList.Lock.Lock()
-			defer articleList.Lock.Unlock()
-			articleList.IDMap[u.ID] = &ArticleInfo{
+			postList.Lock.Lock()
+			defer postList.Lock.Unlock()
+			postList.IDMap[u.ID] = &PostInfo{
 				ID:           u.ID,
 				UserID:       u.UserID,
 				Title:        u.Title,
@@ -98,7 +115,7 @@ func ListArticle(title string, page, number int, sort, status string) ([]*Articl
 	}
 
 	for _, id := range ids {
-		infos = append(infos, articleList.IDMap[id])
+		infos = append(infos, postList.IDMap[id])
 	}
 
 	return infos, count, nil
@@ -110,13 +127,13 @@ func GetArticleDetail(articleID string) (*ArticleDetail, error) {
 	uID := uint64(ID)
 
 	// get article info
-	a, err := model.GetArticle(uID)
+	a, err := model.GetPost(uID)
 	if err != nil {
 		return nil, err
 	}
 
 	// get extra data of article
-	am, err := model.GetArticleMetaData(uID)
+	am, err := model.GetPostMetaData(uID)
 	if err != nil {
 		return nil, err
 	}
@@ -154,9 +171,47 @@ func GetArticleDetail(articleID string) (*ArticleDetail, error) {
 	return ArticleDetail, nil
 }
 
+// GetPageDetail get page detail by id
+func GetPageDetail(pageID string) (*PageDetail, error) {
+	ID, _ := strconv.Atoi(pageID)
+	uID := uint64(ID)
+
+	// get page info
+	p, err := model.GetPost(uID)
+	if err != nil {
+		return nil, err
+	}
+
+	// get extra data of page
+	pm, err := model.GetPostMetaData(uID)
+	if err != nil {
+		return nil, err
+	}
+
+	pageDetail := &PageDetail{
+		ID:              p.ID,
+		Title:           p.Title,
+		ContentMarkdown: p.ContentMarkdown,
+		Slug:            p.Slug,
+		ParentID:        p.ParentID,
+		Status:          p.Status,
+		CommentStatus:   p.CommentStatus,
+		GUID:            p.GUID,
+		CoverPicture:    p.CoverPicture,
+		PostDate:        utils.GetFormatTime(&p.PostDate, "2006-01-02 15:04:05"),
+		MetaData:        make(map[string]interface{}),
+	}
+
+	for _, meta := range pm {
+		pageDetail.MetaData[meta.MetaKey] = meta.MetaValue
+	}
+
+	return pageDetail, nil
+}
+
 // UpdateArticle update article info
 // In this version, article meta data just update description, it should be more than one choise.TODO
-func UpdateArticle(article *model.ArticleModel, description string, category []uint64, tag []uint64) (err error) {
+func UpdateArticle(article *model.PostModel, description string, category []uint64, tag []uint64) (err error) {
 	tx := model.DB.Local.Begin()
 	defer func() {
 		if r := recover(); r != nil {
@@ -169,7 +224,7 @@ func UpdateArticle(article *model.ArticleModel, description string, category []u
 	}
 
 	// udapte article
-	oldArticle, err := model.GetArticle(article.ID)
+	oldArticle, err := model.GetPost(article.ID)
 	if err != nil {
 		return err
 	}
@@ -181,16 +236,16 @@ func UpdateArticle(article *model.ArticleModel, description string, category []u
 	oldArticle.IfTop = article.IfTop
 	oldArticle.CoverPicture = article.CoverPicture
 	oldArticle.PostDate = article.PostDate
-	if err = tx.Model(&model.ArticleModel{}).Save(oldArticle).Error; err != nil {
+	if err = tx.Model(&model.PostModel{}).Save(oldArticle).Error; err != nil {
 		tx.Rollback()
 		return err
 	}
 
 	// update article meta data
-	oldArticleMeta, err := model.GetOneArticleMetaData(article.ID, "description")
+	oldArticleMeta, err := model.GetOnePostMetaData(article.ID, "description")
 	if oldArticleMeta.MetaValue != description {
 		oldArticleMeta.MetaValue = description
-		if err = tx.Model(&model.ArticleMetaModel{}).Save(oldArticleMeta).Error; err != nil {
+		if err = tx.Model(&model.PostMetaModel{}).Save(oldArticleMeta).Error; err != nil {
 			tx.Rollback()
 			return err
 		}
@@ -264,9 +319,8 @@ func calSliceDiff(slice1, slice2 []uint64) (diffslice []uint64) {
 	return
 }
 
-// DeleteArticle delete article by soft delete
-// meta data was reserved
-func DeleteArticle(articleID uint64) error {
+// UpdatePage udpate page info
+func UpdatePage(page *model.PostModel, description, pageTemplate string) (err error) {
 	tx := model.DB.Local.Begin()
 	defer func() {
 		if r := recover(); r != nil {
@@ -274,6 +328,84 @@ func DeleteArticle(articleID uint64) error {
 		}
 	}()
 
+	if tx.Error != nil {
+		return err
+	}
+
+	// udapte page
+	oldPage, err := model.GetPost(page.ID)
+	if err != nil {
+		return err
+	}
+	oldPage.Title = page.Title
+	oldPage.ContentMarkdown = page.ContentMarkdown
+	oldPage.ContetnHTML = page.ContetnHTML
+	oldPage.Status = page.Status
+	oldPage.CommentStatus = page.CommentStatus
+	oldPage.CoverPicture = page.CoverPicture
+	oldPage.PostDate = page.PostDate
+	if oldPage.Slug != page.Slug {
+		oldPage.Slug = page.Slug
+		oldPage.GUID = fmt.Sprintf("/%s", page.Slug)
+	}
+	oldPage.ParentID = page.ParentID
+	if err = tx.Model(&model.PostModel{}).Save(oldPage).Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	// update article meta data
+	// update description
+	metaDescription, err := model.GetOnePostMetaData(page.ID, "description")
+	if metaDescription.MetaValue != description {
+		metaDescription.MetaValue = description
+		if err = tx.Model(&model.PostMetaModel{}).Save(metaDescription).Error; err != nil {
+			tx.Rollback()
+			return err
+		}
+	}
+	// update page_template
+	metaPageTemplate, err := model.GetOnePostMetaData(page.ID, "page_template")
+	if metaPageTemplate.MetaValue != pageTemplate {
+		metaPageTemplate.MetaValue = pageTemplate
+		if err = tx.Model(&model.PostMetaModel{}).Save(metaPageTemplate).Error; err != nil {
+			tx.Rollback()
+			return err
+		}
+	}
+
+	return tx.Commit().Error
+}
+
+// DeletePost delete post by soft delete
+// meta data was reserved
+func DeletePost(postType string, articleID uint64) error {
+	tx := model.DB.Local.Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	if postType == "article" {
+		if err := deleteArticleElse(tx, articleID); err != nil {
+			tx.Rollback()
+			return err
+		}
+	}
+
+	// delete post
+	dPost := tx.Where("id = ?", articleID).Delete(model.PostModel{})
+	if err := dPost.Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	return tx.Commit().Error
+}
+
+// deleteArticleElse delete some data which only article have
+func deleteArticleElse(tx *gorm.DB, articleID uint64) error {
 	// get article taxonomy by type
 	articleTaxonomy, err := GetArticleTaxonomy(articleID)
 	if err != nil {
@@ -283,7 +415,6 @@ func DeleteArticle(articleID uint64) error {
 	// delete article relationship
 	dRelation := tx.Where("object_id = ?", articleID).Delete(model.TermRelationshipsModel{})
 	if err := dRelation.Error; err != nil {
-		tx.Rollback()
 		return err
 	}
 
@@ -293,49 +424,41 @@ func DeleteArticle(articleID uint64) error {
 		// update category count
 		err := UpdateTaxonomyCountByArticleChange(tx, taxonomy, -1)
 		if err != nil {
-			tx.Rollback()
 			return err
 		}
 	}
 
-	// delete article
-	dArticle := tx.Where("id = ?", articleID).Delete(model.ArticleModel{})
-	if err := dArticle.Error; err != nil {
-		tx.Rollback()
-		return err
-	}
-
-	return tx.Commit().Error
+	return nil
 }
 
-// TrashArticle put the article into the trash by "delete" button
-// The different between DeleteArticle and TrashArticle is that TrashArticle just set the status to deleted
-func TrashArticle(articleID uint64) error {
-	oldArticle, err := model.GetArticle(articleID)
+// TrashPost put the post into the trash by "delete" button
+// The different between DeleteArticle and TrashPost is that TrashPost just set the status to deleted
+func TrashPost(postID uint64) error {
+	oldPost, err := model.GetPost(postID)
 	if err != nil {
 		return err
 	}
 
-	oldArticle.Status = "deleted"
+	oldPost.Status = "deleted"
 
-	if err = model.DB.Local.Model(&model.ArticleModel{}).Save(oldArticle).Error; err != nil {
+	if err = model.DB.Local.Model(&model.PostModel{}).Save(oldPost).Error; err != nil {
 		return err
 	}
 
 	return nil
 }
 
-// RestoreArticle restore the article which had been put to the trash
-// this restore action will set the article as a draft status
-func RestoreArticle(articleID uint64) error {
-	oldArticle, err := model.GetArticle(articleID)
+// RestorePost restore the post which had been put to the trash
+// this restore action will set the post as a draft status
+func RestorePost(articleID uint64) error {
+	oldArticle, err := model.GetPost(articleID)
 	if err != nil {
 		return err
 	}
 
 	oldArticle.Status = "draft"
 
-	if err = model.DB.Local.Model(&model.ArticleModel{}).Save(oldArticle).Error; err != nil {
+	if err = model.DB.Local.Model(&model.PostModel{}).Save(oldArticle).Error; err != nil {
 		return err
 	}
 

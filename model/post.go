@@ -4,8 +4,8 @@ import (
 	"time"
 )
 
-// ArticleModel is the struct model for article
-type ArticleModel struct {
+// PostModel is the struct model for post
+type PostModel struct {
 	Model
 
 	UserID          uint64    `gorm:"column:user_id;not null"`
@@ -25,8 +25,8 @@ type ArticleModel struct {
 	PostDate        time.Time `gorm:"column:posted_time;not null"`
 }
 
-// ArticleMetaModel meta data for article
-type ArticleMetaModel struct {
+// PostMetaModel meta data for post
+type PostMetaModel struct {
 	ID        uint64 `gorm:"primary_key;AUTO_INCREMENT;column:id"`
 	PostID    uint64 `gorm:"column:post_id;not null"`
 	MetaKey   string `gorm:"column:meta_key;not null"`
@@ -34,43 +34,43 @@ type ArticleMetaModel struct {
 }
 
 // TableName is the article table name in db
-func (c *ArticleModel) TableName() string {
+func (c *PostModel) TableName() string {
 	return "pt_post"
 }
 
 // TableName is the article meta data table name in db
-func (c *ArticleMetaModel) TableName() string {
+func (c *PostMetaModel) TableName() string {
 	return "pt_post_meta"
 }
 
-// GetArticle gets the article by article id
-func GetArticle(articleID uint64) (*ArticleModel, error) {
-	a := &ArticleModel{}
-	d := DB.Local.Where("id = ? AND post_type = 'article' AND deleted_time is null", articleID).First(&a)
+// GetPost gets the post by post id
+func GetPost(postID uint64) (*PostModel, error) {
+	a := &PostModel{}
+	d := DB.Local.Where("id = ? AND deleted_time is null", postID).First(&a)
 	return a, d.Error
 }
 
-// GetArticleMetaData gets the extral data of article
-func GetArticleMetaData(articleID uint64) ([]*ArticleMetaModel, error) {
-	am := []*ArticleMetaModel{}
-	d := DB.Local.Where("post_id = ?", articleID).Find(&am)
+// GetPostMetaData gets the extral data of post
+func GetPostMetaData(postID uint64) ([]*PostMetaModel, error) {
+	am := []*PostMetaModel{}
+	d := DB.Local.Where("post_id = ?", postID).Find(&am)
 	return am, d.Error
 }
 
-// GetOneArticleMetaData get one specific meta by metakey and article id
-func GetOneArticleMetaData(articleID uint64, metaKey string) (*ArticleMetaModel, error) {
-	am := &ArticleMetaModel{}
-	d := DB.Local.Where("post_id = ? AND meta_key = ?", articleID, metaKey).First(&am)
+// GetOnePostMetaData get one specific meta by metakey and post id
+func GetOnePostMetaData(postID uint64, metaKey string) (*PostMetaModel, error) {
+	am := &PostMetaModel{}
+	d := DB.Local.Where("post_id = ? AND meta_key = ?", postID, metaKey).First(&am)
 	return am, d.Error
 }
 
-// ListArticle shows the articles in condition
-func ListArticle(title string, page, number int, sort, status string) ([]*ArticleModel, uint64, error) {
-	articles := make([]*ArticleModel, 0)
+// ListPost returns the posts list in condition
+func ListPost(postType, title string, page, number int, sort, status string) ([]*PostModel, uint64, error) {
+	posts := make([]*PostModel, 0)
 	var count uint64
 
 	where := "post_type = ? AND parent_id = ?"
-	whereArgs := []interface{}{"article", 0}
+	whereArgs := []interface{}{postType, 0}
 	if "" != title {
 		where += " AND title LIKE ?"
 		whereArgs = append(whereArgs, "%"+title+"%")
@@ -81,8 +81,8 @@ func ListArticle(title string, page, number int, sort, status string) ([]*Articl
 		whereArgs = append(whereArgs, status)
 	}
 
-	if err := DB.Local.Model(&ArticleModel{}).Where(where, whereArgs...).Count(&count).Error; err != nil {
-		return articles, count, err
+	if err := DB.Local.Model(&PostModel{}).Where(where, whereArgs...).Count(&count).Error; err != nil {
+		return posts, count, err
 	}
 
 	offset := (page - 1) * number
@@ -93,9 +93,27 @@ func ListArticle(title string, page, number int, sort, status string) ([]*Articl
 		order = "id DESC"
 	}
 
-	if err := DB.Local.Where(where, whereArgs...).Offset(offset).Limit(number).Order(order).Find(&articles).Error; err != nil {
-		return articles, count, err
+	if err := DB.Local.Where(where, whereArgs...).Offset(offset).Limit(number).Order(order).Find(&posts).Error; err != nil {
+		return posts, count, err
 	}
 
-	return articles, count, nil
+	return posts, count, nil
+}
+
+// PageCheckSlugExist check the slug if already exist
+func PageCheckSlugExist(pageID uint64, Slug string) bool {
+	post := &PostModel{}
+
+	var ifNotFound bool
+	if pageID > 0 {
+		ifNotFound = DB.Local.Where("id != ? AND slug = ?", pageID, Slug).First(&post).RecordNotFound()
+	} else {
+		ifNotFound = DB.Local.Where("slug = ?", Slug).First(&post).RecordNotFound()
+	}
+
+	if ifNotFound {
+		return false
+	}
+
+	return true
 }

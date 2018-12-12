@@ -22,12 +22,12 @@ type ListRequest struct {
 
 // ListResponse is the article list response struct
 type ListResponse struct {
-	TotalCount  uint64                 `json:"totalCount"`
-	TotalPage   uint64                 `json:"totalPage"`
-	ArticleList []*service.ArticleInfo `json:"articleList"`
+	TotalCount  uint64              `json:"totalCount"`
+	TotalPage   uint64              `json:"totalPage"`
+	ArticleList []*service.PostInfo `json:"articleList"`
 }
 
-// List shows the article list in page
+// List return the article list in page
 func List(c *gin.Context) {
 	var r ListRequest
 	if err := c.Bind(&r); err != nil {
@@ -39,7 +39,7 @@ func List(c *gin.Context) {
 		r.Number = constvar.DefaultLimit
 	}
 
-	infos, count, err := service.ListArticle(r.Title, r.Page, r.Number, r.Sort, r.Status)
+	infos, count, err := service.ListPost("article", r.Title, r.Page, r.Number, r.Sort, r.Status)
 	if err != nil {
 		Response.SendResponse(c, err, nil)
 		return
