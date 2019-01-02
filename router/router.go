@@ -6,6 +6,7 @@ import (
 	"puti/handler/article"
 	"puti/handler/auth"
 	"puti/handler/media"
+	"puti/handler/option"
 	"puti/handler/page"
 	"puti/handler/sd"
 	"puti/handler/taxonomy"
@@ -30,7 +31,7 @@ func Load(g *gin.Engine, mw ...gin.HandlerFunc) *gin.Engine {
 
 	// static resource
 	g.Static("/static", "backend/dist/static")
-	g.Static("/upload", "uploads/")
+	g.Static("/uploads", "uploads/")
 	// g.StaticFile("/favicon.ico", "./resources/favicon.ico")
 
 	// Group for api
@@ -93,6 +94,13 @@ func Load(g *gin.Engine, mw ...gin.HandlerFunc) *gin.Engine {
 		m.POST("", media.Upload)
 		m.DELETE("/:id", media.Delete)
 		m.PUT("/:id", media.Update)
+	}
+
+	o := api.Group("/option")
+	o.Use(middleware.AuthMiddleware())
+	{
+		o.GET("", option.List)
+		o.PUT("", option.Update)
 	}
 
 	// the health check handlers

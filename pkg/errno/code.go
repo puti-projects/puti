@@ -37,4 +37,7 @@ var (
 	ErrPageNotFount     = &Errno{Code: 20501, Message: "The page was not found."}
 	ErrPageCreateFailed = &Errno{Code: 20502, Message: "Create page failed."}
 	ErrSlugExist        = &Errno{Code: 20503, Message: "The slug is already exist."}
+
+	// Option errors
+	ErrSettingType = &Errno{Code: 20601, Message: "Error option setting type."}
 )
