@@ -1,4 +1,4 @@
-module puti
+module github.com/puti-projects/puti
 
 require (
 	cloud.google.com/go v0.28.0 // indirect
@@ -33,7 +33,6 @@ require (
 	github.com/teris-io/shortid v0.0.0-20171029131806-771a37caa5cf
 	github.com/ugorji/go/codec v0.0.0-20180920200043-2c86ab75771c // indirect
 	golang.org/x/crypto v0.0.0-20180910181607-0e37d006457b
-	golang.org/x/net v0.0.0-20180926154720-4dfa2610cdf3 // indirect
 	google.golang.org/appengine v1.2.0 // indirect
 	gopkg.in/go-playground/assert.v1 v1.2.1 // indirect
 	gopkg.in/go-playground/validator.v8 v8.18.2 // indirect

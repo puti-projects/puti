@@ -2,7 +2,7 @@ SHELL := /bin/bash
 BASEDIR = $(shell pwd)
 
 # build with verison infos
-versionDir = "puti/pkg/version"
+versionDir = "github.com/puti-projects/puti/internal/pkg/version"
 gitTag = $(shell if [ "`git describe --tags --abbrev=0 2>/dev/null`" != "" ];then git describe --tags --abbrev=0; else git log --pretty=format:'%h' -n 1; fi)
 buildDate = $(shell TZ=Asia/Shanghai date +%FT%T%z)
 gitCommit = $(shell git log --pretty=format:'%H' -n 1)
@@ -19,7 +19,7 @@ gotool:
 	gofmt -w .
 	go tool vet . |& grep -v vendor;true
 ca:
-	openssl req -new -nodes -x509 -out conf/server.crt -keyout conf/server.key -days 3650 -subj "/C=DE/ST=NRW/L=Earth/O=Random Company/OU=IT/CN=127.0.0.1/emailAddress=xxxxx@qq.com"
+	openssl req -new -nodes -x509 -out configs/server.crt -keyout configs/server.key -days 3650 -subj "/C=DE/ST=NRW/L=Earth/O=Random Company/OU=IT/CN=127.0.0.1/emailAddress=xxxxx@qq.com"
 
 help:
 	@echo "make - compile the source code"

@@ -8,11 +8,11 @@ import (
 	"os"
 	"time"
 
-	"puti/config"
-	"puti/model"
-	v "puti/pkg/version"
-	"puti/router"
-	"puti/router/middleware"
+	"github.com/puti-projects/puti/internal/common/config"
+	"github.com/puti-projects/puti/internal/common/model"
+	"github.com/puti-projects/puti/internal/common/router"
+	"github.com/puti-projects/puti/internal/common/router/middleware"
+	v "github.com/puti-projects/puti/internal/pkg/version"
 
 	"github.com/gin-gonic/gin"
 	"github.com/lexkong/log"
