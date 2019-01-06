@@ -11,7 +11,7 @@ import (
 	"github.com/puti-projects/puti/internal/common/config"
 	"github.com/puti-projects/puti/internal/common/model"
 	"github.com/puti-projects/puti/internal/common/router"
-	"github.com/puti-projects/puti/internal/common/router/middleware"
+	"github.com/puti-projects/puti/internal/pkg/option"
 	v "github.com/puti-projects/puti/internal/pkg/version"
 
 	"github.com/gin-gonic/gin"
@@ -50,6 +50,9 @@ func main() {
 	model.DB.Init()
 	defer model.DB.Close()
 
+	// load default options
+	option.LoadOptions()
+
 	// Set gin mode.
 	gin.SetMode(viper.GetString("runmode"))
 
@@ -57,10 +60,7 @@ func main() {
 	g := gin.New()
 
 	// routes
-	router.Load(g,
-		// Middiewares
-		middleware.RequestID(),
-	)
+	router.Load(g)
 
 	// Ping the server to make sure the router is working.
 	go func() {

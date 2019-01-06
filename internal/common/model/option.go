@@ -30,3 +30,14 @@ func GetOptionsByNames(optionNames []string) ([]*OptionModel, error) {
 
 	return options, nil
 }
+
+// GetAutoLoadOptions get options need autoload
+func GetAutoLoadOptions() ([]*OptionModel, error) {
+	var options []*OptionModel
+
+	if err := DB.Local.Where("autoload = 1").Find(&options).Error; err != nil {
+		return options, err
+	}
+
+	return options, nil
+}

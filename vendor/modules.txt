@@ -52,6 +52,8 @@ github.com/mitchellh/mapstructure
 github.com/modern-go/concurrent
 # github.com/modern-go/reflect2 v1.0.1
 github.com/modern-go/reflect2
+# github.com/patrickmn/go-cache v2.1.0+incompatible
+github.com/patrickmn/go-cache
 # github.com/pelletier/go-toml v1.2.0
 github.com/pelletier/go-toml
 # github.com/shirou/gopsutil v2.17.12+incompatible

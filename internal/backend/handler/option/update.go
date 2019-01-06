@@ -1,10 +1,13 @@
 package option
 
 import (
+	"fmt"
+
 	Response "github.com/puti-projects/puti/internal/backend/handler"
-	"github.com/puti-projects/puti/internal/pkg/errno"
 	"github.com/puti-projects/puti/internal/backend/service"
 	"github.com/puti-projects/puti/internal/common/utils"
+	"github.com/puti-projects/puti/internal/pkg/errno"
+	optionCache "github.com/puti-projects/puti/internal/pkg/option"
 
 	"github.com/gin-gonic/gin"
 	"github.com/lexkong/log"
@@ -42,6 +45,11 @@ func Update(c *gin.Context) {
 	if err := service.UpdateOptions(u.Parms); err != nil {
 		Response.SendResponse(c, errno.ErrDatabase, nil)
 		return
+	}
+
+	// update options' cache
+	for optionName, optionValue := range u.Parms {
+		optionCache.Options.Put(optionName, fmt.Sprintf("%v", optionValue))
 	}
 
 	Response.SendResponse(c, nil, nil)
