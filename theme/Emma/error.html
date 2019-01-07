@@ -2,9 +2,9 @@
 <html>
 <head>
     {{ template "head/head" . }}
-    <link type="text/css" rel="stylesheet" href="{{.Conf.StaticServer}}/theme/{{.Setting.ThemeName}}/public/library/bootstrap/css/bootstrap.min.css"/>
-    <link type="text/css" rel="stylesheet" href="{{.Conf.StaticServer}}/theme/{{.Setting.ThemeName}}/public/library/font-awesome-4.7.0/css/font-awesome.min.css"/>
-    <link type="text/css" rel="stylesheet" href="{{.Conf.StaticServer}}/theme/{{.Setting.ThemeName}}/public/css/globals.css"/>
+    <link type="text/css" rel="stylesheet" href="{{.Conf.StaticServer}}/theme/{{.Setting.CurrentTheme}}/public/library/bootstrap/css/bootstrap.min.css"/>
+    <link type="text/css" rel="stylesheet" href="{{.Conf.StaticServer}}/theme/{{.Setting.CurrentTheme}}/public/library/font-awesome-4.7.0/css/font-awesome.min.css"/>
+    <link type="text/css" rel="stylesheet" href="{{.Conf.StaticServer}}/theme/{{.Setting.CurrentTheme}}/public/css/globals.css"/>
 </head>
 <body class="d-flex flex-column">
     {{ template "Emma/header" . }}
@@ -32,10 +32,10 @@
         {{ template "Emma/footer" . }}
     </footer>
     
-    <script type="text/javascript" src="{{.Conf.StaticServer}}/themes/{{.Setting.ThemeName}}/public/js/jquery.min.js"></script>
-    <script type="text/javascript" src="{{.Conf.StaticServer}}/themes/{{.Setting.ThemeName}}/public/js/popper.min.js"></script>
-    <script type="text/javascript" src="{{.Conf.StaticServer}}/themes/{{.Setting.ThemeName}}/public/library/bootstrap/js/bootstrap.min.js"></script>
-    <script type="text/javascript" src="{{.Conf.StaticServer}}/themes/{{.Setting.ThemeName}}/public/js/ie10-viewport-bug-workaround.js"></script>
+    <script type="text/javascript" src="{{.Conf.StaticServer}}/themes/{{.Setting.CurrentTheme}}/public/js/jquery.min.js"></script>
+    <script type="text/javascript" src="{{.Conf.StaticServer}}/themes/{{.Setting.CurrentTheme}}/public/js/popper.min.js"></script>
+    <script type="text/javascript" src="{{.Conf.StaticServer}}/themes/{{.Setting.CurrentTheme}}/public/library/bootstrap/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="{{.Conf.StaticServer}}/themes/{{.Setting.CurrentTheme}}/public/js/ie10-viewport-bug-workaround.js"></script>
 </body>
 </html>
 {{ end }}

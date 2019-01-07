@@ -2,58 +2,57 @@
     <div class="author col-12">
         <div class="row justify-content-center">
             <div class="author-img col-xs-12 col-md-4 col-lg-2">
-                <img src="/themes/{{.Setting.ThemeName}}/public/images/self.png" class="img-thumbnail rounded-circle mx-auto d-block img-fluid " alt="img" height="120" width="120" />        
+                <img src="/themes/{{.Setting.CurrentTheme}}/public/images/self.png" class="img-thumbnail rounded-circle mx-auto d-block img-fluid " alt="img" height="120" width="120" />        
             </div>
         
             <div class="author-word col-xs-12 col-md-4 col-lg-2">
-                <h4 class="author-name col-xs-12 text-center text-md-left"><strong>{{.Setting.blogname}}</strong></h4>
-                <p class="author-desc col-xs-12 text-center text-md-left">{{.Setting.blogdescription}}</p>
+                <h4 class="author-name col-xs-12 text-center text-md-left"><strong>{{.Setting.BlogName}}</strong></h4>
+                <p class="author-desc col-xs-12 text-center text-md-left">{{.Setting.BlogDescription}}</p>
             </div>
         </div>
-    </div>
     
-    <nav class="navbar navbar-light navbar-expand-md col-12 sticky-top">
-        <div class="container">
-            <!--<a class="navbar-brand" href="#">Navbar</a>-->
-            <div class="collapse navbar-collapse col-md-10" id="navbarNavDropdown">
-                <ul class="navbar-nav">
-               
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{.BlogURL}}"><i class="fa fa-home"></i> 首页 <span class="sr-only">(current)</span></a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{.BlogURL}}/subject"><i class="fa fa-flask"></i> 专题</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{.BlogURL}}/archive"><i class="fa fa-archive"></i> 归档</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{.BlogURL}}/project"><i class="fa fa-github-alt"></i> 作品</a>
-                    </li>
-                    <!--<li class="nav-item">
-                        <a class="nav-link" href="#"><i class="fa fa-fire"></i> 工具</a>
-                    </li>-->
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{.BlogURL}}/link"><i class="fa fa-link"></i> 友链</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{.BlogURL}}/page/about-me">
-                            <i class="fa fa-leaf"></i> 关于
-                        </a>
-                    </li>
-                </ul>
-            </div>
-            <form class="form-inline">
-                <div class="navbar-search input-group-sm input-group">
-                    <input type="text" class="form-control" placeholder="查找..." aria-label="搜索">
-                    <span class="input-group-append">
-                        <button class="btn btn-secondary" type="submit"><i class="fa fa-search"></i></button>
-                    </span>
+        <nav class="navbar navbar-light navbar-expand-md col-12 sticky-top">
+            <div class="container">
+                <!--<a class="navbar-brand" href="#">Navbar</a>-->
+                <div class="collapse navbar-collapse col-md-10" id="navbarNavDropdown">
+                    <ul class="navbar-nav">
+                
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{.Setting.SiteUrl}}"><i class="fa fa-home"></i> 首页 <span class="sr-only">(current)</span></a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{.Setting.SiteUrl}}/subject"><i class="fa fa-flask"></i> 专题</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{.Setting.SiteUrl}}/archive"><i class="fa fa-archive"></i> 归档</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{.Setting.SiteUrl}}/project"><i class="fa fa-github-alt"></i> 作品</a>
+                        </li>
+                        <!--<li class="nav-item">
+                            <a class="nav-link" href="#"><i class="fa fa-fire"></i> 工具</a>
+                        </li>-->
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{.Setting.SiteUrl}}/link"><i class="fa fa-link"></i> 友链</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{.Setting.SiteUrl}}/page/about-me">
+                                <i class="fa fa-leaf"></i> 关于
+                            </a>
+                        </li>
+                    </ul>
                 </div>
-            </form>
-            <button class="navbar-toggler float-right" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-        </div>
-    </nav>
+                <form class="form-inline">
+                    <div class="navbar-search input-group-sm input-group">
+                        <input type="text" class="form-control" placeholder="查找..." aria-label="搜索">
+                        <span class="input-group-append">
+                            <button class="btn btn-secondary" type="submit"><i class="fa fa-search"></i></button>
+                        </span>
+                    </div>
+                </form>
+                <button class="navbar-toggler float-right" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+            </div>
+        </nav>
 {{end}}

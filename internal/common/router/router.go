@@ -13,8 +13,9 @@ import (
 	"github.com/puti-projects/puti/internal/backend/handler/sd"
 	"github.com/puti-projects/puti/internal/backend/handler/taxonomy"
 	"github.com/puti-projects/puti/internal/backend/handler/user"
-	"github.com/puti-projects/puti/internal/common/router/middleware"
+	apiMiddleware "github.com/puti-projects/puti/internal/backend/middleware"
 	"github.com/puti-projects/puti/internal/frontend/handler"
+	webMiddleware "github.com/puti-projects/puti/internal/frontend/middleware"
 	optionCache "github.com/puti-projects/puti/internal/pkg/option"
 
 	"github.com/gin-gonic/gin"
@@ -27,7 +28,7 @@ func Load(g *gin.Engine, mw ...gin.HandlerFunc) *gin.Engine {
 
 	g.Use(gin.Recovery())
 	if viper.GetString("runmode") == gin.DebugMode {
-		g.Use(middleware.Options)
+		g.Use(apiMiddleware.Options)
 	}
 
 	loadHealthTest(g)
@@ -48,7 +49,10 @@ func loadWeb(g *gin.Engine, theme string) *gin.Engine {
 
 	// Group for frontend
 	web := g.Group("")
-	web.GET("", handler.ShowIndex)
+	web.Use(webMiddleware.Renderer)
+	{
+		web.GET("", handler.ShowIndex)
+	}
 
 	// 404 handle
 	g.NoRoute(func(c *gin.Context) {
@@ -97,14 +101,14 @@ func loadAPI(g *gin.Engine) *gin.Engine {
 	// Group for api
 	api := g.Group("/api")
 
-	api.Use(middleware.NoCache)
-	api.Use(middleware.Secure)
-	api.Use(middleware.RequestID())
+	api.Use(apiMiddleware.NoCache)
+	api.Use(apiMiddleware.Secure)
+	api.Use(apiMiddleware.RequestID())
 
 	api.POST("/login", auth.Login)
 	api.GET("/token", auth.Info)
 
-	api.Use(middleware.AuthMiddleware())
+	api.Use(apiMiddleware.AuthMiddleware())
 	{
 		api.POST("/user/:username", user.Create)
 		api.GET("/user/:username", user.Get)
