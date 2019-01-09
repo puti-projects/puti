@@ -1,21 +1,23 @@
-package article
+package service
 
 import (
 	"strconv"
 
 	"github.com/puti-projects/puti/internal/common/model"
+	"github.com/puti-projects/puti/internal/common/utils"
 	optionCache "github.com/puti-projects/puti/internal/pkg/option"
 
 	"github.com/lexkong/log"
 )
 
-func GetArticles(page int, keyword string) (articles []*model.PostModel, pagination *util.Pagination) {
+// GetArticles get articles list
+func GetArticles(currentPage int, keyword string) (articles []*model.PostModel, pagination *utils.Pagination) {
 	pageSize, _ := strconv.Atoi(optionCache.Options.Get("posts_per_page"))
-	offset := (page - 1) * pageSize
+	offset := (currentPage - 1) * pageSize
 	count := 0
 
 	where := "`post_type` = ? AND `parent_id` = ? AND `status` = ?"
-	whereArgs := []interface{}{"articles", 0, "publish"}
+	whereArgs := []interface{}{model.PostTypeArticle, 0, model.PostStatusPublish}
 	if "" != keyword {
 		where += " AND `title` LIKE ?"
 		whereArgs = append(whereArgs, "%"+keyword+"%")
@@ -27,9 +29,12 @@ func GetArticles(page int, keyword string) (articles []*model.PostModel, paginat
 		Order("`if_top` DESC, `posted_time` DESC").
 		Offset(offset).Limit(pageSize).
 		Find(&articles)
+
 	if err := result.Error; err != nil {
 		log.Error("get articles failed:", err)
 	}
+
+	pagination = utils.GetPagination(count, currentPage, pageSize, 0)
 
 	return
 }

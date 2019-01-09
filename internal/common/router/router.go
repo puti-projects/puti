@@ -1,6 +1,7 @@
 package router
 
 import (
+	"html/template"
 	"log"
 	"net/http"
 	"path/filepath"
@@ -26,6 +27,8 @@ import (
 func Load(g *gin.Engine, mw ...gin.HandlerFunc) *gin.Engine {
 	theme := optionCache.Options.Get("current_theme")
 
+	g = setFuncMap(g)
+
 	g.Use(gin.Recovery())
 	if viper.GetString("runmode") == gin.DebugMode {
 		g.Use(apiMiddleware.Options)
@@ -35,6 +38,16 @@ func Load(g *gin.Engine, mw ...gin.HandlerFunc) *gin.Engine {
 	loadAPI(g)
 	loadWeb(g, theme)
 	loadStatic(g, theme)
+
+	return g
+}
+
+func setFuncMap(g *gin.Engine) *gin.Engine {
+	g.SetFuncMap(template.FuncMap{
+		"minus": func(a, b int) int {
+			return a - b
+		},
+	})
 
 	return g
 }

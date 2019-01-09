@@ -33,6 +33,14 @@ type PostMetaModel struct {
 	MetaValue string `gorm:"column:meta_value;not null"`
 }
 
+const (
+	PostTypeArticle   = "article"
+	PostTypeArtcle    = "page"
+	PostStatusPublish = "publish"
+	PostStatusDraft   = "draft"
+	PostStatusDeleted = "deleted"
+)
+
 // TableName is the article table name in db
 func (c *PostModel) TableName() string {
 	return "pt_post"

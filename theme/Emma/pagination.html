@@ -1,0 +1,50 @@
+{{define "Emma/pagination"}}
+{{if gt (len .Pagination.PageNums) 1}}
+<div class="col-12">
+    <nav aria-label="Page navigation">
+            <ul class="pagination pagination-sm justify-content-center">
+                {{if gt .Pagination.PreviousPageNum 0}}
+                    <li class="page-item">
+                        <a aria-label="上一页" class="page-link" href="{{.PageURL}}?page={{.Pagination.PreviousPageNum}}">&laquo;</a>
+                    </li>
+                {{end}}
+                {{if gt .Pagination.FirstPageNum 1}}
+                    <li class="page-item">
+                        <a class="page-link" href="{{.PageURL}}?page=1">1</a>
+                    </li>
+                    {{if ne .Pagination.FirstPageNum 2}}
+                    <li class="page-item">
+                        <span class="page-link">...</span>
+                    </li>
+                    {{end}}
+                {{end}}
+                {{range .Pagination.PageNums}}
+                    {{if eq . $.Pagination.CurrentPage}}
+                    <li class="page-item active">
+                        <span class="page-link">{{.}}</span> 
+                    </li>
+                    {{else}}
+                    <li class="page-item">
+                        <a href="{{$.PageURL}}?page={{.}}" class="page-link"><span>{{.}}</span></a>
+                    </li>
+                    {{end}}
+                {{end}}
+                {{if lt .Pagination.LastPageNum .Pagination.TotalPage}}
+                    {{if ne .Pagination.LastPageNum (minus .Pagination.TotalPage 1)}}
+                    <li class="page-item">
+                        <span class="page-link">...</span>{{end}}
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="{{.PageURL}}?page={{.Pagination.TotalPage}}">{{.Pagination.TotalPage}}</a>
+                    </li>
+                {{end}}
+                {{if lt .Pagination.CurrentPage .Pagination.TotalPage}}
+                <li class="page-item">
+                    <a aria-label="下一页" class="page-link" href="{{.PageURL}}?page={{.Pagination.NextPageNum}}">&raquo;</a>
+                </li>
+                {{end}}
+            </ul>
+    </nav>
+</div>
+{{end}}
+{{end}}
