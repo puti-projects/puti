@@ -1,6 +1,8 @@
 package middleware
 
 import (
+	"html/template"
+
 	optionCache "github.com/puti-projects/puti/internal/pkg/option"
 
 	"github.com/gin-gonic/gin"
@@ -37,15 +39,17 @@ func renderBasicSetting(c *gin.Context, renderData *RenderData) *gin.Context {
 	settingMap["BlogName"] = optionCache.Options.Get("blog_name")
 	settingMap["BlogDescription"] = optionCache.Options.Get("blog_description")
 	settingMap["SiteUrl"] = optionCache.Options.Get("site_url")
-	settingMap["ShowOnFront"] = optionCache.Options.Get("show_on_front")
-	settingMap["ShowOnFrontPage"] = optionCache.Options.Get("show_on_front_page")
-	settingMap["ArticleCommentStatus"] = optionCache.Options.Get("article_comment_status")
-	settingMap["pageCommentStatus"] = optionCache.Options.Get("page_comment_status")
 	settingMap["SiteDescription"] = optionCache.Options.Get("site_description")
 	settingMap["SiteKeywords"] = optionCache.Options.Get("site_keywords")
-	settingMap["FooterCopyright"] = optionCache.Options.Get("footer_copyright")
+	settingMap["FooterCopyright"] = template.HTML(optionCache.Options.Get("footer_copyright"))
 	settingMap["SiteLanguage"] = optionCache.Options.Get("site_language")
 	settingMap["CurrentTheme"] = optionCache.Options.Get("current_theme")
+
+	settingMap["ShowOnFront"] = optionCache.Options.Get("show_on_front")
+
+	settingMap["ArticleCommentStatus"] = optionCache.Options.Get("article_comment_status")
+	settingMap["pageCommentStatus"] = optionCache.Options.Get("page_comment_status")
+
 	(*renderData)["Setting"] = settingMap
 
 	return c
