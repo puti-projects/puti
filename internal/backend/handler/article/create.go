@@ -6,11 +6,11 @@ import (
 	"strings"
 
 	Response "github.com/puti-projects/puti/internal/backend/handler"
+	"github.com/puti-projects/puti/internal/backend/service"
 	"github.com/puti-projects/puti/internal/common/model"
+	"github.com/puti-projects/puti/internal/common/utils"
 	"github.com/puti-projects/puti/internal/pkg/errno"
 	"github.com/puti-projects/puti/internal/pkg/token"
-	"github.com/puti-projects/puti/internal/backend/service"
-	"github.com/puti-projects/puti/internal/common/utils"
 
 	"github.com/gin-gonic/gin"
 	"github.com/lexkong/log"
@@ -84,7 +84,7 @@ func handleCreate(r *CreateRequest, userID uint64) (rsp *CreateResponse, err err
 		PostType:        "article",
 		Title:           r.Title,
 		ContentMarkdown: r.Content,
-		ContetnHTML:     r.ContentHTML,
+		ContentHTML:     r.ContentHTML,
 		ParentID:        0,
 		Status:          r.Status,
 		CommentStatus:   r.CommentStatus,

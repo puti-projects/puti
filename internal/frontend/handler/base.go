@@ -18,3 +18,10 @@ func getTheme(c *gin.Context) string {
 
 	return renderData["Setting"].(map[string]interface{})["CurrentTheme"].(string)
 }
+
+// getSiteURL return current site url from setting
+func getSiteURL(c *gin.Context) string {
+	renderData := getRenderData(c)
+
+	return renderData["Setting"].(map[string]interface{})["SiteUrl"].(string)
+}

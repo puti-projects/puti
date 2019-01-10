@@ -12,7 +12,7 @@ type PostModel struct {
 	PostType        string    `gorm:"column:post_type;not null"`
 	Title           string    `gorm:"column:title;not null"`
 	ContentMarkdown string    `gorm:"column:content_markdown;not null"`
-	ContetnHTML     string    `gorm:"column:content_html;not null"`
+	ContentHTML     string    `gorm:"column:content_html;not null"`
 	Slug            string    `gorm:"column:slug;not null"`
 	ParentID        uint64    `gorm:"column:parent_id;not null"` // set to 0 now, use for draft history feature in the future
 	Status          string    `gorm:"column:status;not null"`
@@ -34,10 +34,15 @@ type PostMetaModel struct {
 }
 
 const (
-	PostTypeArticle   = "article"
-	PostTypeArtcle    = "page"
+	// PostTypeArticle post type of article
+	PostTypeArticle = "article"
+	// PostTypePage post type of page
+	PostTypePage = "page"
+	// PostStatusPublish post status of published post
 	PostStatusPublish = "publish"
-	PostStatusDraft   = "draft"
+	// PostStatusDraft post status of draft post
+	PostStatusDraft = "draft"
+	// PostStatusDeleted post status of deleted post
 	PostStatusDeleted = "deleted"
 )
 

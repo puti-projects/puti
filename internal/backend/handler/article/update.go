@@ -4,10 +4,10 @@ import (
 	"strconv"
 
 	Response "github.com/puti-projects/puti/internal/backend/handler"
-	"github.com/puti-projects/puti/internal/common/model"
-	"github.com/puti-projects/puti/internal/pkg/errno"
 	"github.com/puti-projects/puti/internal/backend/service"
+	"github.com/puti-projects/puti/internal/common/model"
 	"github.com/puti-projects/puti/internal/common/utils"
+	"github.com/puti-projects/puti/internal/pkg/errno"
 
 	"github.com/gin-gonic/gin"
 	"github.com/lexkong/log"
@@ -67,7 +67,7 @@ func Update(c *gin.Context) {
 			Model:           model.Model{ID: r.ID},
 			Title:           r.Title,
 			ContentMarkdown: r.Content,
-			ContetnHTML:     r.ContentHTML,
+			ContentHTML:     r.ContentHTML,
 			Status:          r.Status,
 			CommentStatus:   r.CommentStatus,
 			IfTop:           r.IfTop,

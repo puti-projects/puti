@@ -10,16 +10,28 @@
 <body class="d-flex flex-column">
     {{ template "Emma/header" . }}
 
-    <div class="row no-gutters">
-        {{if eq .Setting.ShowOnFront "posts"}}
-            {{ template "Emma/articles" . }}
-        {{else if eq .Setting.ShowOnFront "page"}}
-            {{ template "Emma/page-index" . }}
-        {{else}}
-            <div class="col-12">
-                <span>首页</span>
+    <div class="content col-12 flex-grow">
+        <div class="row no-gutters">
+            <div class="container">
+                <div class="row">
+                    <div class="main-contain col-12 col-md-9">
+                        {{if eq .Setting.ShowOnFront "posts"}}
+                            {{ template "Emma/articles" . }}
+                        {{else if eq .Setting.ShowOnFront "page"}}
+                            {{ template "Emma/page-index" . }}
+                        {{else}}
+                        <div class="col-12">
+                            <span>首页</span>
+                        </div>
+                        {{end}}
+                    </div>
+                    <div class="right-sidebar d-none d-md-block col-3">
+                        {{ template "Emma/top-sidebar" . }}
+                        {{ template "Emma/sticky-sidebar" . }}
+                    </div>
+                </div>
             </div>
-        {{end}}
+        </div>
     </div>
 
     <footer class="footer col-12">

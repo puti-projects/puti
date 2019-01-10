@@ -230,7 +230,7 @@ func UpdateArticle(article *model.PostModel, description string, category []uint
 	}
 	oldArticle.Title = article.Title
 	oldArticle.ContentMarkdown = article.ContentMarkdown
-	oldArticle.ContetnHTML = article.ContetnHTML
+	oldArticle.ContentHTML = article.ContentHTML
 	oldArticle.Status = article.Status
 	oldArticle.CommentStatus = article.CommentStatus
 	oldArticle.IfTop = article.IfTop
@@ -339,7 +339,7 @@ func UpdatePage(page *model.PostModel, description, pageTemplate string) (err er
 	}
 	oldPage.Title = page.Title
 	oldPage.ContentMarkdown = page.ContentMarkdown
-	oldPage.ContetnHTML = page.ContetnHTML
+	oldPage.ContentHTML = page.ContentHTML
 	oldPage.Status = page.Status
 	oldPage.CommentStatus = page.CommentStatus
 	oldPage.CoverPicture = page.CoverPicture

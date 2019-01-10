@@ -21,7 +21,10 @@ func ShowIndex(c *gin.Context) {
 		currentPage, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
 
 		// get content
-		articles, pagination := service.GetArticles(currentPage, "")
+		articles, pagination, err := service.GetArticleList(currentPage, "")
+		if err != nil {
+			// 500
+		}
 
 		renderData["Articles"] = articles
 		renderData["Pagination"] = pagination.Page

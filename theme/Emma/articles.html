@@ -1,6 +1,78 @@
 {{define "Emma/articles"}}
+<div class="row no-gutters">
+{{if gt .Pagination.TotalPage 0}}
+{{range .Articles}}
+    {{if .CoverPicture}}
+        <div class="article-card article-img-card col-12 p-3" onclick="window.open('{{.GUID}}', '_self')">
+            <div class="article-card-body">
+                <div class="row no-gutters">
+                    <div class="article-card-img col-xs-12 text-xs-center col-md-3 m-auto">
+                        <img src="{{.CoverPicture}}" class="img-thumbnail img-fluid mx-auto d-block" alt="img" height="170" width="170" />
+                    </div>
+                    <div class="article-card-body col-xs-12 col-md-9 m-auto">
+                        <h4 class="card-title mb-2"><a href="{{.GUID}}">{{.Title}}</a></h4>
 
-123
+                        <p class="card-subtitle mb-2 text-muted">
+                            <i class="fa fa-calendar-check-o"></i> {{.PostedTime}}
+                            &nbsp;&nbsp;
+                            <i class="fa fa-tags"></i>
+                            {{range .Categories}}
+                                <a href="{{.URL}}">{{.Title}}</a>        
+                            {{end}}
+                            &nbsp;
+                            <i class="fa fa-eye"></i> {{.ViewCount}} 阅读
+                            &nbsp;
+                            <i class="fa fa-comments-o"></i> {{.CommentCount}}条回复
+                        </p>
+
+                        <p class="card-text">{{.Abstract}}</p>
+
+                        {{range .Tags}}
+                            <ul class="tags p-0 pl-2 mt-2">
+                                <li class="mr-3"><a href="{{.URL}}" class="tag"><span>{{.Title}}</span></a></li>
+                            </ul>
+                        {{end}}
+                    </div>
+                </div>
+            </div>
+        </div>
+    {{else}}
+        <div class="article-card article-word-card col-12 p-3" onclick="window.open('{{.GUID}}', '_self')">
+            <div class="article-card-body">
+                <h4 class="card-title mb-2"><a href="{{.GUID}}">{{.Title}}</a></h4>
+
+                <p class="card-subtitle mb-2 text-muted">
+                    <i class="fa fa-calendar-check-o"></i> {{.PostedTime}}
+                    &nbsp;&nbsp;
+                    <i class="fa fa-tags"></i>
+                    {{range .Categories}}
+                        <a href="{{.URL}}">{{.Title}}</a>        
+                    {{end}}
+                    &nbsp;
+                    <i class="fa fa-eye"></i> {{.ViewCount}} 阅读
+                    &nbsp;
+                    <i class="fa fa-comments-o"></i> {{.CommentCount}}条回复
+                </p>
+
+                <p class="card-text">{{.Abstract}}</p>
+            </div>
+
+            <div class="card-bottom">
+                <ul class="tags p-0 pl-2 mt-2">
+                    {{range .Tags}}
+                    <li class="mr-3"><a href="{{.URL}}" class="tag"><span>{{.Title}}</span></a></li>
+                    {{end}}
+                </ul>
+            </div>
+        </div>
+    {{end}}
+{{end}}
+{{else}}
+<div class="col-12">
+    <span>无</span>
+</div>
+{{end}}
 
 {{ template "Emma/pagination" . }}
+</div>
 {{end}}

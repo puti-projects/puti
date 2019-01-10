@@ -2,11 +2,12 @@ package page
 
 import (
 	"fmt"
+
 	Response "github.com/puti-projects/puti/internal/backend/handler"
 	"github.com/puti-projects/puti/internal/common/model"
+	"github.com/puti-projects/puti/internal/common/utils"
 	"github.com/puti-projects/puti/internal/pkg/errno"
 	"github.com/puti-projects/puti/internal/pkg/token"
-	"github.com/puti-projects/puti/internal/common/utils"
 
 	"github.com/gin-gonic/gin"
 	"github.com/lexkong/log"
@@ -80,7 +81,7 @@ func handleCreate(r *CreateRequest, userID uint64) (rsp *CreateResponse, err err
 		PostType:        "page",
 		Title:           r.Title,
 		ContentMarkdown: r.Content,
-		ContetnHTML:     r.ContentHTML,
+		ContentHTML:     r.ContentHTML,
 		Slug:            r.Slug,
 		ParentID:        r.ParentID,
 		Status:          r.Status,
