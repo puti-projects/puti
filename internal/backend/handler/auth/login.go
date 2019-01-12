@@ -2,11 +2,11 @@ package auth
 
 import (
 	Response "github.com/puti-projects/puti/internal/backend/handler"
+	"github.com/puti-projects/puti/internal/backend/service"
 	"github.com/puti-projects/puti/internal/common/model"
 	"github.com/puti-projects/puti/internal/pkg/auth"
 	"github.com/puti-projects/puti/internal/pkg/errno"
 	"github.com/puti-projects/puti/internal/pkg/token"
-	"github.com/puti-projects/puti/internal/backend/service"
 
 	"github.com/gin-gonic/gin"
 )
