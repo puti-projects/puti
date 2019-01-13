@@ -3,7 +3,7 @@
 ############################
 FROM golang:alpine AS builder
 
-RUN apk update && apk add --no-cache git make ca-certificates tzdata && update-ca-certificates
+RUN apk update && apk add --no-cache build-base git tzdata && update-ca-certificates
 # Create putiuser.
 RUN adduser -D -g '' putiuser
 
@@ -24,11 +24,11 @@ COPY --from=builder /usr/share/zoneinfo /usr/share/zoneinfo
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 COPY --from=builder /etc/passwd /etc/passwd
 # Copy our static executable.
-COPY --from=builder /puti/puti /puti
+COPY --from=builder /puti /puti
 # Use an unprivileged user.
 USER putiuser
 
-EXPOSE 8000
+EXPOSE 8000 
 EXPOSE 8080
 # Run the puti binary.
-CMD ["puti"]
+CMD ["/puti/puti"]

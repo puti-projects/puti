@@ -95,6 +95,7 @@ TODO
 Detailed changes for each release are documented in the [changelog file]((https://github.com/axetroy/vscode-gpm/blob/master/CHANGELOG.md)).
 
 ## Dependencies
+Thanks for these great open source libraries:
 | Dependency | About |
 | :----- | :----- | 
 | [gin-gonic/gin](https://github.com/gin-gonic/gin) |  HTTP web framework written in Go |
