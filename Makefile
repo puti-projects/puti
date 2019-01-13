@@ -13,7 +13,7 @@ ldflags="-extldflags -static -w -X ${versionDir}.gitTag=${gitTag} -X ${versionDi
 all: build
 build:
 	@echo "Building binary file."
-	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -mod=vendor -v -ldflags ${ldflags} -o /puti/puti
+	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -mod=vendor -v -ldflags ${ldflags} -o ./puti
 clean:
 	@echo "Cleaning."
 	rm -f puti
