@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"time"
@@ -15,14 +16,14 @@ import (
 	v "github.com/puti-projects/puti/internal/pkg/version"
 
 	"github.com/gin-gonic/gin"
-	"github.com/lexkong/log"
+	"github.com/puti-projects/puti/internal/pkg/logger"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
 )
 
 var (
-	cfg     = pflag.StringP("config", "c", "", "puti config file path.")
-	version = pflag.BoolP("version", "v", false, "show version info.")
+	configPath = pflag.StringP("config", "c", "", "puti config file path.")
+	version    = pflag.BoolP("version", "v", false, "show version info.")
 )
 
 func main() {
@@ -42,7 +43,7 @@ func main() {
 	}
 
 	// init config
-	if err := config.Init(*cfg); err != nil {
+	if err := config.Init(*configPath); err != nil {
 		panic(err)
 	}
 
@@ -67,7 +68,7 @@ func main() {
 		if err := pingServer(); err != nil {
 			log.Fatal("The router has no response, or it might took too long to start up.", err)
 		}
-		log.Info("The router has been deployed successfully.")
+		logger.Info("The router has been deployed successfully.")
 	}()
 
 	// If open https, start listening https request
@@ -77,14 +78,14 @@ func main() {
 		key := viper.GetString("tls.key")
 		if cert != "" && key != "" {
 			go func() {
-				log.Infof("Start to listening the incoming requests on https address: %s", viper.GetString("tls.addr"))
-				log.Info(http.ListenAndServeTLS(viper.GetString("tls.addr"), cert, key, g).Error())
+				logger.Infof("Start to listening the incoming requests on https address: %s", viper.GetString("tls.addr"))
+				logger.Info(http.ListenAndServeTLS(viper.GetString("tls.addr"), cert, key, g).Error())
 			}()
 		}
 	}
 
-	log.Infof("Start to listening the incoming requests on http address: %s", viper.GetString("addr"))
-	log.Info(http.ListenAndServe(viper.GetString("addr"), g).Error())
+	logger.Infof("Start to listening the incoming requests on http address: %s", viper.GetString("addr"))
+	logger.Info(http.ListenAndServe(viper.GetString("addr"), g).Error())
 }
 
 // pingServer pings the http server to make sure the router is working.
@@ -97,7 +98,7 @@ func pingServer() error {
 		}
 
 		// Sleep for a second to continue the next ping.
-		log.Info("Waiting for the router, retry in 1 second.")
+		logger.Info("Waiting for the router, retry in 1 second.")
 		time.Sleep(time.Second)
 	}
 	return errors.New("Cannot connect to the router")

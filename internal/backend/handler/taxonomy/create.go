@@ -2,14 +2,15 @@ package taxonomy
 
 import (
 	"fmt"
+
 	Response "github.com/puti-projects/puti/internal/backend/handler"
 	"github.com/puti-projects/puti/internal/common/model"
 	"github.com/puti-projects/puti/internal/common/utils"
 	"github.com/puti-projects/puti/internal/pkg/errno"
 
 	"github.com/gin-gonic/gin"
-	"github.com/lexkong/log"
-	"github.com/lexkong/log/lager"
+	"github.com/puti-projects/puti/internal/pkg/logger"
+	"go.uber.org/zap"
 )
 
 // CreateRequest struct to crate taxonomy include category and tag
@@ -23,7 +24,7 @@ type CreateRequest struct {
 
 // Create create txonomy
 func Create(c *gin.Context) {
-	log.Info("Category Create function called.", lager.Data{"X-request-Id": utils.GetReqID(c)})
+	logger.Info("Category Create function called.", zap.String("X-request-Id", utils.GetReqID(c)))
 
 	var r CreateRequest
 	if err := c.Bind(&r); err != nil {

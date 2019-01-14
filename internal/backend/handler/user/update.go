@@ -8,11 +8,11 @@ import (
 	"github.com/puti-projects/puti/internal/common/model"
 	"github.com/puti-projects/puti/internal/common/utils"
 	"github.com/puti-projects/puti/internal/pkg/errno"
+	"github.com/puti-projects/puti/internal/pkg/logger"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
-	"github.com/lexkong/log"
-	"github.com/lexkong/log/lager"
+	"go.uber.org/zap"
 )
 
 // UpdateRequest is the update user request params struct
@@ -39,7 +39,7 @@ type UpdatePasswordRequest struct {
 
 // Update user
 func Update(c *gin.Context) {
-	log.Info("Update function called.", lager.Data{"X-Request-Id": utils.GetReqID(c)})
+	logger.Info("Update function called.", zap.String("X-request-Id", utils.GetReqID(c)))
 
 	// Get user id
 	userID, _ := strconv.Atoi(c.Param("id"))

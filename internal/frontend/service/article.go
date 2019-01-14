@@ -11,9 +11,8 @@ import (
 	"github.com/puti-projects/puti/internal/common/config"
 	"github.com/puti-projects/puti/internal/common/model"
 	"github.com/puti-projects/puti/internal/common/utils"
+	"github.com/puti-projects/puti/internal/pkg/logger"
 	optionCache "github.com/puti-projects/puti/internal/pkg/option"
-
-	"github.com/lexkong/log"
 )
 
 // List post list
@@ -45,7 +44,7 @@ func GetArticleList(currentPage int, keyword string) (articleResult []*model.Sho
 		Find(&articles)
 
 	if err := result.Error; err != nil {
-		log.Error("get articles failed:", err)
+		logger.Errorf("get articles failed. %s", err)
 	}
 
 	// get pagination

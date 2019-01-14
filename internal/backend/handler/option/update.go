@@ -7,11 +7,11 @@ import (
 	"github.com/puti-projects/puti/internal/backend/service"
 	"github.com/puti-projects/puti/internal/common/utils"
 	"github.com/puti-projects/puti/internal/pkg/errno"
+	"github.com/puti-projects/puti/internal/pkg/logger"
 	optionCache "github.com/puti-projects/puti/internal/pkg/option"
 
 	"github.com/gin-gonic/gin"
-	"github.com/lexkong/log"
-	"github.com/lexkong/log/lager"
+	"go.uber.org/zap"
 )
 
 // UpdateRequest update request include params which are dynamitly
@@ -21,7 +21,7 @@ type UpdateRequest struct {
 
 // Update update options by setting type
 func Update(c *gin.Context) {
-	log.Info("Option update function called.", lager.Data{"X-Request-Id": utils.GetReqID(c)})
+	logger.Info("option update function called", zap.String("X-request-Id", utils.GetReqID(c)))
 
 	// Get setting type
 	settingType := c.Query("settingType")

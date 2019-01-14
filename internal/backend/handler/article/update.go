@@ -8,10 +8,10 @@ import (
 	"github.com/puti-projects/puti/internal/common/model"
 	"github.com/puti-projects/puti/internal/common/utils"
 	"github.com/puti-projects/puti/internal/pkg/errno"
+	"github.com/puti-projects/puti/internal/pkg/logger"
 
 	"github.com/gin-gonic/gin"
-	"github.com/lexkong/log"
-	"github.com/lexkong/log/lager"
+	"go.uber.org/zap"
 )
 
 // UpdateRequest struct for update article
@@ -33,7 +33,7 @@ type UpdateRequest struct {
 // Update update article
 // Delete and restore article are also in this function and it depends on the 'status'
 func Update(c *gin.Context) {
-	log.Info("Article update function called.", lager.Data{"X-Request-Id": utils.GetReqID(c)})
+	logger.Info("article update function called", zap.String("X-request-Id", utils.GetReqID(c)))
 
 	// Get article id
 	ID, _ := strconv.Atoi(c.Param("id"))

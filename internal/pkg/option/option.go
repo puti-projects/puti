@@ -3,10 +3,9 @@ package option
 import (
 	"time"
 
-	"github.com/puti-projects/puti/internal/common/model"
-
-	"github.com/lexkong/log"
 	gocache "github.com/patrickmn/go-cache"
+	"github.com/puti-projects/puti/internal/common/model"
+	"github.com/puti-projects/puti/internal/pkg/logger"
 )
 
 // DefaultExpiration default expiration time of 2 hours for puti
@@ -30,7 +29,7 @@ func LoadOptions() error {
 		return err
 	}
 
-	log.Info("Options has been deployed successfully.")
+	logger.Info("Options has been deployed successfully.")
 
 	return nil
 }
@@ -64,7 +63,7 @@ func (cache *optionCache) Get(optionName string) string {
 	// If can not find the option by name in cache, get from db
 	option, err := model.GetOption(optionName)
 	if err != nil {
-		log.Errorf(err, "Getting option failed. Option name: %s", optionName)
+		logger.Errorf("getting option failed. Option name: %s. %s", optionName, err)
 		return ""
 	}
 
@@ -72,7 +71,7 @@ func (cache *optionCache) Get(optionName string) string {
 	if option.Autoload == 1 {
 		// option reload
 		if err := getAutoLoadOptions(); err != nil {
-			log.Errorf(err, "Reload default options failed.")
+			logger.Errorf("reload default options failed. %s", err)
 			return ""
 		}
 

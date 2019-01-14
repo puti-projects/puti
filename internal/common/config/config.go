@@ -3,15 +3,18 @@ package config
 import (
 	"strings"
 
+	"github.com/puti-projects/puti/internal/pkg/logger"
+
 	"github.com/fsnotify/fsnotify"
-	"github.com/lexkong/log"
 	"github.com/spf13/viper"
 )
 
+// Config config struct
 type Config struct {
 	Name string
 }
 
+// Init sets all configs using config file setting.
 func Init(cfg string) error {
 	c := Config{
 		Name: cfg,
@@ -54,24 +57,15 @@ func (c *Config) initConfig() error {
 
 // 初始化日志配置
 func (c *Config) initLog() {
-	passLagerCfg := log.PassLagerCfg{
-		Writers:        viper.GetString("log.writers"),
-		LoggerLevel:    viper.GetString("log.logger_level"),
-		LoggerFile:     viper.GetString("log.logger_file"),
-		LogFormatText:  viper.GetBool("log.log_format_text"),
-		RollingPolicy:  viper.GetString("log.rollingPolicy"),
-		LogRotateDate:  viper.GetInt("log.log_rotate_date"),
-		LogRotateSize:  viper.GetInt("log.log_rotate_size"),
-		LogBackupCount: viper.GetInt("log.log_backup_count"),
-	}
+	logger.InitLogger(viper.GetString("log.runmode"))
 
-	log.InitWithConfig(&passLagerCfg)
+	logger.Info("zap logger construction succeeded")
 }
 
 // 监控配置文件变化并热加载程序
 func (c *Config) watchConfig() {
 	viper.WatchConfig()
 	viper.OnConfigChange(func(e fsnotify.Event) {
-		log.Infof("Config file changed: %s", e.Name)
+		logger.Infof("Config file changed: %s", e.Name)
 	})
 }

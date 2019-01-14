@@ -10,11 +10,11 @@ import (
 	"github.com/puti-projects/puti/internal/common/model"
 	"github.com/puti-projects/puti/internal/common/utils"
 	"github.com/puti-projects/puti/internal/pkg/errno"
+	"github.com/puti-projects/puti/internal/pkg/logger"
 	"github.com/puti-projects/puti/internal/pkg/token"
 
 	"github.com/gin-gonic/gin"
-	"github.com/lexkong/log"
-	"github.com/lexkong/log/lager"
+	"go.uber.org/zap"
 )
 
 // CreateRequest struct of article create params
@@ -40,7 +40,8 @@ type CreateResponse struct {
 
 // Create create a new aricle(published or draft)
 func Create(c *gin.Context) {
-	log.Info("Article create function called.", lager.Data{"X-request-Id": utils.GetReqID(c)})
+	// logger.Info("Article create function called.", zap.String("X-request-Id", utils.GetReqID(c)))
+	logger.Info("article create function called", zap.String("X-request-Id", utils.GetReqID(c)))
 
 	// get token and parse
 	t := c.Query("token")

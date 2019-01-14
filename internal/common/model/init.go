@@ -3,9 +3,10 @@ package model
 import (
 	"fmt"
 
+	"github.com/puti-projects/puti/internal/pkg/logger"
+
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql" // mysql for gorm
-	"github.com/lexkong/log"
 	"github.com/spf13/viper"
 )
 
@@ -52,7 +53,8 @@ func openDB(username, password, addr, name string) *gorm.DB {
 
 	db, err := gorm.Open("mysql", config)
 	if err != nil {
-		log.Errorf(err, "Database connection failed. Database name: %s", name)
+		fmt.Println(err)
+		logger.Errorf("Database connection failed. Database name: %s", name)
 	}
 
 	// set for db connection

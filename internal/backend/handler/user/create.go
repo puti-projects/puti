@@ -7,8 +7,8 @@ import (
 	"github.com/puti-projects/puti/internal/pkg/errno"
 
 	"github.com/gin-gonic/gin"
-	"github.com/lexkong/log"
-	"github.com/lexkong/log/lager"
+	"github.com/puti-projects/puti/internal/pkg/logger"
+	"go.uber.org/zap"
 )
 
 // CreateRequest is the create user request params struct
@@ -30,7 +30,7 @@ type CreateResponse struct {
 
 // Create creates a user
 func Create(c *gin.Context) {
-	log.Info("User Create function called.", lager.Data{"X-request-Id": utils.GetReqID(c)})
+	logger.Info("User Create function called.", zap.String("X-request-Id", utils.GetReqID(c)))
 
 	var r CreateRequest
 	if err := c.Bind(&r); err != nil {
