@@ -22,7 +22,7 @@ func Init(cfg string) error {
 
 	// 初始化配置文件
 	if err := c.initConfig(); err != nil {
-		return nil
+		return err
 	}
 
 	// 初始化日志包
@@ -38,7 +38,7 @@ func (c *Config) initConfig() error {
 	if c.Name != "" {
 		viper.SetConfigFile(c.Name) // 如果指定了配置文件，解析指定配置文件
 	} else {
-		viper.AddConfigPath("configs") // 如果没有指定配置文件，则解析默认配置文件
+		viper.AddConfigPath("./configs") // 如果没有指定配置文件，则解析默认配置文件
 		viper.SetConfigName("config")
 	}
 
@@ -57,7 +57,7 @@ func (c *Config) initConfig() error {
 
 // 初始化日志配置
 func (c *Config) initLog() {
-	logger.InitLogger(viper.GetString("log.runmode"))
+	logger.InitLogger(viper.GetString("runmode"))
 
 	logger.Info("zap logger construction succeeded")
 }

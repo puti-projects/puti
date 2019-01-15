@@ -19,6 +19,7 @@ import (
 	"github.com/puti-projects/puti/internal/pkg/logger"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
+	"go.uber.org/zap"
 )
 
 var (
@@ -44,8 +45,9 @@ func main() {
 
 	// init config
 	if err := config.Init(*configPath); err != nil {
-		panic(err)
+		panic(fmt.Errorf("fatal error init configuration: %s", err))
 	}
+	logger.Info("configuration load succeeded.", zap.String("config file", viper.ConfigFileUsed()))
 
 	// init db
 	model.DB.Init()
