@@ -55,7 +55,7 @@ func Create(c *gin.Context) {
 		Nickname: r.Nickname,
 		Email:    r.Email,
 		PageURL:  r.Website,
-		Status:   0,
+		Status:   1,
 		Roles:    r.Role,
 	}
 

@@ -12,7 +12,7 @@ type MediaModel struct {
 
 	UserID      uint64 `gorm:"column:upload_user_id;not null"`
 	PostID      uint64 `gorm:"column:post_id;default:0;not null"`
-	Title       string `gorm:"columntitle:;not null"`
+	Title       string `gorm:"column:title;not null"`
 	Slug        string `gorm:"column:slug;not null"`
 	Description string `gorm:"column:description;not null"`
 	GUID        string `gorm:"column:guid;not null"`
