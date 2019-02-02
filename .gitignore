@@ -21,4 +21,3 @@ logs/
 
 # upload dir
 uploads/*
-!uploads/users/default.jpg

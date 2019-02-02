@@ -28,3 +28,13 @@ type ShowCategory struct {
 	Title string `json:"title"`
 	URL   string `json:"url"`
 }
+
+// ShowWidgetLatestArticles latest article list for widget
+type ShowWidgetLatestArticles struct {
+	ID           string `json:"id"`
+	Title        string `json:"title"`
+	GUID         string `json:"GUID"`
+	CommentCount string `json:"comment_count"`
+	ViewCount    string `json:"view_count"`
+	PostedTime   string `json:"posted_time"`
+}

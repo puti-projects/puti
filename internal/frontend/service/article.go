@@ -157,3 +157,24 @@ func getArticleAbstract(content string) string {
 	abstract := fmt.Sprintf("%s%s", string(abstractRune[:200]), "...")
 	return abstract
 }
+
+// GetLatestArticlesList get latest article list for widget
+func GetLatestArticlesList(getNums int) ([]*model.ShowWidgetLatestArticles, error) {
+	where := "`post_type` = ? AND `parent_id` = ? AND `status` = ?"
+	whereArgs := []interface{}{model.PostTypeArticle, 0, model.PostStatusPublish}
+
+	articles := []*model.ShowWidgetLatestArticles{}
+	postModel := &model.PostModel{}
+	result := model.DB.Local.Table(postModel.TableName()).
+		Select("`id`, `title`, `guid`, `comment_count`, `view_count`, `posted_time`").
+		Where(where, whereArgs...).
+		Order("`posted_time` DESC").
+		Limit(getNums).
+		Find(&articles)
+
+	if err := result.Error; err != nil {
+		return nil, err
+	}
+
+	return articles, nil
+}

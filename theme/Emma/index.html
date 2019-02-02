@@ -15,8 +15,8 @@
             <div class="container">
                 <div class="row">
                     <div class="main-contain col-12 col-md-9">
-                        {{if eq .Setting.ShowOnFront "posts"}}
-                            {{ template "Emma/articles" . }}
+                        {{if eq .Setting.ShowOnFront "article"}}
+                            {{ template "Emma/article-list" . }}
                         {{else if eq .Setting.ShowOnFront "page"}}
                             {{ template "Emma/page-index" . }}
                         {{else}}

@@ -1,28 +1,43 @@
 {{ define "Emma/error.html" }}
+<!DOCTYPE html>
 <html>
 <head>
     {{ template "head/head" . }}
-    <link type="text/css" rel="stylesheet" href="{{.Conf.StaticServer}}/theme/{{.Setting.CurrentTheme}}/public/library/bootstrap/css/bootstrap.min.css"/>
-    <link type="text/css" rel="stylesheet" href="{{.Conf.StaticServer}}/theme/{{.Setting.CurrentTheme}}/public/library/font-awesome-4.7.0/css/font-awesome.min.css"/>
-    <link type="text/css" rel="stylesheet" href="{{.Conf.StaticServer}}/theme/{{.Setting.CurrentTheme}}/public/css/globals.css"/>
+    <link type="text/css" rel="stylesheet" href="{{.Config.StaticServer}}/theme/{{.Setting.CurrentTheme}}/public/library/bootstrap/css/bootstrap.min.css"/>
+    <link type="text/css" rel="stylesheet" href="{{.Config.StaticServer}}/theme/{{.Setting.CurrentTheme}}/public/library/font-awesome-4.7.0/css/font-awesome.min.css"/>
+    <link type="text/css" rel="stylesheet" href="{{.Config.StaticServer}}/theme/{{.Setting.CurrentTheme}}/public/css/globals.css"/>
 </head>
 <body class="d-flex flex-column">
     {{ template "Emma/header" . }}
 
-    <div class="row">
-        <div class="col-md-12">
-            <div class="error-v4">
-                <div class="col-md-12 text-center error-banner">
-                    <h1>{{.code}}</h1>
-                </div>
-
-                <div class="col-md-12 text-center">
-                    <p class="lead">
-                        {{.message}}
-                    </p>
-                    <p>
-                        <a class="btn btn-sm btn-primary" href="/" style="color: #fff;">返回首页</a>
-                    </p>
+    <div class="content col-12 flex-grow">
+        <div class="row no-gutters">
+            <div class="container">
+                <div class="row">
+                    <div class="main-contain col-12 col-md-9">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="error-v4">
+                                    <div class="col-md-12 text-center error-banner">
+                                        <h1>{{.code}}</h1>
+                                    </div>
+                                
+                                    <div class="col-md-12 text-center">
+                                        <p class="lead">
+                                            {{.message}}
+                                        </p>
+                                        <p>
+                                            <a class="btn btn-sm btn-primary" href="/" style="color: #fff;">返回首页</a>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="right-sidebar d-none d-md-block col-3">
+                        {{ template "Emma/top-sidebar" . }}
+                        {{ template "Emma/sticky-sidebar" . }}
+                    </div>
                 </div>
             </div>
         </div>

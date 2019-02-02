@@ -15,7 +15,7 @@ import (
 	"github.com/puti-projects/puti/internal/backend/handler/taxonomy"
 	"github.com/puti-projects/puti/internal/backend/handler/user"
 	apiMiddleware "github.com/puti-projects/puti/internal/backend/middleware"
-	"github.com/puti-projects/puti/internal/frontend/handler"
+	webHandler "github.com/puti-projects/puti/internal/frontend/handler"
 	webMiddleware "github.com/puti-projects/puti/internal/frontend/middleware"
 	optionCache "github.com/puti-projects/puti/internal/pkg/option"
 
@@ -64,16 +64,12 @@ func loadWeb(g *gin.Engine, theme string) *gin.Engine {
 	web := g.Group("")
 	web.Use(webMiddleware.Renderer)
 	{
-		web.GET("", handler.ShowIndex)
+		web.GET("", webHandler.ShowIndex)
+		web.GET("/article", webHandler.ShowArticleList)
 	}
 
 	// 404 handle
-	g.NoRoute(func(c *gin.Context) {
-		c.HTML(http.StatusNotFound, theme+"/error.html", gin.H{
-			"code":    "404",
-			"message": "Sorry! We can't seem to find the page you're looking for.",
-		})
-	})
+	g.NoRoute(webMiddleware.Renderer, webHandler.ShowNotFound)
 
 	return g
 }
@@ -82,6 +78,7 @@ func loadWeb(g *gin.Engine, theme string) *gin.Engine {
 func loadStatic(g *gin.Engine, theme string) *gin.Engine {
 	g.Static("/static", "console/static")
 	g.Static("/uploads", "uploads/")
+	g.Static("/assets", "assets/")
 	// g.StaticFile("/favicon.ico", "./resources/favicon.ico")
 
 	g.Static("theme/"+theme+"/public", "theme/"+theme+"/public")

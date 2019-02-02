@@ -16,7 +16,7 @@ func ShowIndex(c *gin.Context) {
 	renderData := getRenderData(c)
 
 	showOnFront := optionCache.Options.Get("show_on_front")
-	if showOnFront == "posts" {
+	if showOnFront == "article" {
 		// get params
 		currentPage, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
 
@@ -27,13 +27,15 @@ func ShowIndex(c *gin.Context) {
 		}
 
 		renderData["Articles"] = articles
-		renderData["Pagination"] = pagination.Page
 
+		renderData["Pagination"] = pagination.Page
 		pagination.SetPageURL("/article")
 		renderData["PageURL"] = pagination.PageURL
 	} else if showOnFront == "page" {
 	} else {
 	}
 
+	renderData["Widgets"] = getWidgets()
+	renderData["Title"] = renderData["Setting"].(map[string]interface{})["BlogName"].(string) + " - " + renderData["Setting"].(map[string]interface{})["BlogDescription"].(string)
 	c.HTML(http.StatusOK, getTheme(c)+"/index.html", renderData)
 }

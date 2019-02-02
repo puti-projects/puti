@@ -9,6 +9,7 @@ import (
 // getDataModel consume renderer data
 func getRenderData(c *gin.Context) middleware.RenderData {
 	renderData, _ := c.Get("renderData")
+
 	return *(renderData.(*middleware.RenderData))
 }
 
@@ -24,4 +25,13 @@ func getSiteURL(c *gin.Context) string {
 	renderData := getRenderData(c)
 
 	return renderData["Setting"].(map[string]interface{})["SiteUrl"].(string)
+}
+
+// getWidgets load setting widgets into renderData
+func getWidgets() map[string]interface{} {
+	widgetMap := map[string]interface{}{}
+
+	widgetMap["LatestArticles"] = widgetLatestArticles(6)
+
+	return widgetMap
 }
