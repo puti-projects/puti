@@ -79,7 +79,7 @@ func loadStatic(g *gin.Engine, theme string) *gin.Engine {
 	g.Static("/static", "console/static")
 	g.Static("/uploads", "uploads/")
 	g.Static("/assets", "assets/")
-	// g.StaticFile("/favicon.ico", "./resources/favicon.ico")
+	g.StaticFile("/favicon.ico", "assets/favicon.ico")
 
 	g.Static("theme/"+theme+"/public", "theme/"+theme+"/public")
 
