@@ -1,12 +1,10 @@
 <p align="center">
-    <img src="assets/logo.png" alt="Puti Logo" width="150" height="150">
+    <img src="../assets/logo.png" alt="Puti Logo" width="150" height="150">
+    <br><br>
+    <h1>Puti</h1>
 </p>
-<p align="center">
+
 [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fputi-projects%2Fputi.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fputi-projects%2Fputi?ref=badge_shield) 
-</p>
-<p align="center">
-# Puti
-</p>
 
 [中文](https://github.com/puti-projects/puti/blob/master/README.md)
  | Engilsh
