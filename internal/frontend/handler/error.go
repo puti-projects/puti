@@ -14,5 +14,7 @@ func ShowNotFound(c *gin.Context) {
 	renderData["code"] = "404"
 	renderData["message"] = "Sorry! We can't seem to find the page you're looking for."
 
+	renderData["Widgets"] = getWidgets()
+	renderData["Title"] = "404 - " + renderData["Setting"].(map[string]interface{})["BlogName"].(string)
 	c.HTML(http.StatusNotFound, getTheme(c)+"/error.html", renderData)
 }

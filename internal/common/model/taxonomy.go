@@ -20,6 +20,8 @@ type TermModel struct {
 	Count       uint64 `gorm:"column:count;not null"`
 }
 
+const DefaultUnCategorizedID = 1
+
 // TableName TermTaxonomyModel's binding db name
 func (c *TermTaxonomyModel) TableName() string {
 	return "pt_term_taxonomy"

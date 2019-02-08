@@ -21,6 +21,112 @@ type List struct {
 	IDMap map[uint64]*model.ShowArticle
 }
 
+// GetArticleListByTaxonomy get articles list
+func GetArticleListByTaxonomy(currentPage int, taxonomyType, taxonomySlug, keyword string) (termName string, articleResult []*model.ShowArticle, pagination *utils.Pagination, err error) {
+	// get articles data
+	pageSize, _ := strconv.Atoi(optionCache.Options.Get("posts_per_page"))
+	offset := (currentPage - 1) * pageSize
+	count := 0
+
+	// get term id
+	var termTaxonomyID uint64
+	getTermTaxonomyID := model.DB.Local.Table("pt_term t").
+		Select("t.`name`, tt.`term_taxonomy_id`").
+		Joins("INNER JOIN pt_term_taxonomy tt ON tt.term_id = t.term_id").
+		Where("t.`slug` = ? AND tt.`taxonomy` = ?", taxonomySlug, taxonomyType).
+		Row()
+	getTermTaxonomyID.Scan(&termName, &termTaxonomyID)
+
+	// get article list
+	where := "p.`deleted_time` IS NULL AND p.`post_type` = ? AND p.`parent_id` = ? AND p.`status` = ? AND tr.`term_taxonomy_id` = ?"
+	whereArgs := []interface{}{model.PostTypeArticle, 0, model.PostStatusPublish, termTaxonomyID}
+	if "" != keyword {
+		where += " AND p.`title` LIKE ?"
+		whereArgs = append(whereArgs, "%"+keyword+"%")
+	}
+
+	articles := []*model.PostModel{}
+	result := model.DB.Local.Table("pt_post p").
+		Select("p.`id`, p.`title`, p.`if_top`, p.`content_html`, p.`guid`, p.`cover_picture`, p.`comment_count`, p.`view_count`, p.`posted_time`").
+		Joins("INNER JOIN pt_term_relationships tr ON tr.object_id = p.id").
+		Unscoped().
+		Where(where, whereArgs...).Count(&count).
+		Order("p.`if_top` DESC, p.`posted_time` DESC").
+		Offset(offset).Limit(pageSize).
+		Find(&articles)
+
+	if err := result.Error; err != nil {
+		logger.Errorf("get articles failed. %s", err)
+	}
+
+	// get pagination
+	pagination = utils.GetPagination(count, currentPage, pageSize, 0)
+
+	// handle articles data
+	articleResult = make([]*model.ShowArticle, 0)
+	ids := []uint64{}
+	for _, article := range articles {
+		ids = append(ids, article.ID)
+	}
+
+	wg := sync.WaitGroup{}
+	articleList := List{
+		Lock:  new(sync.Mutex),
+		IDMap: make(map[uint64]*model.ShowArticle, len(articles)),
+	}
+
+	errChan := make(chan error, 1)
+	finished := make(chan bool, 1)
+
+	siteURL := optionCache.Options.Get("site_url")
+	for _, a := range articles {
+		wg.Add(1)
+		go func(a *model.PostModel) {
+			defer wg.Done()
+
+			var ifTop = false
+			if a.IfTop == 1 {
+				ifTop = true
+			}
+
+			articleCategory, articleTag := getArticleTaxonomyInfo(a.ID, siteURL)
+
+			articleList.Lock.Lock()
+			defer articleList.Lock.Unlock()
+			articleList.IDMap[a.ID] = &model.ShowArticle{
+				ID:           a.ID,
+				Title:        template.HTML(a.Title),
+				IfTop:        ifTop,
+				Abstract:     getArticleAbstract(a.ContentHTML),
+				GUID:         a.GUID,
+				CoverPicture: a.CoverPicture,
+				CommentCount: a.CommentCount,
+				ViewCount:    a.ViewCount,
+				PostedTime:   a.PostDate.In(config.TimeLoc()).Format("2006-01-02 15:04"),
+				Tags:         articleTag,
+				Categories:   articleCategory,
+			}
+		}(a)
+	}
+
+	go func() {
+		wg.Wait()
+		close(finished)
+	}()
+
+	select {
+	case <-finished:
+	case err := <-errChan:
+		return "", nil, nil, err
+	}
+
+	for _, id := range ids {
+		articleResult = append(articleResult, articleList.IDMap[id])
+	}
+
+	return
+}
+
 // GetArticleList get articles list
 func GetArticleList(currentPage int, keyword string) (articleResult []*model.ShowArticle, pagination *utils.Pagination, err error) {
 	// get articles data
@@ -132,7 +238,7 @@ func getArticleTaxonomyInfo(articleID uint64, siteURL string) ([]*model.ShowCate
 		}
 
 		if taxonomy == "tag" {
-			articleTag = append(articleTag, &model.ShowTag{Title: name, URL: siteURL + "/" + config.PathTag + "/" + slug})
+			articleTag = append(articleTag, &model.ShowTag{Title: name, URL: siteURL + config.PathTag + "/" + slug})
 		}
 	}
 

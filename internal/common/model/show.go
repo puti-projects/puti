@@ -38,3 +38,13 @@ type ShowWidgetLatestArticles struct {
 	ViewCount    string `json:"view_count"`
 	PostedTime   string `json:"posted_time"`
 }
+
+// ShowWidgetCategoryTreeNode category tree node for widget
+type ShowWidgetCategoryTreeNode struct {
+	TermID   uint64                        `json:"term_id"`
+	Name     string                        `json:"name"`
+	Slug     string                        `json:"slug"`
+	Count    uint64                        `json:"count"`
+	URL      string                        `json:"url"`
+	Children []*ShowWidgetCategoryTreeNode `json:"children"`
+}

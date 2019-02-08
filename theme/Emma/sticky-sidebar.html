@@ -2,7 +2,17 @@
 <div class="sidebar sticky-sidebar">
     <div class="widget widget-category d-block clearfix">
         <h4><span><i class="fa fa-tags"></i>&nbsp;分类</span></h4>
-        <ul class="news-list fa-ul ml-4 mb-0 ">
+        <ul id="category-list" class="category-list list-unstyled">
+        {{range .Widgets.CategoryList}}
+            <li id="category-item-{{.TermID}}" class="category-item"><a href="{{.URL}}">{{.Name}}</a>
+                <ul class="category-sub-list list-unstyled">
+                {{range .Children}}
+                    <li id="category-item-{{.TermID}}" class="category-item"><a href="{{.URL}}">{{.Name}}</a></li>
+                {{end}}
+                </ul>
+            </li>
+        {{end}}
+        </ul>
     </div>
 
     <div class="widget widget-news d-block">

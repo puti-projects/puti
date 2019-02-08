@@ -59,7 +59,7 @@ func GetTaxonomyTree(termTaxonomy []*model.TermTaxonomyModel, pid uint64) []*Tre
 				ParentTermID: v.ParentTermID,
 				Level:        v.Level,
 			}
-			treeNode.Children = GetTaxonomyTree(termTaxonomy, v.ID)
+			treeNode.Children = GetTaxonomyTree(termTaxonomy, v.TermID)
 			tree = append(tree, &treeNode)
 		}
 	}

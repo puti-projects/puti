@@ -15,3 +15,13 @@ func widgetLatestArticles(showNums int) []*model.ShowWidgetLatestArticles {
 
 	return list
 }
+
+func widgetCategoryList() []*model.ShowWidgetCategoryTreeNode {
+	list, err := service.GetcategoryList()
+	if err != nil {
+		logger.Errorf("get category list failed. %s", err)
+		return nil
+	}
+
+	return list
+}

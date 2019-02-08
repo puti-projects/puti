@@ -32,6 +32,7 @@ func getWidgets() map[string]interface{} {
 	widgetMap := map[string]interface{}{}
 
 	widgetMap["LatestArticles"] = widgetLatestArticles(6)
+	widgetMap["CategoryList"] = widgetCategoryList()
 
 	return widgetMap
 }
