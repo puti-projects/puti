@@ -2,10 +2,10 @@ package model
 
 import "html/template"
 
-// ShowArticle output article model
+// ShowArticle output article model for list
 type ShowArticle struct {
 	ID           uint64          `json:"id"`
-	Title        template.HTML   `json:"title"`
+	Title        string          `json:"title"`
 	IfTop        bool            `json:"ifTop,omitempty"`
 	Abstract     string          `json:"abstract"`
 	GUID         string          `json:"url"`
@@ -47,4 +47,19 @@ type ShowWidgetCategoryTreeNode struct {
 	Count    uint64                        `json:"count"`
 	URL      string                        `json:"url"`
 	Children []*ShowWidgetCategoryTreeNode `json:"children"`
+}
+
+// ShowArticleDetail article detail output model
+type ShowArticleDetail struct {
+	ID            uint64                 `json:"id"`
+	Title         string                 `json:"title"`
+	ContentHTML   template.HTML          `json:"content_html"`
+	CommentStatus uint64                 `json:"comment_status"`
+	GUID          string                 `json:"guid"`
+	CommentCount  uint64                 `json:"commentCount"`
+	ViewCount     uint64                 `json:"viewCount"`
+	PostedTime    string                 `json:"posted_time"`
+	MetaData      map[string]interface{} `json:"meta_date"`
+	Tags          []*ShowTag             `json:"tags"`
+	Categories    []*ShowCategory        `json:"categories"`
 }

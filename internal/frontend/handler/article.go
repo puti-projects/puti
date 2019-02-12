@@ -3,6 +3,7 @@ package handler
 import (
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/puti-projects/puti/internal/frontend/service"
 
@@ -84,4 +85,22 @@ func ShowTagArticleList(c *gin.Context) {
 	renderData["Widgets"] = getWidgets()
 	renderData["Title"] = termName + " - 标签 - " + renderData["Setting"].(map[string]interface{})["BlogName"].(string)
 	c.HTML(http.StatusOK, getTheme(c)+"/articles.html", renderData)
+}
+
+// ShowArticleDetail handle article datail
+func ShowArticleDetail(c *gin.Context) {
+	renderData := getRenderData(c)
+
+	// get params
+	articleID := strings.Split(c.Param("id"), ".")[0]
+
+	articleDetail, err := service.GetArticleDetailByID(articleID)
+	if err != nil {
+		// 500
+	}
+
+	renderData["Article"] = articleDetail
+
+	renderData["Title"] = articleDetail.Title + " - " + renderData["Setting"].(map[string]interface{})["BlogName"].(string)
+	c.HTML(http.StatusOK, getTheme(c)+"/article-detail.html", renderData)
 }

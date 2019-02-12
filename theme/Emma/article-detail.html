@@ -1,0 +1,126 @@
+{{ define "Emma/article-detail.html" }}
+<!DOCTYPE html>
+<html>
+<head>
+    {{ template "head/head" . }}
+    <link type="text/css" rel="stylesheet" href="{{.Config.StaticServer}}/assets/library/github-markdown-css/github-markdown.css"/>
+    <link type="text/css" rel="stylesheet" href="{{.Config.StaticServer}}/assets/library/highlight/styles/github.css"/>
+    <link type="text/css" rel="stylesheet" href="{{.Config.StaticServer}}/assets/backend/library/katex/katex.min.css"/>
+    <link type="text/css" rel="stylesheet" href="{{.Config.StaticServer}}/theme/{{.Setting.CurrentTheme}}/public/library/bootstrap/css/bootstrap.min.css"/>
+    <link type="text/css" rel="stylesheet" href="{{.Config.StaticServer}}/theme/{{.Setting.CurrentTheme}}/public/library/font-awesome-4.7.0/css/font-awesome.min.css"/>
+    <link type="text/css" rel="stylesheet" href="{{.Config.StaticServer}}/theme/{{.Setting.CurrentTheme}}/public/css/globals.css"/>
+</head>
+<body class="d-flex flex-column">
+    {{ template "Emma/header" . }}
+
+    <div class="content col-12 flex-grow">
+        <div class="container">
+            <div class="row">
+                <div class="main-contain col-12 col-md-9">
+                    <div class="row post-container bg-white no-gutters mb-3">
+                        <div class="col-12 post-header mt-2">
+                            <h1 class="post-title">{{.Article.Title}}</h1>
+                        </div>
+                    
+                        <div class="col-12 post_meta">
+                            <ul class="post_meta_ul list-unstyled">
+                                <li class="inline-li float-left mr-2">
+                                    <i class="fa fa-calendar-check-o"></i>
+                                    {{.Article.PostedTime}}
+                                </li>
+                                <li class="inline-li float-left mr-2">
+                                    <span class="post-span"> | </span>
+                                </li>
+                                <li class="inline-li float-left mr-2">
+                                    <i class="fa fa-tags"></i>
+                                    {{range .Article.Categories}}
+                                        <a href="{{.URL}}" rel="category">{{.Title}}</a>        
+                                    {{end}}
+                                </li>
+                                <li class="inline-li float-left mr-2">
+                                    <span class="post-span"> | </span>
+                                </li>
+                                <li class="inline-li float-left mr-2">
+                                    <i class="fa fa-eye"></i>
+                                    {{.Article.ViewCount}} 阅读&nbsp;&nbsp;
+                                </li>
+                    
+                                <li class="inline-li float-left mr-2">
+                                    <i class="fa fa-comments-o"></i>
+                                    <a href="#comments">{{.Article.CommentCount}} 回复</a>
+                                </li>
+                            </ul>
+                        </div>
+                    
+                        <div id="editormd-view" class="col-12 post-content editormd">
+                            <div class="editormd-html-textarea markdown-body" name="editormd-view-html-code">{{.Article.ContentHTML}}</div>
+                        </div>
+                    
+                        <div class="col-12">
+                            <hr>
+                        </div>
+                    
+                        <div class="col-12 post-tags">
+                            <i class="fa fa-tags"></i> 标签：
+                            {{range .Article.Tags}}
+                                <a href="{{.URL}}" rel="tag"><span>{{.Title}}</span></a>
+                            {{end}}
+                        </div>
+                    </div>
+
+                    <div class="row post-state bg-white no-gutters mb-3">
+                        <div class="col-12 mb-1">
+                            <span>
+                                <b><i class="fa fa-copyright" aria-hidden="true"></i> 版权声明：</b>本站文章如无说明，则为原创。本站采用 <i class="fa fa-lg fa-creative-commons" aria-hidden="true"></i><a href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank"> 知识共享署名-非商业性使用-禁止演绎 4.0 国际许可协议</a> 进行许可。
+                            </span>
+                        </div>
+                        <div class="col-12">
+                            <span>
+                                <b><i class="fa fa-link" aria-hidden="true"></i> 本文链接：</b><a href="{{.Article.GUID}}" title="{{.Article.Title}}">{{.Article.GUID}}</a>
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="row post-lastAndNext no-gutters mb-3">
+                        <div class="col-xs-12 col-sm-6 lastAndNext-left">
+                            <p class="float-left mb-0">上一篇：{{if .LastArticle}}{{.LastArticle}}{{else}}没有了，已经是最后文章{{end}}</p>
+                        </div>
+                        <div class="col-xs-12 col-sm-6 lastAndNext-right">
+                            <p class="float-xs-left float-md-right mb-0">下一篇：{{if .NextArticle}}{{.NextArticle}}{{else}}没有了，已经是最新文章{{end}}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="bottom-tools">
+                        <a id="back-to-top" title="返回顶部"></a>
+                    </div>
+                </div>
+
+                <div class="right-sidebar d-none d-md-block col-3">
+                    {{ template "Emma/top-sidebar" . }}
+        
+                    <div class="sidebar sticky-sidebar">
+                        <div class="widget widget-toc d-block clearfix">
+                            <h4 class="mb-1"><span><i class="fa fa-bookmark-o"></i>&nbsp;目录</span></h4>
+                            <div id="custom-toc-container" class="markdown-body editormd-preview-container p-0">123</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer col-12">
+        {{ template "Emma/footer" . }}
+    </footer>
+
+    <script type="text/javascript" src="{{.Config.StaticServer}}/theme/{{.Setting.CurrentTheme}}/public/js/jquery.min.js"></script>
+    <script type="text/javascript" src="{{.Config.StaticServer}}/theme/{{.Setting.CurrentTheme}}/public/js/popper.min.js"></script>
+    <script type="text/javascript" src="{{.Config.StaticServer}}/theme/{{.Setting.CurrentTheme}}/public/library/bootstrap/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="{{.Config.StaticServer}}/theme/{{.Setting.CurrentTheme}}/public/js/ie10-viewport-bug-workaround.js"></script>
+    <script type="text/javascript" src="{{.Config.StaticServer}}/assets/library/highlight/highlight.pack.js"></script>
+    <script type="text/javascript" src="{{.Config.StaticServer}}/assets/library/katex/katex.min.js"></script>
+    <script type="text/javascript" src="{{.Config.StaticServer}}/themes/{{.Setting.CurrentTheme}}/public/js/article.js"></script>
+    <script type="text/javascript" src="{{.Config.StaticServer}}/themes/{{.Setting.CurrentTheme}}/public/js/analysis.js"></script>
+</body>
+</html>
+{{ end }}

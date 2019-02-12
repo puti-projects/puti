@@ -68,6 +68,7 @@ func loadWeb(g *gin.Engine, theme string) *gin.Engine {
 		web.GET("/article", webHandler.ShowArticleList)
 		web.GET("/category/:slug", webHandler.ShowCategoryArticleList)
 		web.GET("/tag/:slug", webHandler.ShowTagArticleList)
+		web.GET("/article/:id", webHandler.ShowArticleDetail)
 	}
 
 	// 404 handle

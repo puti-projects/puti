@@ -95,7 +95,7 @@ func GetArticleListByTaxonomy(currentPage int, taxonomyType, taxonomySlug, keywo
 			defer articleList.Lock.Unlock()
 			articleList.IDMap[a.ID] = &model.ShowArticle{
 				ID:           a.ID,
-				Title:        template.HTML(a.Title),
+				Title:        a.Title,
 				IfTop:        ifTop,
 				Abstract:     getArticleAbstract(a.ContentHTML),
 				GUID:         a.GUID,
@@ -189,7 +189,7 @@ func GetArticleList(currentPage int, keyword string) (articleResult []*model.Sho
 			defer articleList.Lock.Unlock()
 			articleList.IDMap[a.ID] = &model.ShowArticle{
 				ID:           a.ID,
-				Title:        template.HTML(a.Title),
+				Title:        a.Title,
 				IfTop:        ifTop,
 				Abstract:     getArticleAbstract(a.ContentHTML),
 				GUID:         a.GUID,
@@ -283,4 +283,45 @@ func GetLatestArticlesList(getNums int) ([]*model.ShowWidgetLatestArticles, erro
 	}
 
 	return articles, nil
+}
+
+// GetArticleDetailByID get article detail by article id
+func GetArticleDetailByID(articleID string) (*model.ShowArticleDetail, error) {
+	ID, _ := strconv.Atoi(articleID)
+	aID := uint64(ID)
+
+	a := &model.PostModel{}
+	err := model.DB.Local.Where("id = ? AND post_type = ? AND parent_id = ? AND status =?", aID, model.PostTypeArticle, 0, model.PostStatusPublish).First(&a).Error
+	if err != nil {
+		// TODO not found
+		return nil, err
+	}
+
+	siteURL := optionCache.Options.Get("site_url")
+	articleCategory, articleTag := getArticleTaxonomyInfo(aID, siteURL)
+
+	articleDetail := &model.ShowArticleDetail{
+		ID:            a.ID,
+		Title:         a.Title,
+		ContentHTML:   template.HTML(a.ContentHTML),
+		CommentStatus: a.CommentStatus,
+		GUID:          siteURL + a.GUID,
+		CommentCount:  a.CommentCount,
+		ViewCount:     a.ViewCount,
+		PostedTime:    utils.GetFormatTime(&a.PostDate, "2006-01-02 15:04"),
+		MetaData:      make(map[string]interface{}),
+		Categories:    articleCategory,
+		Tags:          articleTag,
+	}
+
+	// get extra data of article
+	am, err := model.GetPostMetaData(aID)
+	if err != nil {
+		return nil, err
+	}
+	for _, meta := range am {
+		articleDetail.MetaData[meta.MetaKey] = meta.MetaValue
+	}
+
+	return articleDetail, nil
 }
