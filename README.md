@@ -1,10 +1,15 @@
 <p align="center">
     <img src="assets/logo.png" alt="Puti Logo" width="150" height="150">
-    <br><br>
-    <h1>Puti</h1>
 </p>
-
-[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fputi-projects%2Fputi.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fputi-projects%2Fputi?ref=badge_shield) 
+<h1 align="center">Puti</h1>
+<p align="center">
+    <em>:black_nib:Puti is a blog system written in Golang.</em>
+</p>
+<p align="center">
+    <a href="https://app.fossa.io/projects/git%2Bgithub.com%2Fputi-projects%2Fputi?ref=badge_shield">
+        <img src="https://app.fossa.io/api/projects/git%2Bgithub.com%2Fputi-projects%2Fputi.svg?type=shield" alt="FOSSA Status">
+    </a>
+</p>
 
 中文 | [Engilsh](https://github.com/puti-projects/puti/blob/master/docs/README_EN.md)
 
@@ -28,6 +33,7 @@ This project is still developing.
 * [x] Setting
 * [x] Theme support
 * [ ] Plugin support
+* [ ] Toc support(not theme)
 
 ## Screenshot
 
