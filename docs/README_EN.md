@@ -10,11 +10,10 @@
         <img src="https://app.fossa.io/api/projects/git%2Bgithub.com%2Fputi-projects%2Fputi.svg?type=shield" alt="FOSSA Status">
     </a>
 </p>
-
-[中文](https://github.com/puti-projects/puti/blob/master/README.md)
+<p align="center">
+<a href="https://github.com/puti-projects/puti/blob/master/README.md" target="_blank">中文</a>
  | Engilsh
-
-------------
+</p>
 
 
 ## Project Status

@@ -3,17 +3,18 @@
 </p>
 <h1 align="center">Puti</h1>
 <p align="center">
-    <em>:black_nib:Puti is a blog system written in Golang.</em>
+    <em>:black_nib: Puti is a blog system written in Golang.</em>
 </p>
 <p align="center">
-    <a href="https://app.fossa.io/projects/git%2Bgithub.com%2Fputi-projects%2Fputi?ref=badge_shield">
+    <a href="https://app.fossa.io/projects/git%2Bgithub.com%2Fputi-projects%2Fputi?ref=badge_shield" target="_blank">
         <img src="https://app.fossa.io/api/projects/git%2Bgithub.com%2Fputi-projects%2Fputi.svg?type=shield" alt="FOSSA Status">
     </a>
 </p>
+<p align="center">
+中文
+ | <a href="https://github.com/puti-projects/puti/blob/master/docs/README_EN.md" target="_blank">Engilsh</a>
+</p>
 
-中文 | [Engilsh](https://github.com/puti-projects/puti/blob/master/docs/README_EN.md)
-
-------------
 
 ## Project Status
 This project is still developing.
