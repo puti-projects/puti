@@ -21,7 +21,8 @@ func ShowArticleList(c *gin.Context) {
 	// get content
 	articles, pagination, err := service.GetArticleList(currentPage, "")
 	if err != nil {
-		// 500
+		ShowInternalServerError(c)
+		return
 	}
 
 	renderData["Articles"] = articles
@@ -47,7 +48,8 @@ func ShowCategoryArticleList(c *gin.Context) {
 	// get content
 	termName, articles, pagination, err := service.GetArticleListByTaxonomy(currentPage, "category", taxonomySlug, "")
 	if err != nil {
-		// 500
+		ShowInternalServerError(c)
+		return
 	}
 
 	renderData["Articles"] = articles
@@ -73,7 +75,8 @@ func ShowTagArticleList(c *gin.Context) {
 	// get content
 	termName, articles, pagination, err := service.GetArticleListByTaxonomy(currentPage, "tag", taxonomySlug, "")
 	if err != nil {
-		// 500
+		ShowInternalServerError(c)
+		return
 	}
 
 	renderData["Articles"] = articles
@@ -96,7 +99,8 @@ func ShowArticleDetail(c *gin.Context) {
 
 	articleDetail, err := service.GetArticleDetailByID(articleID)
 	if err != nil {
-		// 500
+		ShowInternalServerError(c)
+		return
 	}
 
 	renderData["Article"] = articleDetail

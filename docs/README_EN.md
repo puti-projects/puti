@@ -1,5 +1,5 @@
 <p align="center">
-    <img src="assets/logo.png" alt="Puti Logo" width="150" height="150">
+    <img src="../assets/logo.png" alt="Puti Logo" width="150" height="150">
 </p>
 <h1 align="center">Puti</h1>
 <p align="center">
@@ -11,7 +11,7 @@
     </a>
 </p>
 <p align="center">
-<a href="https://github.com/puti-projects/puti/blob/master/README.md" target="_blank">中文</a>
+<a href="https://github.com/puti-projects/puti/blob/master/README.md">中文</a>
  | Engilsh
 </p>
 

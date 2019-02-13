@@ -61,6 +61,7 @@ func loadWeb(g *gin.Engine, theme string) *gin.Engine {
 	})
 
 	// Group for frontend
+	// notice: page route is handle in NoRoute(), since the wildcard problem in root from httprouter
 	web := g.Group("")
 	web.Use(webMiddleware.Renderer)
 	{
@@ -71,7 +72,7 @@ func loadWeb(g *gin.Engine, theme string) *gin.Engine {
 		web.GET("/article/:id", webHandler.ShowArticleDetail)
 	}
 
-	// 404 handle
+	// no route handle
 	g.NoRoute(webMiddleware.Renderer, webHandler.ShowNotFound)
 
 	return g

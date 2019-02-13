@@ -2,12 +2,25 @@ package handler
 
 import (
 	"net/http"
+	"strings"
+
+	"github.com/puti-projects/puti/internal/frontend/service"
 
 	"github.com/gin-gonic/gin"
 )
 
 // ShowNotFound 404 handler
 func ShowNotFound(c *gin.Context) {
+	if !strings.HasPrefix(c.Request.RequestURI, "/themes") {
+		// no static, and get slug
+		slug := strings.TrimLeft(c.Request.RequestURI, "/")
+		pageID := service.GetPageIDBySlug(slug)
+		if pageID > 0 {
+			ShowPageDetail(c)
+			return
+		}
+	}
+
 	// get renderer data include basic data
 	renderData := getRenderData(c)
 
@@ -17,4 +30,17 @@ func ShowNotFound(c *gin.Context) {
 	renderData["Widgets"] = getWidgets()
 	renderData["Title"] = "404 - " + renderData["Setting"].(map[string]interface{})["BlogName"].(string)
 	c.HTML(http.StatusNotFound, getTheme(c)+"/error.html", renderData)
+}
+
+// ShowInternalServerError 500 handler
+func ShowInternalServerError(c *gin.Context) {
+	// get renderer data include basic data
+	renderData := getRenderData(c)
+
+	renderData["code"] = "500"
+	renderData["message"] = "Something is not quite right. We will be back soon!"
+
+	renderData["Widgets"] = getWidgets()
+	renderData["Title"] = "500 - " + renderData["Setting"].(map[string]interface{})["BlogName"].(string)
+	c.HTML(http.StatusInternalServerError, getTheme(c)+"/error.html", renderData)
 }

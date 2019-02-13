@@ -23,7 +23,8 @@ func ShowIndex(c *gin.Context) {
 		// get content
 		articles, pagination, err := service.GetArticleList(currentPage, "")
 		if err != nil {
-			// 500
+			ShowInternalServerError(c)
+			return
 		}
 
 		renderData["Articles"] = articles

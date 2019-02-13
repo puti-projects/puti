@@ -23,7 +23,7 @@ log:
 # database
 db:
   name: db_puti
-  addr: database:3306 # host:port
+  addr: localhost:3306 # host:port
   username: putiroot
   password: puti123456
 
