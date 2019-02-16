@@ -8,6 +8,7 @@ import (
 	"github.com/puti-projects/puti/internal/frontend/service"
 
 	"github.com/gin-gonic/gin"
+	"github.com/jinzhu/gorm"
 )
 
 // ShowArticleList article list handle
@@ -96,14 +97,23 @@ func ShowArticleDetail(c *gin.Context) {
 
 	// get params
 	articleID := strings.Split(c.Param("id"), ".")[0]
+	ID, _ := strconv.Atoi(articleID)
+	aID := uint64(ID)
 
-	articleDetail, err := service.GetArticleDetailByID(articleID)
+	articleDetail, err := service.GetArticleDetailByID(aID)
 	if err != nil {
+		if gorm.IsRecordNotFoundError(err) {
+			ShowNotFound(c)
+			return
+		}
+
 		ShowInternalServerError(c)
 		return
 	}
 
 	renderData["Article"] = articleDetail
+	renderData["LastArticle"] = service.GetLastArticle(aID)
+	renderData["NextArticle"] = service.GetNextArticle(aID)
 
 	renderData["Title"] = articleDetail.Title + " - " + renderData["Setting"].(map[string]interface{})["BlogName"].(string)
 	c.HTML(http.StatusOK, getTheme(c)+"/article-detail.html", renderData)

@@ -14,10 +14,11 @@ func ShowNotFound(c *gin.Context) {
 	if !strings.HasPrefix(c.Request.RequestURI, "/themes") {
 		// no static, and get slug
 		slug := strings.TrimLeft(c.Request.RequestURI, "/")
-		pageID := service.GetPageIDBySlug(slug)
-		if pageID > 0 {
-			ShowPageDetail(c)
-			return
+		if !strings.Contains(slug, "/") {
+			if pageID := service.GetPageIDBySlug(slug); pageID > 0 {
+				ShowPageDetail(c, pageID)
+				return
+			}
 		}
 	}
 

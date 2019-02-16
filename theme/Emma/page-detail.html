@@ -1,2 +1,57 @@
 {{ define "Emma/page-detail.html" }}
+<!DOCTYPE html>
+<html>
+<head>
+    {{ template "head/head" . }}
+    <link type="text/css" rel="stylesheet" href="{{.Config.StaticServer}}/assets/library/github-markdown-css/github-markdown.css"/>
+    <link type="text/css" rel="stylesheet" href="{{.Config.StaticServer}}/theme/{{.Setting.CurrentTheme}}/public/library/bootstrap/css/bootstrap.min.css"/>
+    <link type="text/css" rel="stylesheet" href="{{.Config.StaticServer}}/theme/{{.Setting.CurrentTheme}}/public/library/font-awesome-4.7.0/css/font-awesome.min.css"/>
+    <link type="text/css" rel="stylesheet" href="{{.Config.StaticServer}}/theme/{{.Setting.CurrentTheme}}/public/css/globals.css"/>
+</head>
+<body class="d-flex flex-column">
+    {{ template "Emma/header" . }}
+
+    <div class="content col-12 flex-grow">
+        <div class="row no-gutters">
+            <div class="container">
+                <div class="row">
+                    <div class="main-contain col-12 col-md-9">
+                        <div class="row post-container bg-white no-gutters mb-3">
+                            <div class="col-12 post-header mt-2">
+                                <h1 class="post-title">{{.Page.Title}}</h1>
+                            </div>
+                        
+                            <div class="col-12 post_meta">
+                                <ul class="post_meta_ul list-unstyled">
+                                    <li class="inline-li float-left mr-2">
+                                        <i class="fa fa-calendar-check-o"></i>
+                                        {{.Page.PostedTime}}
+                                    </li>
+                                </ul>
+                            </div>
+                        
+                            <div id="editormd-view" class="col-12 post-content editormd">
+                                <div class="editormd-html-textarea markdown-body" name="editormd-view-html-code">{{.Page.ContentHTML}}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="right-sidebar d-none d-md-block col-3">
+                        {{ template "Emma/top-sidebar" . }}
+                        {{ template "Emma/sticky-sidebar" . }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer col-12">
+        {{ template "Emma/footer" . }}
+    </footer>
+    
+    <script type="text/javascript" src="{{.Config.StaticServer}}/theme/{{.Setting.CurrentTheme}}/public/js/jquery.min.js"></script>
+    <script type="text/javascript" src="{{.Config.StaticServer}}/theme/{{.Setting.CurrentTheme}}/public/js/popper.min.js"></script>
+    <script type="text/javascript" src="{{.Config.StaticServer}}/theme/{{.Setting.CurrentTheme}}/public/library/bootstrap/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="{{.Config.StaticServer}}/theme/{{.Setting.CurrentTheme}}/public/js/ie10-viewport-bug-workaround.js"></script>
+</body>
+</html>
 {{ end }}

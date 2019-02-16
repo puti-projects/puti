@@ -49,6 +49,12 @@ type ShowWidgetCategoryTreeNode struct {
 	Children []*ShowWidgetCategoryTreeNode `json:"children"`
 }
 
+// ShowLastAndNextArticle last or next article url model
+type ShowLastOrNextArticle struct {
+	Title string `json:"title"`
+	Url   string `json:"url"`
+}
+
 // ShowArticleDetail article detail output model
 type ShowArticleDetail struct {
 	ID            uint64                 `json:"id"`
@@ -62,4 +68,17 @@ type ShowArticleDetail struct {
 	MetaData      map[string]interface{} `json:"meta_date"`
 	Tags          []*ShowTag             `json:"tags"`
 	Categories    []*ShowCategory        `json:"categories"`
+}
+
+// ShowPageDetail page detail output model
+type ShowPageDetail struct {
+	ID            uint64                 `json:"id"`
+	Title         string                 `json:"title"`
+	ContentHTML   template.HTML          `json:"content_html"`
+	CommentStatus uint64                 `json:"comment_status"`
+	GUID          string                 `json:"guid"`
+	CommentCount  uint64                 `json:"commentCount"`
+	ViewCount     uint64                 `json:"viewCount"`
+	PostedTime    string                 `json:"posted_time"`
+	MetaData      map[string]interface{} `json:"meta_date"`
 }

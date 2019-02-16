@@ -286,19 +286,15 @@ func GetLatestArticlesList(getNums int) ([]*model.ShowWidgetLatestArticles, erro
 }
 
 // GetArticleDetailByID get article detail by article id
-func GetArticleDetailByID(articleID string) (*model.ShowArticleDetail, error) {
-	ID, _ := strconv.Atoi(articleID)
-	aID := uint64(ID)
-
+func GetArticleDetailByID(articleID uint64) (*model.ShowArticleDetail, error) {
 	a := &model.PostModel{}
-	err := model.DB.Local.Where("id = ? AND post_type = ? AND parent_id = ? AND status =?", aID, model.PostTypeArticle, 0, model.PostStatusPublish).First(&a).Error
+	err := model.DB.Local.Where("id = ? AND post_type = ? AND parent_id = ? AND status =?", articleID, model.PostTypeArticle, 0, model.PostStatusPublish).First(&a).Error
 	if err != nil {
-		// TODO not found
 		return nil, err
 	}
 
 	siteURL := optionCache.Options.Get("site_url")
-	articleCategory, articleTag := getArticleTaxonomyInfo(aID, siteURL)
+	articleCategory, articleTag := getArticleTaxonomyInfo(articleID, siteURL)
 
 	articleDetail := &model.ShowArticleDetail{
 		ID:            a.ID,
@@ -315,7 +311,7 @@ func GetArticleDetailByID(articleID string) (*model.ShowArticleDetail, error) {
 	}
 
 	// get extra data of article
-	am, err := model.GetPostMetaData(aID)
+	am, err := model.GetPostMetaData(articleID)
 	if err != nil {
 		return nil, err
 	}
@@ -324,4 +320,40 @@ func GetArticleDetailByID(articleID string) (*model.ShowArticleDetail, error) {
 	}
 
 	return articleDetail, nil
+}
+
+// GetLastArticle get last article title and url
+func GetLastArticle(currentArticleID uint64) *model.ShowLastOrNextArticle {
+	var title string
+	var url string
+	postModel := &model.PostModel{}
+	row := model.DB.Local.Table(postModel.TableName()).
+		Where("`id` < ? AND `post_type` = ? AND `parent_id` = ? AND `status` = ? AND `deleted_time` IS NULL", currentArticleID, model.PostTypeArticle, 0, model.PostStatusPublish).
+		Select("`title`, `guid`").Order("`id` DESC").Row()
+	row.Scan(&title, &url)
+
+	article := &model.ShowLastOrNextArticle{
+		Title: title,
+		Url:   url,
+	}
+
+	return article
+}
+
+// GetNextArticle get next article title and url
+func GetNextArticle(currentArticleID uint64) *model.ShowLastOrNextArticle {
+	var title string
+	var url string
+	postModel := &model.PostModel{}
+	row := model.DB.Local.Table(postModel.TableName()).
+		Where("`id` > ? AND `post_type` = ? AND `parent_id` = ? AND `status` = ? AND `deleted_time` IS NULL", currentArticleID, model.PostTypeArticle, 0, model.PostStatusPublish).
+		Select("`title`, `guid`").Order("`id` ASC").Row()
+	row.Scan(&title, &url)
+
+	article := &model.ShowLastOrNextArticle{
+		Title: title,
+		Url:   url,
+	}
+
+	return article
 }
