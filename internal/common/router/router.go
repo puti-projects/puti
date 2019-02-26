@@ -70,6 +70,7 @@ func loadWeb(g *gin.Engine, theme string) *gin.Engine {
 		web.GET("/category/:slug", webHandler.ShowCategoryArticleList)
 		web.GET("/tag/:slug", webHandler.ShowTagArticleList)
 		web.GET("/article/:id", webHandler.ShowArticleDetail)
+		web.GET("/archive", webHandler.ShowArchive)
 	}
 
 	// no route handle

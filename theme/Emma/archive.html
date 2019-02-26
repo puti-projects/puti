@@ -1,0 +1,71 @@
+{{ define "Emma/archive.html" }}
+<!DOCTYPE html>
+<html>
+<head>
+    {{ template "head/head" . }}
+    <link type="text/css" rel="stylesheet" href="{{.Config.StaticServer}}/theme/{{.Setting.CurrentTheme}}/public/library/bootstrap/css/bootstrap.min.css"/>
+    <link type="text/css" rel="stylesheet" href="{{.Config.StaticServer}}/theme/{{.Setting.CurrentTheme}}/public/library/font-awesome-4.7.0/css/font-awesome.min.css"/>
+    <link type="text/css" rel="stylesheet" href="{{.Config.StaticServer}}/theme/{{.Setting.CurrentTheme}}/public/css/globals.css"/>
+</head>
+<body class="d-flex flex-column">
+    {{ template "Emma/header" . }}
+
+    <div class="content col-12 flex-grow">
+        <div class="row no-gutters">
+            <div class="container">
+                <div class="row">
+                    <div class="main-contain col-12 col-md-9">
+                        <div class="archives-body card rounded-0">
+                            <div class="card-header text-white bg-dark rounded-0">
+                                <h4 class="m-auto"><i class="fa fa-file-o"></i> 归档</h4>
+                            </div>
+                            {{if .Archive}}
+                                <ul class="list-group" id="archives">
+                                    {{range  $year := .ArchiveSortYear}}
+                                        <li class="list-group-item border-0">
+                                            <h4 class="font-weight-bold mb-2">{{$year}} 年</h4>
+                                            <ul class="list-group">
+                                                {{ range $theMonth := index $.ArchiveSortMonth $year }}
+                                                    <li class="list-group-item archive-month border border-1">
+                                                        <h5 class="mb-2"><span class="font-weight-bold ml-3">{{$theMonth}} 月</span><small class="float-right text-muted">{{len (index $.Archive $year $theMonth) }} 篇文章</small></h5>
+                                                        <ul class="list-group list-group-flush month_items">
+                                                            {{ range index $.Archive $year $theMonth }}
+                                                                <li class="list-group-item">
+                                                                <span>{{.PostedDay}} 日：</span><a href="{{.GUID}}">{{.Title}}</a>
+                                                                    <span class="badge badge-primary d-flex float-right">{{.ViewCount}} 阅读</span>
+                                                                </li>
+                                                            {{end}}
+                                                        </ul>
+                                                    </li>
+                                                {{end}}
+                                            </ul>
+                                        </li>
+                                    {{end}}
+                                </ul>
+                            {{else}}
+                                <div class="card-body">
+                                    暂无文章
+                                </div>
+                            {{end}}
+                        </div>                        
+                    </div>
+                    <div class="right-sidebar d-none d-md-block col-3">
+                        {{ template "Emma/top-sidebar" . }}
+                        {{ template "Emma/sticky-sidebar" . }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer col-12">
+        {{ template "Emma/footer" . }}
+    </footer>
+    
+    <script type="text/javascript" src="{{.Config.StaticServer}}/theme/{{.Setting.CurrentTheme}}/public/js/jquery.min.js"></script>
+    <script type="text/javascript" src="{{.Config.StaticServer}}/theme/{{.Setting.CurrentTheme}}/public/js/popper.min.js"></script>
+    <script type="text/javascript" src="{{.Config.StaticServer}}/theme/{{.Setting.CurrentTheme}}/public/library/bootstrap/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="{{.Config.StaticServer}}/theme/{{.Setting.CurrentTheme}}/public/js/ie10-viewport-bug-workaround.js"></script>
+</body>
+</html>
+{{ end }}

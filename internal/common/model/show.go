@@ -82,3 +82,13 @@ type ShowPageDetail struct {
 	PostedTime    string                 `json:"posted_time"`
 	MetaData      map[string]interface{} `json:"meta_date"`
 }
+
+type ShowArchive struct {
+	ID           uint64 `json:"id"`
+	Title        string `json:"title"`
+	GUID         string `json:"guid"`
+	CommentCount uint64 `json:"commentCount"`
+	ViewCount    uint64 `json:"viewCount"`
+	PostedTime   string `json:"posted_time"`
+	PostedDay    string `json:"posted_day"`
+}
