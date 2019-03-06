@@ -6,7 +6,6 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/puti-projects/puti/internal/common/config"
 	"github.com/puti-projects/puti/internal/common/model"
 	"github.com/puti-projects/puti/internal/common/utils"
 
@@ -96,7 +95,7 @@ func ListPost(postType, title string, page, number int, sort, status string) ([]
 				UserID:       u.UserID,
 				Title:        u.Title,
 				Status:       u.Status,
-				PostDate:     u.PostDate.In(config.TimeLoc()).Format("2006-01-02 15:04"),
+				PostDate:     utils.GetFormatNullTime(&u.PostDate, "2006-01-02 15:04"),
 				CommentCount: u.CommentCount,
 				ViewCount:    u.ViewCount,
 			}
@@ -147,7 +146,7 @@ func GetArticleDetail(articleID string) (*ArticleDetail, error) {
 		IfTop:           a.IfTop,
 		GUID:            a.GUID,
 		CoverPicture:    a.CoverPicture,
-		PostDate:        utils.GetFormatTime(&a.PostDate, "2006-01-02 15:04:05"),
+		PostDate:        utils.GetFormatNullTime(&a.PostDate, "2006-01-02 15:04:05"),
 		MetaData:        make(map[string]interface{}),
 		Category:        make([]uint64, 0),
 		Tag:             make([]uint64, 0),
@@ -198,7 +197,7 @@ func GetPageDetail(pageID string) (*PageDetail, error) {
 		CommentStatus:   p.CommentStatus,
 		GUID:            p.GUID,
 		CoverPicture:    p.CoverPicture,
-		PostDate:        utils.GetFormatTime(&p.PostDate, "2006-01-02 15:04:05"),
+		PostDate:        utils.GetFormatNullTime(&p.PostDate, "2006-01-02 15:04:05"),
 		MetaData:        make(map[string]interface{}),
 	}
 

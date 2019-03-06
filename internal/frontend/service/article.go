@@ -102,7 +102,7 @@ func GetArticleListByTaxonomy(currentPage int, taxonomyType, taxonomySlug, keywo
 				CoverPicture: a.CoverPicture,
 				CommentCount: a.CommentCount,
 				ViewCount:    a.ViewCount,
-				PostedTime:   a.PostDate.In(config.TimeLoc()).Format("2006-01-02 15:04"),
+				PostedTime:   utils.GetFormatNullTime(&a.PostDate, "2006-01-02 15:04"),
 				Tags:         articleTag,
 				Categories:   articleCategory,
 			}
@@ -196,7 +196,7 @@ func GetArticleList(currentPage int, keyword string) (articleResult []*model.Sho
 				CoverPicture: a.CoverPicture,
 				CommentCount: a.CommentCount,
 				ViewCount:    a.ViewCount,
-				PostedTime:   a.PostDate.In(config.TimeLoc()).Format("2006-01-02 15:04"),
+				PostedTime:   utils.GetFormatNullTime(&a.PostDate, "2006-01-02 15:04"),
 				Tags:         articleTag,
 				Categories:   articleCategory,
 			}
@@ -304,7 +304,7 @@ func GetArticleDetailByID(articleID uint64) (*model.ShowArticleDetail, error) {
 		GUID:          siteURL + a.GUID,
 		CommentCount:  a.CommentCount,
 		ViewCount:     a.ViewCount,
-		PostedTime:    utils.GetFormatTime(&a.PostDate, "2006-01-02 15:04"),
+		PostedTime:    utils.GetFormatNullTime(&a.PostDate, "2006-01-02 15:04"),
 		MetaData:      make(map[string]interface{}),
 		Categories:    articleCategory,
 		Tags:          articleTag,

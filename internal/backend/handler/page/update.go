@@ -71,7 +71,7 @@ func Update(c *gin.Context) {
 			Status:          r.Status,
 			CommentStatus:   r.CommentStatus,
 			CoverPicture:    r.CoverPicture,
-			PostDate:        utils.StringToTime("2006-01-02 15:04:05", r.PostedTime),
+			PostDate:        utils.StringToNullTime("2006-01-02 15:04:05", r.PostedTime),
 			Slug:            r.Slug,
 			ParentID:        r.ParentID,
 		}

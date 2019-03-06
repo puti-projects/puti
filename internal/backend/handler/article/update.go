@@ -72,7 +72,7 @@ func Update(c *gin.Context) {
 			CommentStatus:   r.CommentStatus,
 			IfTop:           r.IfTop,
 			CoverPicture:    r.CoverPicture,
-			PostDate:        utils.StringToTime("2006-01-02 15:04:05", r.PostedTime),
+			PostDate:        utils.StringToNullTime("2006-01-02 15:04:05", r.PostedTime),
 		}
 
 		// Update changed fields.

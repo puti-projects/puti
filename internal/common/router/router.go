@@ -12,6 +12,7 @@ import (
 	"github.com/puti-projects/puti/internal/backend/handler/option"
 	"github.com/puti-projects/puti/internal/backend/handler/page"
 	"github.com/puti-projects/puti/internal/backend/handler/sd"
+	"github.com/puti-projects/puti/internal/backend/handler/subject"
 	"github.com/puti-projects/puti/internal/backend/handler/taxonomy"
 	"github.com/puti-projects/puti/internal/backend/handler/user"
 	apiMiddleware "github.com/puti-projects/puti/internal/backend/middleware"
@@ -153,6 +154,8 @@ func loadAPI(g *gin.Engine) *gin.Engine {
 		api.PUT("/media/:id", media.Update)
 		api.GET("/option", option.List)
 		api.PUT("/option", option.Update)
+		api.GET("/subject", subject.List)
+		api.POST("/subject", subject.Create)
 	}
 
 	return g

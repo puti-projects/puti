@@ -20,6 +20,7 @@ type TermModel struct {
 	Count       uint64 `gorm:"column:count;not null"`
 }
 
+// DefaultUnCategorizedID the default category's ID
 const DefaultUnCategorizedID = 1
 
 // TableName TermTaxonomyModel's binding db name

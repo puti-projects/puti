@@ -93,7 +93,7 @@ func handleCreate(r *CreateRequest, userID uint64) (rsp *CreateResponse, err err
 		CoverPicture:    r.CoverPicture,
 		CommentCount:    0,
 		ViewCount:       0,
-		PostDate:        utils.StringToTime("2006-01-02 15:04:05", r.PostedTime),
+		PostDate:        utils.StringToNullTime("2006-01-02 15:04:05", r.PostedTime),
 	}
 	if err := tx.Create(&article).Error; err != nil {
 		return rsp, err
@@ -162,10 +162,6 @@ func (r *CreateRequest) checkParam() error {
 
 	if r.Content == "" {
 		return errno.New(errno.ErrValidation, nil).Add("Content can not be empty.")
-	}
-
-	if r.PostedTime == "" {
-		return errno.New(errno.ErrValidation, nil).Add("PostedTime can not be empty.")
 	}
 
 	if r.Status == "" {
