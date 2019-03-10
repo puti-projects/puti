@@ -183,3 +183,18 @@ func updateSubjectCount(tx *gorm.DB, subjectID uint64, countDiff uint64) error {
 
 	return nil
 }
+
+// GetArticleSubejct get article's subject by article id
+func GetArticleSubejct(articleID uint64) ([]uint64, error) {
+	subject, err := model.GetArticleSubject(articleID)
+	if err != nil {
+		return nil, err
+	}
+
+	articleSubject := make([]uint64, 0)
+	for _, item := range subject {
+		articleSubject = append(articleSubject, item.SubjectID)
+	}
+
+	return articleSubject, nil
+}

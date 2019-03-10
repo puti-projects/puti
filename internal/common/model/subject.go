@@ -16,21 +16,9 @@ type SubjectModel struct {
 	LastUpdated mysql.NullTime `gorm:"column:last_updated"`
 }
 
-// SubjectRelationshipsModel `pt_subject_relationships` 's struct
-type SubjectRelationshipsModel struct {
-	ObjectID  uint64 `gorm:"column:object_id;not null;primary_key"`
-	SubjectID uint64 `gorm:"column:subject_id;not null;primary_key"`
-	OrderNum  string `gorm:"column:order_num;not null"`
-}
-
 // TableName is the resource table name in db
 func (c *SubjectModel) TableName() string {
 	return "pt_subject"
-}
-
-// TableName SubjectRelationshipsModel's binding db name
-func (c *SubjectRelationshipsModel) TableName() string {
-	return "pt_subject_relationships"
 }
 
 // Create creates a new subject
@@ -62,7 +50,7 @@ func GetAllSubjects() ([]*SubjectModel, error) {
 	return subjects, result.Error
 }
 
-// SubjectCheckNameExist check the subject name if is already exist
+// SubjectCheckNameExistWhileCreate check the subject name if is already exist
 func SubjectCheckNameExistWhileCreate(name string) bool {
 	count := 0
 	subjectModel := &SubjectModel{}

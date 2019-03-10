@@ -43,6 +43,7 @@ type ArticleDetail struct {
 	MetaData        map[string]interface{} `json:"meta_date"`
 	Category        []uint64               `json:"category"`
 	Tag             []uint64               `json:"tag"`
+	Subject         []uint64               `json:"subject"`
 }
 
 // PageDetail struct for page info detail
@@ -150,6 +151,7 @@ func GetArticleDetail(articleID string) (*ArticleDetail, error) {
 		MetaData:        make(map[string]interface{}),
 		Category:        make([]uint64, 0),
 		Tag:             make([]uint64, 0),
+		Subject:         make([]uint64, 0),
 	}
 
 	for _, meta := range am {
@@ -166,6 +168,12 @@ func GetArticleDetail(articleID string) (*ArticleDetail, error) {
 	if tagOk {
 		ArticleDetail.Tag = tag
 	}
+
+	subjectTaxonomy, err := GetArticleSubejct(uID)
+	if err != nil {
+		return nil, err
+	}
+	ArticleDetail.Subject = subjectTaxonomy
 
 	return ArticleDetail, nil
 }
