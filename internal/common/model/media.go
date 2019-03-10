@@ -11,15 +11,27 @@ type MediaModel struct {
 	Model
 
 	UserID      uint64 `gorm:"column:upload_user_id;not null"`
-	PostID      uint64 `gorm:"column:post_id;default:0;not null"`
 	Title       string `gorm:"column:title;not null"`
 	Slug        string `gorm:"column:slug;not null"`
 	Description string `gorm:"column:description;not null"`
 	GUID        string `gorm:"column:guid;not null"`
 	Type        string `gorm:"column:type;not null"`
 	MimeType    string `gorm:"column:mime_type;not null"`
+	Usage       string `gorm:"column:usage;not null"`
 	Status      uint64 `gorm:"column:status;default:1;not null"`
 }
+
+// ResourceTypePicture resource type of picture
+const ResourceTypePicture = "picture"
+
+// StatusNormal normal status value
+const StatusNormal = 1
+
+// UsageDefault default usage
+const UsageDefault = "common"
+
+// UsageCover usage for cover
+const UsageCover = "cover"
 
 // TableName is the resource table name in db
 func (c *MediaModel) TableName() string {

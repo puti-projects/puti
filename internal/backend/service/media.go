@@ -36,7 +36,7 @@ func GetMedia(id uint64) (*MediaDetail, error) {
 		return nil, err
 	}
 
-	userInfo := &MediaDetail{
+	mediaInfo := &MediaDetail{
 		MediaInfo: MediaInfo{
 			ID:         m.ID,
 			Title:      m.Title,
@@ -48,7 +48,7 @@ func GetMedia(id uint64) (*MediaDetail, error) {
 		Description: m.Description,
 	}
 
-	return userInfo, nil
+	return mediaInfo, nil
 }
 
 // ListMedia returns media list and media count

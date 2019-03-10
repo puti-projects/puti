@@ -155,7 +155,9 @@ func loadAPI(g *gin.Engine) *gin.Engine {
 		api.GET("/option", option.List)
 		api.PUT("/option", option.Update)
 		api.GET("/subject", subject.List)
-		api.POST("/subject", subject.Create)
+		api.GET("/subject/:id", subject.Detail)
+		api.POST("/subject/:name", subject.Create)
+		api.PUT("/subject/:id", subject.Update)
 	}
 
 	return g

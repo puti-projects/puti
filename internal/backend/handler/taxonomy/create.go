@@ -7,9 +7,9 @@ import (
 	"github.com/puti-projects/puti/internal/common/model"
 	"github.com/puti-projects/puti/internal/common/utils"
 	"github.com/puti-projects/puti/internal/pkg/errno"
+	"github.com/puti-projects/puti/internal/pkg/logger"
 
 	"github.com/gin-gonic/gin"
-	"github.com/puti-projects/puti/internal/pkg/logger"
 	"go.uber.org/zap"
 )
 
@@ -40,7 +40,7 @@ func Create(c *gin.Context) {
 
 	level, err := model.GetTaxonomyLevel(r.ParentID, r.Taxonomy)
 	if err != nil {
-		Response.SendResponse(c, errno.ErrTaxonomyParentId, nil)
+		Response.SendResponse(c, errno.ErrTaxonomyParentID, nil)
 		return
 	}
 

@@ -31,6 +31,7 @@ const savePathURI string = "/uploads/"
 func Upload(c *gin.Context) {
 	// get userId and file
 	userID := c.PostForm("userId")
+	usage := c.DefaultPostForm("usage", "common")
 	file, _ := c.FormFile("file")
 
 	// General the save path by upload time
@@ -74,6 +75,7 @@ func Upload(c *gin.Context) {
 		Slug:     fileNameWithoutExt,
 		GUID:     pathName,
 		MimeType: utils.GetFileMimeTypeByExt(fileExt),
+		Usage:    usage,
 	}
 
 	// save file info
