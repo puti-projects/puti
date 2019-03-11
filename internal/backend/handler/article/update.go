@@ -28,6 +28,7 @@ type UpdateRequest struct {
 	IfTop         uint64   `json:"if_top"`
 	Category      []uint64 `json:"category"`
 	Tag           []uint64 `json:"tag"`
+	Subject       []uint64 `json:"subject"`
 }
 
 // Update update article
@@ -76,7 +77,7 @@ func Update(c *gin.Context) {
 		}
 
 		// Update changed fields.
-		if err := service.UpdateArticle(article, r.Description, r.Category, r.Tag); err != nil {
+		if err := service.UpdateArticle(article, r.Description, r.Category, r.Tag, r.Subject); err != nil {
 			Response.SendResponse(c, errno.ErrDatabase, nil)
 			return
 		}

@@ -15,7 +15,7 @@ func (c *SubjectRelationshipsModel) TableName() string {
 // GetArticleSubject get article's conection subject
 func GetArticleSubject(articleID uint64) ([]*SubjectRelationshipsModel, error) {
 	var subjectRelationships []*SubjectRelationshipsModel
-	result := DB.Local.Where("`ObjectID` = ?", articleID).Find(&subjectRelationships)
+	result := DB.Local.Where("`object_id` = ?", articleID).Find(&subjectRelationships)
 
 	return subjectRelationships, result.Error
 }

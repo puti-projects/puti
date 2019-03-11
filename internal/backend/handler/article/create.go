@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"time"
 
+	"github.com/go-sql-driver/mysql"
 	Response "github.com/puti-projects/puti/internal/backend/handler"
 	"github.com/puti-projects/puti/internal/backend/service"
 	"github.com/puti-projects/puti/internal/common/model"
@@ -30,6 +32,7 @@ type CreateRequest struct {
 	IfTop         uint64   `json:"if_top"`
 	Category      []uint64 `json:"category"`
 	Tag           []uint64 `json:"tag"`
+	Subject       []uint64 `json:"subject"`
 }
 
 // CreateResponse return the new article id and url
@@ -40,7 +43,6 @@ type CreateResponse struct {
 
 // Create create a new aricle(published or draft)
 func Create(c *gin.Context) {
-	// logger.Info("Article create function called.", zap.String("X-request-Id", utils.GetReqID(c)))
 	logger.Info("article create function called", zap.String("X-request-Id", utils.GetReqID(c)))
 
 	// get token and parse
@@ -62,6 +64,7 @@ func Create(c *gin.Context) {
 	// add article data
 	rsp, err := handleCreate(&r, userContext.ID)
 	if err != nil {
+		fmt.Println(err)
 		Response.SendResponse(c, errno.ErrArticleCreateFailed, nil)
 		return
 	}
@@ -93,7 +96,11 @@ func handleCreate(r *CreateRequest, userID uint64) (rsp *CreateResponse, err err
 		CoverPicture:    r.CoverPicture,
 		CommentCount:    0,
 		ViewCount:       0,
-		PostDate:        utils.StringToNullTime("2006-01-02 15:04:05", r.PostedTime),
+	}
+	if r.PostedTime == "" && r.Status == model.PostStatusPublish {
+		article.PostDate = mysql.NullTime{Time: time.Now(), Valid: true}
+	} else {
+		article.PostDate = utils.StringToNullTime("2006-01-02 15:04:05", r.PostedTime)
 	}
 	if err := tx.Create(&article).Error; err != nil {
 		return rsp, err
@@ -145,7 +152,33 @@ func handleCreate(r *CreateRequest, userID uint64) (rsp *CreateResponse, err err
 	insertTaxonomy := append(r.Category, r.Tag...)
 	if err := service.UpdateTaxonomyCountByArticleChange(tx, insertTaxonomy, 1); err != nil {
 		tx.Rollback()
-		return nil, err
+		return rsp, err
+	}
+
+	// if upload subject id, set subject
+	if subjectLen := len(r.Subject); subjectLen != 0 {
+		subjectValueStrings := make([]string, 0, subjectLen)
+		subjectValueArgs := make([]interface{}, 0, subjectLen*3)
+		for _, subject := range r.Subject {
+			if subject != 0 {
+				subjectValueStrings = append(subjectValueStrings, "(?, ?, ?)")
+				subjectValueArgs = append(subjectValueArgs, article.ID)
+				subjectValueArgs = append(subjectValueArgs, subject)
+				subjectValueArgs = append(subjectValueArgs, 0)
+			}
+		}
+		sr := &model.SubjectRelationshipsModel{}
+		sqls := fmt.Sprintf("INSERT INTO %s (object_id, subject_id, order_num) VALUES %s", sr.TableName(), strings.Join(subjectValueStrings, ","))
+		if err := tx.Exec(sqls, subjectValueArgs...).Error; err != nil {
+			tx.Rollback()
+			return rsp, err
+		}
+
+		// update subject count
+		if err := service.UpdateSubjectCountByArticleChange(tx, r.Subject, 1); err != nil {
+			tx.Rollback()
+			return rsp, err
+		}
 	}
 
 	rsp.ID = article.ID

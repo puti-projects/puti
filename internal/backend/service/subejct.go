@@ -198,3 +198,59 @@ func GetArticleSubejct(articleID uint64) ([]uint64, error) {
 
 	return articleSubject, nil
 }
+
+// UpdateSubjectCountByArticleChange update subject's count (article number) when creating or updaing the article
+// checkout taxonomy's parent and compare it with the subjectIDGroup is in need
+func UpdateSubjectCountByArticleChange(tx *gorm.DB, subjectIDGroup []uint64, countDiff int64) (err error) {
+	var parentIDs []uint64
+	for _, subjectID := range subjectIDGroup {
+		parentIDs, err = getSubjectParentID(tx, subjectID, parentIDs)
+		if err != nil {
+			return err
+		}
+	}
+
+	if len(parentIDs) != 0 {
+		for _, v := range parentIDs {
+			inGroup := false
+			for _, vv := range subjectIDGroup {
+				if vv == v {
+					inGroup = true
+				}
+			}
+
+			if inGroup == false {
+				subjectIDGroup = append(subjectIDGroup, v)
+			}
+		}
+	}
+
+	if len(subjectIDGroup) != 0 {
+		subjectModel := &model.SubjectModel{}
+		err = tx.Table(subjectModel.TableName()).Where("`id` IN (?)", subjectIDGroup).UpdateColumn("count", gorm.Expr("count + ?", countDiff)).Error
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+// getSubjectParentID get all level parents
+func getSubjectParentID(tx *gorm.DB, subjectID uint64, parentIDs []uint64) (parentIDGroup []uint64, err error) {
+	subject := &model.SubjectModel{}
+	err = tx.Where("`id` = ?", subjectID).First(&subject).Error
+	if err != nil {
+		return nil, err
+	}
+
+	if subject.ParentID != 0 {
+		parentIDGroup = append(parentIDGroup, subject.ParentID)
+		parentIDGroup, err = getSubjectParentID(tx, subject.ParentID, parentIDGroup)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return parentIDGroup, nil
+}

@@ -5,7 +5,9 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"time"
 
+	"github.com/go-sql-driver/mysql"
 	"github.com/puti-projects/puti/internal/common/model"
 	"github.com/puti-projects/puti/internal/common/utils"
 
@@ -218,7 +220,7 @@ func GetPageDetail(pageID string) (*PageDetail, error) {
 
 // UpdateArticle update article info
 // In this version, article meta data just update description, it should be more than one choise.TODO
-func UpdateArticle(article *model.PostModel, description string, category []uint64, tag []uint64) (err error) {
+func UpdateArticle(article *model.PostModel, description string, category []uint64, tag []uint64, subject []uint64) (err error) {
 	tx := model.DB.Local.Begin()
 	defer func() {
 		if r := recover(); r != nil {
@@ -243,6 +245,9 @@ func UpdateArticle(article *model.PostModel, description string, category []uint
 	oldArticle.IfTop = article.IfTop
 	oldArticle.CoverPicture = article.CoverPicture
 	oldArticle.PostDate = article.PostDate
+	if oldArticle.PostDate.Valid == false && article.Status == model.PostStatusPublish {
+		oldArticle.PostDate = mysql.NullTime{Time: time.Now(), Valid: true}
+	}
 	if err = tx.Model(&model.PostModel{}).Save(oldArticle).Error; err != nil {
 		tx.Rollback()
 		return err
@@ -270,7 +275,7 @@ func UpdateArticle(article *model.PostModel, description string, category []uint
 	}
 	newTaxonomy := append(category, tag...)
 
-	// delete all old relationship
+	// delete all old taxonomy relationship
 	dRelation := tx.Where("object_id = ?", article.ID).Delete(model.TermRelationshipsModel{})
 	if err := dRelation.Error; err != nil {
 		tx.Rollback()
@@ -279,7 +284,7 @@ func UpdateArticle(article *model.PostModel, description string, category []uint
 
 	// insert all new relationship
 	valueStrings := make([]string, 0, len(newTaxonomy))
-	valueArgs := make([]interface{}, 0, len(newTaxonomy))
+	valueArgs := make([]interface{}, 0, len(newTaxonomy)*3)
 	for _, item := range newTaxonomy {
 		termTaxonomy, _ := model.GetTermTaxonomy(item, "")
 		valueStrings = append(valueStrings, "(?, ?, ?)")
@@ -303,6 +308,57 @@ func UpdateArticle(article *model.PostModel, description string, category []uint
 		return err
 	}
 	if err := UpdateTaxonomyCountByArticleChange(tx, deleteTaxonomy, -1); err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	// get old subject
+	articleSubject, err := model.GetArticleSubject(article.ID)
+	if err != nil && !gorm.IsRecordNotFoundError(err) {
+		tx.Rollback()
+		return err
+	}
+	var oldSubject []uint64
+	for _, item := range articleSubject {
+		oldSubject = append(oldSubject, item.SubjectID)
+	}
+
+	// delete all old subject relationship
+	deleteSubjectRelation := tx.Where("`object_id` = ?", article.ID).Delete(model.SubjectRelationshipsModel{})
+	if err := deleteSubjectRelation.Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	// insert all new relationship
+	if subjectLen := len(subject); subjectLen != 0 {
+		subjectValueStrings := make([]string, 0, subjectLen)
+		subjectValueArgs := make([]interface{}, 0, subjectLen*3)
+		for _, subject := range subject {
+			subjectValueStrings = append(subjectValueStrings, "(?, ?, ?)")
+			subjectValueArgs = append(subjectValueArgs, article.ID) // object_id
+			subjectValueArgs = append(subjectValueArgs, subject)    // subject_id
+			subjectValueArgs = append(subjectValueArgs, 0)          // order_num
+		}
+		sr := &model.SubjectRelationshipsModel{}
+		sqlr := fmt.Sprintf("INSERT INTO %s (object_id, subject_id, order_num) VALUES %s", sr.TableName(), strings.Join(subjectValueStrings, ","))
+		if err := tx.Exec(sqlr, subjectValueArgs...).Error; err != nil {
+			tx.Rollback()
+			return err
+		}
+	}
+
+	// calculate subject diff
+	deleteSubject := calSliceDiff(oldSubject, subject)
+	insertSubject := calSliceDiff(subject, oldSubject)
+	// update subject's count
+	if err := UpdateSubjectCountByArticleChange(tx, insertSubject, 1); err != nil {
+		fmt.Println(err)
+		tx.Rollback()
+		return err
+	}
+	if err := UpdateSubjectCountByArticleChange(tx, deleteSubject, -1); err != nil {
+		fmt.Println(err)
 		tx.Rollback()
 		return err
 	}

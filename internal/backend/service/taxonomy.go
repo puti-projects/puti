@@ -341,10 +341,12 @@ func UpdateTaxonomyCountByArticleChange(tx *gorm.DB, termIDGroup []uint64, count
 		}
 	}
 
-	termModel := &model.TermModel{}
-	err = tx.Table(termModel.TableName()).Where("term_id IN (?)", termIDGroup).UpdateColumn("count", gorm.Expr("count + ?", countDiff)).Error
-	if err != nil {
-		return err
+	if len(termIDGroup) != 0 {
+		termModel := &model.TermModel{}
+		err = tx.Table(termModel.TableName()).Where("term_id IN (?)", termIDGroup).UpdateColumn("count", gorm.Expr("count + ?", countDiff)).Error
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
