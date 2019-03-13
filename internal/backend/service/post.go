@@ -351,13 +351,14 @@ func UpdateArticle(article *model.PostModel, description string, category []uint
 	// calculate subject diff
 	deleteSubject := calSliceDiff(oldSubject, subject)
 	insertSubject := calSliceDiff(subject, oldSubject)
-	// update subject's count
-	if err := UpdateSubjectCountByArticleChange(tx, insertSubject, 1); err != nil {
+
+	// update subject's info
+	if err := UpdateSubjectInfoByArticleChange(tx, insertSubject, 1, true); err != nil {
 		fmt.Println(err)
 		tx.Rollback()
 		return err
 	}
-	if err := UpdateSubjectCountByArticleChange(tx, deleteSubject, -1); err != nil {
+	if err := UpdateSubjectInfoByArticleChange(tx, deleteSubject, -1, true); err != nil {
 		fmt.Println(err)
 		tx.Rollback()
 		return err

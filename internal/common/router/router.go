@@ -158,6 +158,7 @@ func loadAPI(g *gin.Engine) *gin.Engine {
 		api.GET("/subject/:id", subject.Detail)
 		api.POST("/subject/:name", subject.Create)
 		api.PUT("/subject/:id", subject.Update)
+		api.DELETE("/subject/:id", subject.Delete)
 	}
 
 	return g

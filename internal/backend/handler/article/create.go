@@ -155,7 +155,7 @@ func handleCreate(r *CreateRequest, userID uint64) (rsp *CreateResponse, err err
 		return rsp, err
 	}
 
-	// if upload subject id, set subject
+	// if upload subject id
 	if subjectLen := len(r.Subject); subjectLen != 0 {
 		subjectValueStrings := make([]string, 0, subjectLen)
 		subjectValueArgs := make([]interface{}, 0, subjectLen*3)
@@ -174,8 +174,8 @@ func handleCreate(r *CreateRequest, userID uint64) (rsp *CreateResponse, err err
 			return rsp, err
 		}
 
-		// update subject count
-		if err := service.UpdateSubjectCountByArticleChange(tx, r.Subject, 1); err != nil {
+		// update subject
+		if err := service.UpdateSubjectInfoByArticleChange(tx, r.Subject, 1, true); err != nil {
 			tx.Rollback()
 			return rsp, err
 		}

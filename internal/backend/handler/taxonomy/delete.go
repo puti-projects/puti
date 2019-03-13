@@ -15,7 +15,7 @@ import (
 
 // Delete delete the taxonomy directly without soft delete
 func Delete(c *gin.Context) {
-	logger.Info("Delete function called.", zap.String("X-request-Id", utils.GetReqID(c)))
+	logger.Info("Delete taxonomy function called.", zap.String("X-request-Id", utils.GetReqID(c)))
 
 	ID, _ := strconv.Atoi(c.Param("id"))
 	taxonomyType := c.Query("taxonomy") // TODO
@@ -42,7 +42,7 @@ func checkIfCanDelete(termID uint64, taxonomyType string) error {
 	}
 
 	if ifHasChild := service.IfTaxonomyHasChild(termID, taxonomyType); ifHasChild == true {
-		return errno.New(errno.ErrValidation, nil).Add("taxonomy can not be delete id has children")
+		return errno.New(errno.ErrValidation, nil).Add("taxonomy has children and can not be deleted")
 	}
 
 	return nil

@@ -2,7 +2,9 @@ package service
 
 import (
 	"strings"
+	"time"
 
+	"github.com/go-sql-driver/mysql"
 	"github.com/puti-projects/puti/internal/common/model"
 	"github.com/puti-projects/puti/internal/common/utils"
 
@@ -199,9 +201,9 @@ func GetArticleSubejct(articleID uint64) ([]uint64, error) {
 	return articleSubject, nil
 }
 
-// UpdateSubjectCountByArticleChange update subject's count (article number) when creating or updaing the article
+// UpdateSubjectInfoByArticleChange update subject's info (count, last updated time) when creating or updaing the article
 // checkout taxonomy's parent and compare it with the subjectIDGroup is in need
-func UpdateSubjectCountByArticleChange(tx *gorm.DB, subjectIDGroup []uint64, countDiff int64) (err error) {
+func UpdateSubjectInfoByArticleChange(tx *gorm.DB, subjectIDGroup []uint64, countDiff int64, updateLastUpdated bool) (err error) {
 	var parentIDs []uint64
 	for _, subjectID := range subjectIDGroup {
 		parentIDs, err = getSubjectParentID(tx, subjectID, parentIDs)
@@ -227,9 +229,20 @@ func UpdateSubjectCountByArticleChange(tx *gorm.DB, subjectIDGroup []uint64, cou
 
 	if len(subjectIDGroup) != 0 {
 		subjectModel := &model.SubjectModel{}
-		err = tx.Table(subjectModel.TableName()).Where("`id` IN (?)", subjectIDGroup).UpdateColumn("count", gorm.Expr("count + ?", countDiff)).Error
-		if err != nil {
-			return err
+		updateColumns := map[string]interface{}{}
+		if countDiff != 0 {
+			updateColumns["count"] = gorm.Expr("count + ?", countDiff)
+		}
+		if updateLastUpdated {
+			updateColumns["last_updated"] = mysql.NullTime{Time: time.Now(), Valid: true}
+		}
+
+		// exec
+		if len(updateColumns) != 0 {
+			err = tx.Table(subjectModel.TableName()).Where("`id` IN (?)", subjectIDGroup).Updates(updateColumns).Error
+			if err != nil {
+				return err
+			}
 		}
 	}
 
@@ -253,4 +266,57 @@ func getSubjectParentID(tx *gorm.DB, subjectID uint64, parentIDs []uint64) (pare
 	}
 
 	return parentIDGroup, nil
+}
+
+// IfSubjectHasChild check the subject has children or not
+func IfSubjectHasChild(subjectID uint64) bool {
+	count := model.GetSubjectChildrenNumber(subjectID)
+	if count > 0 {
+		return true
+	}
+
+	return false
+}
+
+// DeleteSubject delete subject directly
+func DeleteSubject(subjectID uint64) error {
+	// begin transcation
+	tx := model.DB.Local.Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	// get subject info
+	subject := &model.SubjectModel{}
+	t := tx.Where("`id` = ?", subjectID).First(&subject)
+	if t.Error != nil {
+		return t.Error
+	}
+
+	// delete subject
+	dSubject := tx.Where("`id` = ?", subjectID).Delete(model.SubjectModel{})
+	if err := dSubject.Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	// delete relationship
+	dRelation := tx.Where("`subject_id` = ?", subjectID).Delete(model.SubjectRelationshipsModel{})
+	if err := dRelation.Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	// update parent count number(if has parent)
+	if subject.ParentID > 0 {
+		if err := updateSubjectCount(tx, subject.ParentID, -subject.Count); err != nil {
+			tx.Rollback()
+			return err
+		}
+	}
+
+	// commit
+	return tx.Commit().Error
 }

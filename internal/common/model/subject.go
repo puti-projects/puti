@@ -79,3 +79,9 @@ func SubjectCheckNameExistWhileUpdate(subjectID uint64, name string) bool {
 
 	return false
 }
+
+// GetSubjectChildrenNumber calcuelate the total number of subject's children
+func GetSubjectChildrenNumber(subjectID uint64) (count int) {
+	DB.Local.Model(&SubjectModel{}).Where("`parent_id` = ?", subjectID).Count(&count)
+	return count
+}
