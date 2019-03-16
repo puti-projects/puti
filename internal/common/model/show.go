@@ -49,10 +49,10 @@ type ShowWidgetCategoryTreeNode struct {
 	Children []*ShowWidgetCategoryTreeNode `json:"children"`
 }
 
-// ShowLastAndNextArticle last or next article url model
+// ShowLastOrNextArticle last or next article url model
 type ShowLastOrNextArticle struct {
 	Title string `json:"title"`
-	Url   string `json:"url"`
+	URL   string `json:"url"`
 }
 
 // ShowArticleDetail article detail output model
@@ -83,6 +83,7 @@ type ShowPageDetail struct {
 	MetaData      map[string]interface{} `json:"meta_date"`
 }
 
+// ShowArchive archive item
 type ShowArchive struct {
 	ID           uint64 `json:"id"`
 	Title        string `json:"title"`
@@ -91,4 +92,28 @@ type ShowArchive struct {
 	ViewCount    uint64 `json:"viewCount"`
 	PostedTime   string `json:"posted_time"`
 	PostedDay    string `json:"posted_day"`
+}
+
+// ShowSubjectInfo show subejcts info output model
+type ShowSubjectInfo struct {
+	ID            uint64 `json:"id"`
+	ParentURL     string `json:"parent_url"`
+	Name          string `json:"name"`
+	Slug          string `json:"slug"`
+	Description   string `json:"description"`
+	CoverImageURL string `json:"cover_image_url"`
+	Count         string `json:"count"`
+}
+
+// ShowSubjectList show subejcts list output model
+type ShowSubjectList struct {
+	ID                uint64 `json:"id"`
+	URL               string `json:"url"`
+	Name              string `json:"name"`
+	Slug              string `json:"slug"`
+	Description       string `json:"description"`
+	CoverImageURL     string `json:"cover_image_url"`
+	Count             uint64 `json:"count"`
+	LastUpdated       string `json:"last_updated"`
+	SubLastUpdatedDay string `json:"sub_last_updated"`
 }

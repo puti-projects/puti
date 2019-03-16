@@ -50,3 +50,13 @@ func StringToNullTime(layout string, timeString string) mysql.NullTime {
 
 	return nullTime
 }
+
+// SubNullTimeUnitlNowAsDay calculate the diff day until now
+func SubNullTimeUnitlNowAsDay(t time.Time) float64 {
+	now := time.Now()
+
+	sub := now.Sub(t)
+	subDay := sub.Hours() / 24
+
+	return subDay
+}

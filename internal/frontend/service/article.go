@@ -8,6 +8,7 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/go-sql-driver/mysql"
 	"github.com/puti-projects/puti/internal/common/config"
 	"github.com/puti-projects/puti/internal/common/model"
 	"github.com/puti-projects/puti/internal/common/utils"
@@ -334,7 +335,7 @@ func GetLastArticle(currentArticleID uint64) *model.ShowLastOrNextArticle {
 
 	article := &model.ShowLastOrNextArticle{
 		Title: title,
-		Url:   url,
+		URL:   url,
 	}
 
 	return article
@@ -352,8 +353,45 @@ func GetNextArticle(currentArticleID uint64) *model.ShowLastOrNextArticle {
 
 	article := &model.ShowLastOrNextArticle{
 		Title: title,
-		Url:   url,
+		URL:   url,
 	}
 
 	return article
+}
+
+// GetSubjectArticleList get article list connected to subject
+func GetSubjectArticleList(subjectID uint64) ([]*map[string]interface{}, error) {
+	var articleList []*map[string]interface{}
+
+	postModel := &model.PostModel{}
+	srModel := &model.SubjectRelationshipsModel{}
+	rows, err := model.DB.Local.Table(postModel.TableName()+" p").
+		Select("p.`id`, p.`title`, p.`guid`, p.`comment_count`, p.`view_count`, p.`posted_time`").
+		Joins("INNER JOIN "+srModel.TableName()+" sr ON sr.`object_id` = p.`id`").
+		Where("p.`post_type` = ? AND p.`parent_id` = ? AND p.`status` = ? AND sr.`subject_id` = ? AND p.`deleted_time` is null",
+			model.PostTypeArticle, 0, model.PostStatusPublish, subjectID).
+		Order("p.`posted_time` DESC").
+		Rows()
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var id, commentCount, viewCount uint64
+		var title, guid string
+		var postedTime *mysql.NullTime
+		rows.Scan(&id, &title, &guid, &commentCount, &viewCount, &postedTime)
+
+		item := &map[string]interface{}{
+			"ID":           id,
+			"Title":        title,
+			"GUID":         guid,
+			"CommentCount": commentCount,
+			"ViewCount":    viewCount,
+			"PostedTime":   postedTime,
+		}
+		articleList = append(articleList, item)
+	}
+
+	return articleList, nil
 }

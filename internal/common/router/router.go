@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"path/filepath"
 
+	"github.com/go-sql-driver/mysql"
 	"github.com/puti-projects/puti/internal/backend/handler/article"
 	"github.com/puti-projects/puti/internal/backend/handler/auth"
 	"github.com/puti-projects/puti/internal/backend/handler/media"
@@ -16,6 +17,7 @@ import (
 	"github.com/puti-projects/puti/internal/backend/handler/taxonomy"
 	"github.com/puti-projects/puti/internal/backend/handler/user"
 	apiMiddleware "github.com/puti-projects/puti/internal/backend/middleware"
+	"github.com/puti-projects/puti/internal/common/utils"
 	webHandler "github.com/puti-projects/puti/internal/frontend/handler"
 	webMiddleware "github.com/puti-projects/puti/internal/frontend/middleware"
 	optionCache "github.com/puti-projects/puti/internal/pkg/option"
@@ -48,6 +50,9 @@ func setFuncMap(g *gin.Engine) *gin.Engine {
 		"minus": func(a, b int) int {
 			return a - b
 		},
+		"formatNullTime": func(time *mysql.NullTime, format string) string {
+			return utils.GetFormatNullTime(time, format)
+		},
 	})
 
 	return g
@@ -72,6 +77,9 @@ func loadWeb(g *gin.Engine, theme string) *gin.Engine {
 		web.GET("/tag/:slug", webHandler.ShowTagArticleList)
 		web.GET("/article/:id", webHandler.ShowArticleDetail)
 		web.GET("/archive", webHandler.ShowArchive)
+		web.GET("/subject", webHandler.ShowTopSubjects)
+		web.GET("/subject/:slug", webHandler.ShowSubjects)
+
 	}
 
 	// no route handle
