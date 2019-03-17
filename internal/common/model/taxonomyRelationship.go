@@ -21,7 +21,10 @@ func (c *TermRelationshipsModel) TableName() string {
 // GetArticleTaxonomy get article taxonomy include all type
 func GetArticleTaxonomy(articleID uint64) ([]*ArticleTaxonomy, error) {
 	sql := "SELECT t.term_id, tt.taxonomy FROM pt_term t LEFT JOIN pt_term_taxonomy tt ON tt.term_id = t.term_id LEFT JOIN pt_term_relationships tr ON tr.term_taxonomy_id = tt.term_taxonomy_id WHERE tr.object_id = ?"
-	rows, _ := DB.Local.Raw(sql, articleID).Rows()
+	rows, err := DB.Local.Raw(sql, articleID).Rows()
+	if err != nil {
+		return nil, err
+	}
 	defer rows.Close()
 
 	result := make([]*ArticleTaxonomy, 0)

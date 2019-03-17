@@ -5,6 +5,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/puti-projects/puti/internal/common/utils"
 	"github.com/puti-projects/puti/internal/frontend/service"
 
 	"github.com/gin-gonic/gin"
@@ -110,6 +111,8 @@ func ShowArticleDetail(c *gin.Context) {
 		ShowInternalServerError(c)
 		return
 	}
+
+	utils.CounterCache.CountOne(c.ClientIP(), aID)
 
 	renderData["Article"] = articleDetail
 	renderData["LastArticle"] = service.GetLastArticle(aID)

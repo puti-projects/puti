@@ -20,16 +20,16 @@ func GetArchive() (map[string]map[string][]*model.ShowArchive, []string, map[str
 		Where(where, whereArgs...).
 		Order("`posted_time` DESC").
 		Rows()
+	if err != nil {
+		logger.Errorf("get all articles failed. %s", err)
+		return nil, nil, nil, err
+	}
 	defer rows.Close()
 	for rows.Next() {
 		var archive model.PostModel
 		// ScanRows scan a row into archive
 		model.DB.Local.ScanRows(rows, &archive)
 		archives = append(archives, archive)
-	}
-	if err != nil {
-		logger.Errorf("get all articles failed. %s", err)
-		return nil, nil, nil, err
 	}
 
 	dataMap := map[string]map[string][]*model.ShowArchive{}

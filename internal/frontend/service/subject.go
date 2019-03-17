@@ -48,6 +48,9 @@ func GetChildrenSubejcts(parentID uint64) (subjectResult []*model.ShowSubjectLis
 		Joins("LEFT JOIN pt_resource r ON r.id = s.`cover_image`").
 		Where("s.`parent_id` = ? AND s.`deleted_time` is null", parentID).
 		Rows()
+	if err != nil {
+		return nil, err
+	}
 	defer rows.Close()
 	for rows.Next() {
 		subject := &ChildrenSubejctsResult{}

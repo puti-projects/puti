@@ -13,6 +13,7 @@ import (
 	"github.com/puti-projects/puti/internal/common/model"
 	"github.com/puti-projects/puti/internal/common/router"
 	"github.com/puti-projects/puti/internal/pkg/option"
+	"github.com/puti-projects/puti/internal/pkg/tickers"
 	v "github.com/puti-projects/puti/internal/pkg/version"
 
 	"github.com/gin-gonic/gin"
@@ -85,6 +86,10 @@ func main() {
 			}()
 		}
 	}
+
+	// init ticker
+	tickers.InitCountTicker()
+	logger.Info("Start to running the count ticker.")
 
 	logger.Infof("Start to listening the incoming requests on http address: %s", viper.GetString("addr"))
 	logger.Info(http.ListenAndServe(viper.GetString("addr"), g).Error())

@@ -90,7 +90,10 @@ func GetArticleListByTaxonomy(currentPage int, taxonomyType, taxonomySlug, keywo
 				ifTop = true
 			}
 
-			articleCategory, articleTag := getArticleTaxonomyInfo(a.ID, siteURL)
+			articleCategory, articleTag, err := getArticleTaxonomyInfo(a.ID, siteURL)
+			if err != nil {
+				errChan <- err
+			}
 
 			articleList.Lock.Lock()
 			defer articleList.Lock.Unlock()
@@ -184,7 +187,10 @@ func GetArticleList(currentPage int, keyword string) (articleResult []*model.Sho
 				ifTop = true
 			}
 
-			articleCategory, articleTag := getArticleTaxonomyInfo(a.ID, siteURL)
+			articleCategory, articleTag, err := getArticleTaxonomyInfo(a.ID, siteURL)
+			if err != nil {
+				errChan <- err
+			}
 
 			articleList.Lock.Lock()
 			defer articleList.Lock.Unlock()
@@ -222,9 +228,12 @@ func GetArticleList(currentPage int, keyword string) (articleResult []*model.Sho
 	return
 }
 
-func getArticleTaxonomyInfo(articleID uint64, siteURL string) ([]*model.ShowCategory, []*model.ShowTag) {
-	sql := "SELECT t.name, t.slug, tt.taxonomy FROM pt_term t LEFT JOIN pt_term_taxonomy tt ON tt.term_id = t.term_id LEFT JOIN pt_term_relationships tr ON tr.term_taxonomy_id = tt.term_taxonomy_id WHERE tr.object_id = ?"
-	rows, _ := model.DB.Local.Raw(sql, articleID).Rows()
+func getArticleTaxonomyInfo(articleID uint64, siteURL string) ([]*model.ShowCategory, []*model.ShowTag, error) {
+	sql := "SELECT t.`name`, t.`slug`, tt.`taxonomy` FROM pt_term t LEFT JOIN pt_term_taxonomy tt ON tt.`term_id` = t.`term_id` LEFT JOIN pt_term_relationships tr ON tr.`term_taxonomy_id` = tt.`term_taxonomy_id` WHERE tr.`object_id` = ?"
+	rows, err := model.DB.Local.Raw(sql, articleID).Rows()
+	if err != nil {
+		return nil, nil, err
+	}
 	defer rows.Close()
 
 	articleCategory := make([]*model.ShowCategory, 0)
@@ -243,7 +252,7 @@ func getArticleTaxonomyInfo(articleID uint64, siteURL string) ([]*model.ShowCate
 		}
 	}
 
-	return articleCategory, articleTag
+	return articleCategory, articleTag, nil
 }
 
 func getArticleAbstract(content string) string {
@@ -295,7 +304,10 @@ func GetArticleDetailByID(articleID uint64) (*model.ShowArticleDetail, error) {
 	}
 
 	siteURL := optionCache.Options.Get("site_url")
-	articleCategory, articleTag := getArticleTaxonomyInfo(articleID, siteURL)
+	articleCategory, articleTag, err := getArticleTaxonomyInfo(articleID, siteURL)
+	if err != nil {
+		return nil, err
+	}
 
 	articleDetail := &model.ShowArticleDetail{
 		ID:            a.ID,
