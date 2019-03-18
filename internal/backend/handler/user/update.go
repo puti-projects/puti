@@ -116,8 +116,8 @@ func Update(c *gin.Context) {
 
 		Response.SendResponse(c, nil, nil)
 		return
-	} else {
-		Response.SendResponse(c, errno.ErrBind, nil)
-		return
 	}
+
+	Response.SendResponse(c, errno.ErrBind, nil)
+	return
 }

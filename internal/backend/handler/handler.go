@@ -8,12 +8,14 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// Response handle response
 type Response struct {
 	Code    int         `json:"code"`
 	Message string      `json:"message"`
 	Data    interface{} `json:"data"`
 }
 
+// SendResponse send request's response
 func SendResponse(c *gin.Context, err error, data interface{}) {
 	code, message := errno.DecodeErr(err)
 

@@ -10,6 +10,7 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
+// ShowTopSubjects subject list (parent id is 0)
 func ShowTopSubjects(c *gin.Context) {
 	// get renderer data include basic data
 	renderData := getRenderData(c)
@@ -28,6 +29,7 @@ func ShowTopSubjects(c *gin.Context) {
 	c.HTML(http.StatusOK, getTheme(c)+"/subjects.html", renderData)
 }
 
+// ShowSubjects subejct list for children (parent id != 0)
 func ShowSubjects(c *gin.Context) {
 	renderData := getRenderData(c)
 

@@ -58,11 +58,7 @@ func DeleteUser(id uint64) error {
 
 // Update updates an user account information.
 func (c *UserModel) Update() (err error) {
-	if err = DB.Local.Model(&UserModel{}).Save(c).Error; err != nil {
-		return err
-	}
-
-	return nil
+	return DB.Local.Model(&UserModel{}).Save(c).Error
 }
 
 // ListUser List all users

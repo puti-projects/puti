@@ -130,11 +130,8 @@ func UpdateUser(user *model.UserModel) (err error) {
 	oldUser.PageURL = strings.TrimSpace(user.PageURL)
 	oldUser.Roles = user.Roles
 
-	if err = oldUser.Update(); err != nil {
-		return err
-	}
-
-	return nil
+	err = oldUser.Update()
+	return err
 }
 
 // UpdateUserStatus updates user status by id
@@ -148,11 +145,8 @@ func UpdateUserStatus(user *model.UserModel) (err error) {
 	// Set new status values
 	oldUser.Status = user.Status
 
-	if err = oldUser.Update(); err != nil {
-		return err
-	}
-
-	return nil
+	err = oldUser.Update()
+	return err
 }
 
 // UpdateUserPassword just reset user's password
@@ -166,11 +160,8 @@ func UpdateUserPassword(user *model.UserModel) (err error) {
 	// Set new password
 	oldUser.Password = user.Password
 
-	if err = oldUser.Update(); err != nil {
-		return err
-	}
-
-	return nil
+	err = oldUser.Update()
+	return err
 }
 
 // UpdateUserAvatar save the new avatar url
@@ -184,9 +175,6 @@ func UpdateUserAvatar(user *model.UserModel) (err error) {
 	// Set new password
 	oldUser.Avatar = user.Avatar
 
-	if err = oldUser.Update(); err != nil {
-		return err
-	}
-
-	return nil
+	err = oldUser.Update()
+	return err
 }

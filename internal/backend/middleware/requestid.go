@@ -5,7 +5,7 @@ import (
 	uuid "github.com/google/uuid"
 )
 
-// RequestId middleware of set a X-Request-Id header by general a uuid
+// RequestID middleware of set a X-Request-Id header by general a uuid
 func RequestID() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// check for incoming header, use it if exists

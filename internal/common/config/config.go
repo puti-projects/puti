@@ -34,6 +34,7 @@ func Init(cfg string) error {
 	return nil
 }
 
+// initConfig int config
 func (c *Config) initConfig() error {
 	if c.Name != "" {
 		viper.SetConfigFile(c.Name) // 如果指定了配置文件，解析指定配置文件
@@ -55,14 +56,14 @@ func (c *Config) initConfig() error {
 	return nil
 }
 
-// 初始化日志配置
+// initLog init log config 初始化日志配置
 func (c *Config) initLog() {
 	logger.InitLogger(viper.GetString("runmode"))
 
 	logger.Info("zap logger construction succeeded")
 }
 
-// 监控配置文件变化并热加载程序
+// watchConfig watch config if has been changed 监控配置文件变化并热加载程序
 func (c *Config) watchConfig() {
 	viper.WatchConfig()
 	viper.OnConfigChange(func(e fsnotify.Event) {

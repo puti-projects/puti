@@ -39,12 +39,8 @@ func (c *TermModel) Create() error {
 }
 
 // Update updates the taxonomy term
-func (c *TermModel) Update() (err error) {
-	if err = DB.Local.Model(&TermModel{}).Save(c).Error; err != nil {
-		return err
-	}
-
-	return nil
+func (c *TermModel) Update() error {
+	return DB.Local.Model(&TermModel{}).Save(c).Error
 }
 
 // Create creates a new taxonomy
@@ -54,11 +50,7 @@ func (c *TermTaxonomyModel) Create() error {
 
 // Update updates the taxonomy term taxonomy
 func (c *TermTaxonomyModel) Update() (err error) {
-	if err = DB.Local.Model(&TermTaxonomyModel{}).Save(c).Error; err != nil {
-		return err
-	}
-
-	return nil
+	return DB.Local.Model(&TermTaxonomyModel{}).Save(c).Error
 }
 
 // GetAllTermsByType gets terms and taxonomy_terms by type(category, tag)

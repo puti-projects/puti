@@ -41,8 +41,7 @@ func (c *MediaModel) TableName() string {
 // BeforeCreate set values before create
 // Set file type by mime-type
 func (c *MediaModel) BeforeCreate(scope *gorm.Scope) error {
-	scope.SetColumn("Type", utils.GetFileType(c.MimeType))
-	return nil
+	return scope.SetColumn("Type", utils.GetFileType(c.MimeType))
 }
 
 // Create save the new media file info

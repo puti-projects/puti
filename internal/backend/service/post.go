@@ -459,8 +459,7 @@ func DeletePost(postType string, articleID uint64) error {
 	}
 
 	// delete post
-	dPost := tx.Where("id = ?", articleID).Delete(model.PostModel{})
-	if err := dPost.Error; err != nil {
+	if err := tx.Where("id = ?", articleID).Delete(model.PostModel{}).Error; err != nil {
 		tx.Rollback()
 		return err
 	}

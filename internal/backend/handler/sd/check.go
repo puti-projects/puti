@@ -12,9 +12,13 @@ import (
 )
 
 const (
-	B  = 1
+	// B to byte
+	B = 1
+	// KB to B
 	KB = 1024 * B
+	// MB to KB
 	MB = 1024 * KB
+	// GB to MB
 	GB = 1024 * MB
 )
 

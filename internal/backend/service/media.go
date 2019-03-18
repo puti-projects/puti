@@ -122,9 +122,6 @@ func UpdateMedia(media *model.MediaModel) (err error) {
 	oldMedia.Slug = media.Slug
 	oldMedia.Description = media.Description
 
-	if err = oldMedia.Update(); err != nil {
-		return err
-	}
-
-	return nil
+	err = oldMedia.Update()
+	return err
 }
