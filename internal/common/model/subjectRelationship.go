@@ -12,7 +12,7 @@ func (c *SubjectRelationshipsModel) TableName() string {
 	return "pt_subject_relationships"
 }
 
-// GetArticleSubject get article's conection subject
+// GetArticleSubject get article's connection subject
 func GetArticleSubject(articleID uint64) ([]*SubjectRelationshipsModel, error) {
 	var subjectRelationships []*SubjectRelationshipsModel
 	result := DB.Local.Where("`object_id` = ?", articleID).Find(&subjectRelationships)

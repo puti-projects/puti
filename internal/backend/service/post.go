@@ -354,12 +354,10 @@ func UpdateArticle(article *model.PostModel, description string, category []uint
 
 	// update subject's info
 	if err := UpdateSubjectInfoByArticleChange(tx, insertSubject, 1, true); err != nil {
-		fmt.Println(err)
 		tx.Rollback()
 		return err
 	}
 	if err := UpdateSubjectInfoByArticleChange(tx, deleteSubject, -1, true); err != nil {
-		fmt.Println(err)
 		tx.Rollback()
 		return err
 	}
@@ -467,16 +465,16 @@ func DeletePost(postType string, articleID uint64) error {
 	return tx.Commit().Error
 }
 
-// deleteArticleElse delete some data which only article have
+// deleteArticleElse delete extra data which only article have
 func deleteArticleElse(tx *gorm.DB, articleID uint64) error {
-	// get article taxonomy by type
+	// get article taxonomy by id
 	articleTaxonomy, err := GetArticleTaxonomy(articleID)
 	if err != nil {
 		return err
 	}
 
 	// delete article relationship
-	dRelation := tx.Where("object_id = ?", articleID).Delete(model.TermRelationshipsModel{})
+	dRelation := tx.Where("`object_id` = ?", articleID).Delete(model.TermRelationshipsModel{})
 	if err := dRelation.Error; err != nil {
 		return err
 	}
@@ -487,6 +485,30 @@ func deleteArticleElse(tx *gorm.DB, articleID uint64) error {
 		// update category count
 		err := UpdateTaxonomyCountByArticleChange(tx, taxonomy, -1)
 		if err != nil {
+			return err
+		}
+	}
+
+	// get article subject by id
+	articleSubject, err := model.GetArticleSubject(articleID)
+	if err != nil {
+		return err
+	}
+
+	// delete article subject
+	dsRelation := tx.Where("`object_id` = ?", articleID).Delete(model.SubjectRelationshipsModel{})
+	if err := dsRelation.Error; err != nil {
+		return err
+	}
+
+	// recount and update subject count
+	subjectIDs := make([]uint64, 0)
+	for _, subject := range articleSubject {
+		subjectIDs = append(subjectIDs, subject.SubjectID)
+	}
+	if len(subjectIDs) != 0 {
+		// update subject count
+		if err := UpdateSubjectInfoByArticleChange(tx, subjectIDs, -1, false); err != nil {
 			return err
 		}
 	}

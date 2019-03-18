@@ -13,7 +13,7 @@ import (
 // Detail get subject detail
 func Detail(c *gin.Context) {
 	ID := c.Param("id")
-	subjectID, err := strconv.Atoi(ID)
+	subjectID, _ := strconv.Atoi(ID)
 
 	subject, err := service.GetSubjectInfo(uint64(subjectID))
 	if err != nil {

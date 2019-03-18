@@ -13,6 +13,7 @@ import (
 	"github.com/puti-projects/puti/internal/backend/handler/option"
 	"github.com/puti-projects/puti/internal/backend/handler/page"
 	"github.com/puti-projects/puti/internal/backend/handler/sd"
+	"github.com/puti-projects/puti/internal/backend/handler/statistics"
 	"github.com/puti-projects/puti/internal/backend/handler/subject"
 	"github.com/puti-projects/puti/internal/backend/handler/taxonomy"
 	"github.com/puti-projects/puti/internal/backend/handler/user"
@@ -134,6 +135,7 @@ func loadAPI(g *gin.Engine) *gin.Engine {
 
 	api.Use(apiMiddleware.AuthMiddleware())
 	{
+		api.GET("/statistics/dashboard", statistics.Dashboard)
 		api.POST("/user/:username", user.Create)
 		api.GET("/user/:username", user.Get)
 		api.DELETE("/user/:id", user.Delete)

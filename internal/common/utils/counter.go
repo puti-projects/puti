@@ -19,7 +19,7 @@ const (
 )
 
 // CounterCacheExpiration default expiration time
-// The cache will store for 15 minutes, but these is a ticker runing will clean the data for 10 minutes expiration
+// The cache will store for 15 minutes, but these is a ticker running will clean the data for 10 minutes expiration
 var CounterCacheExpiration = 15 * time.Minute
 
 // CounterCachePurgesExpiration default purges expired items

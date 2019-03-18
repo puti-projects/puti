@@ -7,7 +7,7 @@ type TermRelationshipsModel struct {
 	TermOrder      string `gorm:"column:term_order;not null"`
 }
 
-// ArticleTaxonomy use for artcile taxonomy
+// ArticleTaxonomy use for article taxonomy
 type ArticleTaxonomy struct {
 	TermID   uint64
 	Taxonomy string
