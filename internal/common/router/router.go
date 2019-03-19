@@ -136,6 +136,7 @@ func loadAPI(g *gin.Engine) *gin.Engine {
 	api.Use(apiMiddleware.AuthMiddleware())
 	{
 		api.GET("/statistics/dashboard", statistics.Dashboard)
+		api.GET("/statistics/system", statistics.System)
 		api.POST("/user/:username", user.Create)
 		api.GET("/user/:username", user.Get)
 		api.DELETE("/user/:id", user.Delete)

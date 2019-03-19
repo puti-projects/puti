@@ -21,3 +21,5 @@ logs/
 
 # upload dir
 uploads/*
+
+configs/config.yaml

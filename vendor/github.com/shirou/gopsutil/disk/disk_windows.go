@@ -15,7 +15,7 @@ var (
 	procGetDiskFreeSpaceExW     = common.Modkernel32.NewProc("GetDiskFreeSpaceExW")
 	procGetLogicalDriveStringsW = common.Modkernel32.NewProc("GetLogicalDriveStringsW")
 	procGetDriveType            = common.Modkernel32.NewProc("GetDriveTypeW")
-	provGetVolumeInformation    = common.Modkernel32.NewProc("GetVolumeInformationW")
+	procGetVolumeInformation    = common.Modkernel32.NewProc("GetVolumeInformationW")
 )
 
 var (
@@ -36,6 +36,10 @@ type Win32_PerfFormattedData struct {
 const WaitMSec = 500
 
 func Usage(path string) (*UsageStat, error) {
+	return UsageWithContext(context.Background(), path)
+}
+
+func UsageWithContext(ctx context.Context, path string) (*UsageStat, error) {
 	ret := &UsageStat{}
 
 	lpFreeBytesAvailable := int64(0)
@@ -64,6 +68,10 @@ func Usage(path string) (*UsageStat, error) {
 }
 
 func Partitions(all bool) ([]PartitionStat, error) {
+	return PartitionsWithContext(context.Background(), all)
+}
+
+func PartitionsWithContext(ctx context.Context, all bool) ([]PartitionStat, error) {
 	var ret []PartitionStat
 	lpBuffer := make([]byte, 254)
 	diskret, _, err := procGetLogicalDriveStringsW.Call(
@@ -75,9 +83,6 @@ func Partitions(all bool) ([]PartitionStat, error) {
 	for _, v := range lpBuffer {
 		if v >= 65 && v <= 90 {
 			path := string(v) + ":"
-			if path == "A:" || path == "B:" { // skip floppy drives
-				continue
-			}
 			typepath, _ := windows.UTF16PtrFromString(path)
 			typeret, _, _ := procGetDriveType.Call(uintptr(unsafe.Pointer(typepath)))
 			if typeret == 0 {
@@ -92,7 +97,7 @@ func Partitions(all bool) ([]PartitionStat, error) {
 				lpFileSystemFlags := int64(0)
 				lpFileSystemNameBuffer := make([]byte, 256)
 				volpath, _ := windows.UTF16PtrFromString(string(v) + ":/")
-				driveret, _, err := provGetVolumeInformation.Call(
+				driveret, _, err := procGetVolumeInformation.Call(
 					uintptr(unsafe.Pointer(volpath)),
 					uintptr(unsafe.Pointer(&lpVolumeNameBuffer[0])),
 					uintptr(len(lpVolumeNameBuffer)),
@@ -129,11 +134,13 @@ func Partitions(all bool) ([]PartitionStat, error) {
 }
 
 func IOCounters(names ...string) (map[string]IOCountersStat, error) {
+	return IOCountersWithContext(context.Background(), names...)
+}
+
+func IOCountersWithContext(ctx context.Context, names ...string) (map[string]IOCountersStat, error) {
 	ret := make(map[string]IOCountersStat, 0)
 	var dst []Win32_PerfFormattedData
 
-	ctx, cancel := context.WithTimeout(context.Background(), common.Timeout)
-	defer cancel()
 	err := common.WMIQueryWithContext(ctx, "SELECT * FROM Win32_PerfFormattedData_PerfDisk_LogicalDisk", &dst)
 	if err != nil {
 		return ret, err
