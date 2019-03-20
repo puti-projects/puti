@@ -35,7 +35,7 @@ func Upload(c *gin.Context) {
 	file, _ := c.FormFile("file")
 
 	// General the save path by upload time
-	savePath, err := getSavePath()
+	savePath, err := getSavePath(usage)
 	if err != nil {
 		Response.SendResponse(c, errno.ErrUploadFile, nil)
 		return
@@ -93,7 +93,25 @@ func Upload(c *gin.Context) {
 }
 
 // getSavePath general the hole uri by upload time
-func getSavePath() (string, error) {
+func getSavePath(usage string) (string, error) {
+	if usage == "cover" {
+		coverPath := fmt.Sprintf(".%s%s", savePathURI, "cover")
+		coverPathExist, err := utils.PathExists(coverPath)
+		if err != nil {
+			return "", err
+		}
+		if !coverPathExist {
+			err := os.Mkdir(coverPath, os.ModePerm)
+			if err != nil {
+				return "", err
+			}
+		}
+
+		var savePath string
+		savePath = fmt.Sprintf("%s%s/", savePathURI, "cover")
+		return savePath, nil
+	}
+
 	now := time.Now()
 
 	// handel year path
