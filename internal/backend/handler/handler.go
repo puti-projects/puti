@@ -26,3 +26,9 @@ func SendResponse(c *gin.Context, err error, data interface{}) {
 		Data:    data,
 	})
 }
+
+// HealthCheck shows `OK` as the ping-pong result.
+func HealthCheck(c *gin.Context) {
+	message := "OK"
+	c.String(http.StatusOK, message)
+}

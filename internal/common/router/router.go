@@ -7,12 +7,12 @@ import (
 	"path/filepath"
 
 	"github.com/go-sql-driver/mysql"
+	apiHandler "github.com/puti-projects/puti/internal/backend/handler"
 	"github.com/puti-projects/puti/internal/backend/handler/article"
 	"github.com/puti-projects/puti/internal/backend/handler/auth"
 	"github.com/puti-projects/puti/internal/backend/handler/media"
 	"github.com/puti-projects/puti/internal/backend/handler/option"
 	"github.com/puti-projects/puti/internal/backend/handler/page"
-	"github.com/puti-projects/puti/internal/backend/handler/sd"
 	"github.com/puti-projects/puti/internal/backend/handler/statistics"
 	"github.com/puti-projects/puti/internal/backend/handler/subject"
 	"github.com/puti-projects/puti/internal/backend/handler/taxonomy"
@@ -178,12 +178,9 @@ func loadAPI(g *gin.Engine) *gin.Engine {
 // loadHelthTest the health check handlers
 func loadHealthTest(g *gin.Engine) *gin.Engine {
 	// Group for health check
-	svcd := g.Group("/sd")
+	svcd := g.Group("/check")
 	{
-		svcd.GET("/health", sd.HealthCheck)
-		svcd.GET("/disk", sd.DiskCheck)
-		svcd.GET("/cpu", sd.CPUCheck)
-		svcd.GET("/ram", sd.RAMCheck)
+		svcd.GET("/health", apiHandler.HealthCheck)
 	}
 
 	return g
