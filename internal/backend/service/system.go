@@ -3,6 +3,8 @@ package service
 import (
 	"fmt"
 
+	"github.com/puti-projects/puti/internal/pkg/constvar"
+
 	"github.com/shirou/gopsutil/cpu"
 	"github.com/shirou/gopsutil/disk"
 	"github.com/shirou/gopsutil/host"
@@ -24,7 +26,7 @@ const (
 // SystemInfo system infomation
 type SystemInfo struct {
 	Hostname string `json:"hostname"`
-	Uptime   uint64 `json:"uptime"`
+	Uptime   string `json:"uptime"`
 	OS       string `json:"os"`
 	Platform string `json:"platform"`
 }
@@ -163,10 +165,16 @@ func RAMCheck() *RAMHealth {
 func SystemInfoCheck() *SystemInfo {
 	info, _ := host.Info()
 
+	days := info.Uptime / constvar.SecondsPerDay
+	daysSec := info.Uptime % constvar.SecondsPerDay
+	hours := daysSec / constvar.SecondsPerHour
+	hoursSec := daysSec % constvar.SecondsPerHour
+	minutes := hoursSec / constvar.SecondsPerMinute
+
 	var systemInfo *SystemInfo
 	systemInfo = &SystemInfo{
 		Hostname: info.Hostname,
-		Uptime:   info.Uptime,
+		Uptime:   fmt.Sprintf("%d天 %d小时 %d分钟", days, hours, minutes),
 		OS:       info.OS,
 		Platform: info.Platform + " / " + info.PlatformVersion,
 	}
