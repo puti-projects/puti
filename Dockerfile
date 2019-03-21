@@ -4,7 +4,10 @@
 ARG GOLANG_BUILDER_VERSION=alpine
 FROM golang:${GOLANG_BUILDER_VERSION} AS builder
 
-RUN apk update && apk add --no-cache build-base git tzdata && update-ca-certificates
+RUN apk update && apk add --no-cache build-base git tzdata && apk add ca-certificates
+
+# Create putiuser
+RUN adduser -D -g '' putiuser
 
 COPY . /puti
 WORKDIR /puti
@@ -20,13 +23,33 @@ FROM scratch
 
 # Import from the builder.
 COPY --from=builder /usr/share/zoneinfo /usr/share/zoneinfo
+COPY --from=builder /etc/passwd /etc/passwd
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 
-# Copy our static executable.
-COPY --from=builder /puti /puti
+# Copy useful files or filepath to path /app
+WORKDIR /app/puti
+# binary
+COPY --from=builder /puti/puti puti
+# backend html
+COPY --from=builder /puti/console console
+# other static file
+COPY --from=builder /puti/assets assets
 
-WORKDIR /puti
+# these should set volume
+# config
+COPY --from=builder /puti/configs configs
+# theme path
+COPY --from=builder /puti/theme theme
+# upload path
+COPY --from=builder /puti/uploads uploads
+
+VOLUME ["/data"]
+
+COPY --from=builder /puti/scripts/docker/docker-entrypoint.sh /usr/local/bin/
+RUN ln -s usr/local/bin/docker-entrypoint.sh /
+ENTRYPOINT ["/docker-entrypoint.sh"]
+
+USER putiuser
 
 EXPOSE 8000 8080
-# Run the puti binary.
 CMD ["./puti"]
