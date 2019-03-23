@@ -43,6 +43,8 @@ COPY --from=builder /puti/theme theme
 # upload path
 COPY --from=builder /puti/uploads uploads
 
+RUN mkdir -p /data/puti \
+    && chown -R putiuser /data /data/puti /app/puti
 VOLUME ["/data"]
 
 COPY --from=builder /puti/scripts/docker/docker-entrypoint.sh /usr/local/bin/
