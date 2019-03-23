@@ -1,34 +1,43 @@
 #!/bin/sh
 set -e
 
-#Create VOLUME folder if not exist
-BASE_DATA=/data/puti
-BASE_APPPUTI=/app/puti
-for f in /configs /theme /uploads; do
-    if ! test -d ${BASE_DATA}$f; then
-        echo "${BASE_DATA}$f is not exist, move from ${BASE_APPPUTI}$f"
-        mv ${BASE_APPPUTI}$f ${BASE_DATA}$f
+if [ "$1" = 'puti' ]; then
+    #Create VOLUME folder if not exist
+    BASE_DATA=/data/puti
+    BASE_APPPUTI=/app/puti
+    for f in /configs /theme /uploads; do
+        if ! test -d ${BASE_DATA}$f; then
+            echo "${BASE_DATA}$f is not exist, move from ${BASE_APPPUTI}$f"
+            mv ${BASE_APPPUTI}$f ${BASE_DATA}$f
+        fi
+    done
+
+    if ! test -d /data/logs/puti; then
+        echo "/data/logs/puti is not exist, creating."
+        mkdir -p /data/logs/puti
     fi
-done
 
-if ! test -d /data/logs/puti; then
-    echo "/data/logs/puti is not exist, creating."
-    mkdir -p /data/logs/puti
-fi
+    chmod 0755 /data/puti/configs /data/puti/theme /data/puti/uploads /data/logs/puti
 
-chmod 0755 /data/puti/configs /data/puti/theme /data/puti/uploads /data/logs/puti
+    # Link volumed data with app data
+    for f in /configs /theme /uploads; do
+        if ! test -L ${BASE_APPPUTI}$f; then
+            echo "link ${BASE_APPPUTI}$f is not exist, creating from source: ${BASE_DATA}$f"
+            ln -sfn ${BASE_DATA}$f ${BASE_APPPUTI}$f
+        fi
+    done
 
-# Link volumed data with app data
-for f in /configs /theme /uploads; do
-    if ! test -L ${BASE_APPPUTI}$f; then
-        echo "link ${BASE_APPPUTI}$f is not exist, creating from source: ${BASE_DATA}$f"
-        ln -sfn ${BASE_DATA}$f ${BASE_APPPUTI}$f
+    if ! test -L /app/puti/logs; then
+        echo "link /app/puti/logs is not exist, creating from source: /data/logs/puti"
+        ln -sfn /data/logs/puti /app/puti/logs
     fi
-done
 
-# Only for the first time
-if ! test -d /app/puti/configs/config.yaml; then
-    cp /app/puti/configs/config.yaml.example /app/puti/configs/config.yaml
+    # Only for the first time
+    if ! test -d /app/puti/configs/config.yaml; then
+        cp /app/puti/configs/config.yaml.example /app/puti/configs/config.yaml
+    fi
+
+	exec /app/puti/puti
 fi
 
 exec "$@"

@@ -47,11 +47,11 @@ RUN mkdir -p /data/puti \
     && chown -R putiuser /data /data/puti /app/puti
 VOLUME ["/data"]
 
-COPY --from=builder /puti/scripts/docker/docker-entrypoint.sh /usr/local/bin/
+COPY --from=builder /puti/scripts/docker/docker-entrypoint.sh /puti/scripts/docker/wait-for-db.sh /usr/local/bin/
 RUN ln -s /usr/local/bin/docker-entrypoint.sh /
-ENTRYPOINT ["/docker-entrypoint.sh"]
 
 USER putiuser
-
 EXPOSE 8000 8080
-CMD ["./puti"]
+
+ENTRYPOINT ["/docker-entrypoint.sh"]
+CMD ["puti"]
