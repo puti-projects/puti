@@ -20,10 +20,10 @@
 
 
 ## Project Status
-Puti 项目现在仍在开发中。因为作者接触 Go 语言的第一个项目，所以代码质量不到位之处，将在未来不断优化，非常欢迎你的贡献。
+Puti 项目现在仍在开发中。因为是作者接触 Go 语言的第一个项目，所以代码质量不到位之处，将会在未来不断优化，非常欢迎你的贡献。
 
 ## Features
-项目计划实现以及已经实现的列表如下：
+项目计划实现以及已经实现的功能列表如下：
 * [ ] 功能
   * [ ] 登录注册
     * [x] 登录
@@ -90,7 +90,7 @@ $ docker pull puti/puti
 $ mkdir -p /data/puti
 
 # Use `docker run` for the first time.
-$ docker run --name=puti -p 80:8000 -p 443:8080 -v /data/puti:/data puti/puti
+$ docker run --name=puti -p 80:8000 -p 443:8080 -v /data/puti:/data/puti /data/logs:/data/logs/puti puti/puti
 
 # Use `docker start` if you have stopped it.
 $ docker start puti

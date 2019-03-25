@@ -16,10 +16,6 @@ if [ "$1" = 'puti' ]; then
             echo "${BASE_DATA}$f is not empty, continue without initialization"
         else
             echo "${BASE_DATA}$f is empty, initialize now"
-            cd ${INIT_PATH}
-            ls -l 
-            cd ${INIT_PATH}$f
-            ls -l
             cp -r ${INIT_PATH}$f/* ${BASE_DATA}$f/
         fi  
 
