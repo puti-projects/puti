@@ -2,30 +2,39 @@
 set -e
 
 if [ "$1" = 'puti' ]; then
-    #Create VOLUME folder if not exist
     BASE_DATA=/data/puti
     BASE_APPPUTI=/app/puti
+    INIT_PATH=/app/init
+
     for f in /configs /theme /uploads; do
         if ! test -d ${BASE_DATA}$f; then
-            echo "${BASE_DATA}$f is not exist, move from ${BASE_APPPUTI}$f"
-            mv ${BASE_APPPUTI}$f ${BASE_DATA}$f
+            echo "${BASE_DATA}$f is not exist, creating by copy"
+            mkdir -p ${BASE_DATA}$f
         fi
-    done
 
-    if ! test -d /data/logs/puti; then
-        echo "/data/logs/puti is not exist, creating."
-        mkdir -p /data/logs/puti
-    fi
+        if [ "$(ls -A ${BASE_DATA}$f)" ]; then
+            echo "${BASE_DATA}$f is not empty, continue without initialization"
+        else
+            echo "${BASE_DATA}$f is empty, initialize now"
+            cd ${INIT_PATH}
+            ls -l 
+            cd ${INIT_PATH}$f
+            ls -l
+            cp -r ${INIT_PATH}$f/* ${BASE_DATA}$f/
+        fi  
 
-    chmod 0755 /data/puti/configs /data/puti/theme /data/puti/uploads /data/logs/puti
-
-    # Link volumed data with app data
-    for f in /configs /theme /uploads; do
+        # Link volumed data with app data
         if ! test -L ${BASE_APPPUTI}$f; then
             echo "link ${BASE_APPPUTI}$f is not exist, creating from source: ${BASE_DATA}$f"
             ln -sfn ${BASE_DATA}$f ${BASE_APPPUTI}$f
         fi
     done
+
+    # logs path
+    if ! test -d /data/logs/puti; then
+        echo "/data/logs/puti is not exist, creating"
+        mkdir -p /data/logs/puti
+    fi
 
     if ! test -L /app/puti/logs; then
         echo "link /app/puti/logs is not exist, creating from source: /data/logs/puti"
@@ -37,7 +46,10 @@ if [ "$1" = 'puti' ]; then
         cp /app/puti/configs/config.yaml.example /app/puti/configs/config.yaml
     fi
 
-	exec /app/puti/puti
+    chown -R putiuser:putiuser /data/puti /data/logs/puti
+    chmod 0755 -R /data
+
+    exec gosu putiuser /app/puti/puti
 fi
 
 exec "$@"

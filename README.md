@@ -20,24 +20,51 @@
 
 
 ## Project Status
-This project is still developing.
+Puti 项目现在仍在开发中。因为作者接触 Go 语言的第一个项目，所以代码质量不到位之处，将在未来不断优化，非常欢迎你的贡献。
 
 ## Features
-* [x] Loign
-* [ ] Register
-* [x] Article
-* [x] Category
-* [x] Tag
-* [ ] Subject
-* [ ] Link
-* [x] Media
-* [x] Page
-* [x] User
-* [ ] Comments
-* [x] Setting
-* [x] Theme support
-* [ ] Plugin support
-* [ ] Toc support(not theme)
+项目计划实现以及已经实现的列表如下：
+* [ ] 功能
+  * [ ] 登录注册
+    * [x] 登录
+    * [ ] 注册
+    * [ ] 第三方接入（github等）
+  * [x] 文章
+  * [x] 页面
+  * [x] 分类
+  * [x] 标签
+  * [x] 专题
+  * [ ] 链接
+  * [x] 媒体
+  * [x] 用户
+  * [ ] 评论
+  * [ ] 设置
+    * [x] 普通设置
+    * [ ] 第三方设置（接入GItHub，WeChat等）
+  * [ ] 前台主题
+    * [X] 主题支持
+    * [X] 默认主题（Emma）
+    * [ ] 自由切换 
+  * [ ] 插件
+    * [ ] 插件支持
+    * [ ] 插件管理（上传、删除等）
+  * [ ] 邮件
+    * [ ] 邮件配置
+    * [ ] 邮件发送
+* [ ] 技术支持 
+  * [ ] 完善的 i18n 
+  * [ ] 邮件服务配置
+  * [ ] TOC (目前在前端主题实现)
+  * [ ] 配置图片裁切
+  * [X] HTTPS
+  * [x] WebServer 转发
+  * [ ] 头像接入
+  * [ ] OAuth 
+  * [ ] 媒体文件云存储
+* [ ] 生态
+  * [x] Docker 镜像支持
+  * [x] 配置化的自动部署脚本  
+  * [ ] 简单的统计系统
 
 ## Screenshot
 
