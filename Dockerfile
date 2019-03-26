@@ -22,24 +22,6 @@ FROM alpine:latest
 COPY --from=builder /usr/share/zoneinfo /usr/share/zoneinfo
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 
-WORKDIR /app
-
-# Copy useful files or filepath to path /app
-# binary
-COPY --from=builder /puti/puti ./puti/puti
-# backend html
-COPY --from=builder /puti/console ./puti/console
-# other static file
-COPY --from=builder /puti/assets ./puti/assets
-
-# these should set volume 
-# config
-COPY --from=builder /puti/configs ./init/configs
-# theme path
-COPY --from=builder /puti/theme ./init/theme
-# upload path
-COPY --from=builder /puti/uploads ./init/uploads
-
 ENV GOSU_VERSION 1.11
 RUN set -eux; \
 	\
@@ -67,7 +49,24 @@ RUN set -eux; \
     # verify that the binary works
 	gosu --version; \
 	gosu nobody true
-    
+
+WORKDIR /app/puti/
+# Copy useful files or filepath to path /app
+# binary
+COPY --from=builder /puti/puti ./puti
+# backend html
+COPY --from=builder /puti/console ./console
+# other static file
+COPY --from=builder /puti/assets ./assets
+
+# these should set volume 
+# config
+COPY --from=builder /puti/configs /app/init/configs
+# theme path
+COPY --from=builder /puti/theme /app/init/theme
+# upload path
+COPY --from=builder /puti/uploads /app/init/uploads
+
 RUN addgroup -g 1000 -S putiuser \
     && adduser -u 1000 -S putiuser -G putiuser \
 	&& chown -R putiuser:putiuser /app
