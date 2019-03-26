@@ -45,7 +45,8 @@ if [ "$1" = 'puti' ]; then
     chown -R putiuser:putiuser /data/puti /data/logs/puti
     chmod 0755 -R /data
 
-    exec gosu putiuser /app/puti/puti
+    cd /app/puti/
+    exec gosu putiuser puti
 fi
 
 exec "$@"

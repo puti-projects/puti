@@ -90,7 +90,7 @@ $ docker pull puti/puti
 $ mkdir -p /data/puti
 
 # Use `docker run` for the first time.
-$ docker run --name=puti -p 80:8000 -p 443:8080 -v /data/puti:/data/puti /data/logs:/data/logs/puti puti/puti
+$ docker run --name=puti -p 80:8000 -p 443:8080 -v /data/puti:/data/puti -v /data/logs:/data/logs/puti puti/puti
 
 # Use `docker start` if you have stopped it.
 $ docker start puti
