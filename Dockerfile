@@ -68,8 +68,7 @@ COPY --from=builder /puti/theme /app/init/theme
 COPY --from=builder /puti/uploads /app/init/uploads
 
 RUN addgroup -g 1000 -S putiuser \
-    && adduser -u 1000 -S putiuser -G putiuser \
-	&& chown -R putiuser:putiuser /app
+    && adduser -u 1000 -S putiuser -G putiuser 
 
 # copy script
 COPY --from=builder /puti/scripts/docker/docker-entrypoint.sh /puti/scripts/docker/wait-for-db.sh /usr/local/bin/

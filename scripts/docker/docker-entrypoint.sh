@@ -42,8 +42,8 @@ if [ "$1" = 'puti' ]; then
         cp /app/puti/configs/config.yaml.example /app/puti/configs/config.yaml
     fi
 
-    chown -R putiuser:putiuser /data/puti /data/logs
-    chmod 0755 -R /data
+    chown -R putiuser:putiuser /data/puti /data/logs /app
+    chmod 0755 -R /data /app
 
     exec gosu putiuser /app/puti/puti
 fi
