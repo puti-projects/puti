@@ -22,8 +22,14 @@
 ## Project Status
 Puti 项目现在仍在开发中。因为是作者接触 Go 语言的第一个项目，所以代码质量不到位之处，将会在未来不断优化，非常欢迎你的贡献。
 
+## Environmental requirements
+ - Golang 1.12+ 
+ - MySQL 
+  
+Golang 1.12 为正式支持go module版本，本项目使用了go module；Nginx 为可选配置。
+
 ## Features
-项目计划实现以及已经实现的功能列表如下：
+项目计划实现以及已经实现的功能如下：
 * [ ] 功能
   * [ ] 登录注册
     * [x] 登录
@@ -82,19 +88,25 @@ Puti 项目现在仍在开发中。因为是作者接触 Go 语言的第一个�
 ### Installation
 #### Using Docker
 ##### 使用现成的镜像
+我们已经提供了现成的镜像，可以直接拉取使用：
 ```sh
-# Pull image from Docker Hub.
+# 从 Docker Hub 拉取镜像
 $ docker pull puti/puti
 
-# Create local directory for volume.
-$ mkdir -p /data/puti
+# 创建需要挂载的目录，例如：`/data/puti`为应用文件存放目录，`/data/logs/puti`为日志存放目录
+$ mkdir -p /data/puti /data/logs/puti
 
-# Use `docker run` for the first time.
-$ docker run --name=puti -p 80:8000 -p 443:8080 -v /data/puti:/data/puti -v /data/logs:/data/logs/puti puti/puti
+# 第一次通过`docker run`来创建一个容器
+$ docker run --name=puti -p 80:8000 -p 443:8080 -v /data/puti:/data/puti -v /data/logs/puti:/data/logs/puti puti/puti
 
-# Use `docker start` if you have stopped it.
+# 使用 `docker stop``docker start`来停止，关闭容器。
+$ docker stop puti
 $ docker start puti
-```  
+```
+更多内容查看：[Docker use](./script/docker.README.md)
+
+##### 使用可配置的部署脚本
+我们提供了简单方便地一键部署 Docker-compose 脚本文件，懒人必备。[puti-projects/puti-environment](https://github.com/puti-projects/puti-environment)
 
 ### Usage
 

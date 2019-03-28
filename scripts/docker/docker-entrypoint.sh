@@ -38,7 +38,8 @@ if [ "$1" = 'puti' ]; then
     fi
 
     # Only for the first time
-    if ! test -d /app/puti/configs/config.yaml; then
+    if ! test -e /app/puti/configs/config.yaml; then
+        echo "config file not exist, init from config.yaml.example"
         cp /app/puti/configs/config.yaml.example /app/puti/configs/config.yaml
     fi
 
