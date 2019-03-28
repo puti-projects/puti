@@ -23,8 +23,9 @@
 Puti 项目现在仍在开发中。因为是作者接触 Go 语言的第一个项目，所以代码质量不到位之处，将会在未来不断优化，非常欢迎你的贡献。
 
 ## Environmental requirements
- - Golang 1.12+ 
+ - Golang 1.12+ (Build using modules)
  - MySQL 
+ - Nginx (Optional)
   
 Golang 1.12 为正式支持go module版本，本项目使用了go module；Nginx 为可选配置。
 
@@ -76,11 +77,6 @@ Golang 1.12 为正式支持go module版本，本项目使用了go module；Nginx
 
 ## Online Demo
 [Demo](https://demo.goozp.com)
-
-## Environmental requirements
-- Golang 1.11 (Build using modules)
-- MySQL
-- Nginx (Optional)
 
 ## Getting Started
 
