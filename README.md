@@ -6,6 +6,9 @@
     <em>:black_nib: Puti is a blog system written in Golang.</em>
 </p>
 <p align="center">
+    <a href="https://circleci.com/gh/puti-projects/puti">
+        <img src="https://circleci.com/gh/puti-projects/puti.svg?style=svg" alt="CircleCI">
+    </a>
     <a href="https://goreportcard.com/report/github.com/puti-projects/puti">
         <img src="https://goreportcard.com/badge/github.com/puti-projects/puti" alt="Go Report Card">
     </a>
