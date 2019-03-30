@@ -81,7 +81,7 @@ The project plan implementation and the functions that have been implemented are
 
 ### Configuration
 Puti's configuration file is `config.yaml` under path `configs`, and the configuration file can be initialized from `config.yaml.example` when first used.   
-Configuration to be aware of：
+Configuration to be aware of：   
 | Configuration | Description |
 | :----- | :----- | 
 | addr |  HTTP Port |

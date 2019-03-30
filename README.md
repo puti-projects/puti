@@ -80,7 +80,7 @@ Golang 1.11 版本开始支持 go module，本项目使用了go module；Nginx �
 ## 快速开始
 ### 配置
 Puti 的配置文件位于configs下的config.yaml，初次使用可以从config.yaml.example 初始化配置文件。   
-需要注意的配置：
+需要注意的配置：   
 | 配置 | 说明 |
 | :----- | :----- | 
 | addr |  HTTP 端口 |
