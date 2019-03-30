@@ -82,9 +82,10 @@ The project plan implementation and the functions that have been implemented are
 ### Configuration
 Puti's configuration file is `config.yaml` under path `configs`, and the configuration file can be initialized from `config.yaml.example` when first used.   
 Configuration to be aware of：   
+
 | Configuration | Description |
 | :----- | :----- | 
-| addr |  HTTP Port |
+| addr | HTTP Port |
 | jwt_secret |  Json web token secret key |
 | tls.https_open |  Open HTTPS  |
 | tls.addr |  HTTPS Port  |
@@ -94,6 +95,7 @@ Configuration to be aware of：
 | db.addr |  Database HOST:PORT  |
 | db.username |  Database user  |
 | db.password |  Database password |
+
 
 ### Installation
 #### Source installation
