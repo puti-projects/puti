@@ -15,7 +15,7 @@
 </p>
 <p align="center">
 中文
- | <a href="https://github.com/puti-projects/puti/blob/master/docs/README_EN.md">Engilsh</a>
+ | <a href="https://github.com/puti-projects/puti/blob/master/README_EN.md">Engilsh</a>
 </p>
 
 
@@ -80,7 +80,34 @@ Golang 1.11 版本开始支持 go module，本项目使用了go module；Nginx �
 ## Getting Started
 
 ### Configuration
+Puti 的配置文件位于configs下的config.yaml，初次使用可以从config.yaml.example 初始化配置文件。   
+需要注意的配置：
+| 配置 | 说明 |
+| :----- | :----- | 
+| addr |  HTTP 端口 |
+| jwt_secret |  Json web token 秘钥 |
+| tls.https_open |  开启 HTTPS  |
+| tls.addr |  HTTPS 端口  |
+| tls.cert | SSL证书路径   |
+| tls.key |  SSL私钥路径  |
+| db.name |  数据库名称  |
+| db.addr |  数据库 HOST:PORT  |
+| db.username |  数据库登录名  |
+| db.password |  数据库密码  |
+
 ### Installation
+#### 源码安装
+源码安装要求系统已经安装要求版本的 Go 语言，因为建议使用 Go 1.11 及以上版本，所以我们不关注 GOPATH 的问题。   
+鉴于某种因素，为了有更好的包下载体验，项目中已经内置了 Vendor 目录，并且统一用 go module 来管理。   
+```
+# 下载
+$ go get -u github.com/puti-projects/puti
+
+# 使用Makefile来构建程序
+$ cd $GOPATH/src/github.com/puti-projects/puti
+$ make
+```
+
 #### Using Docker
 ##### 使用现成的镜像
 我们已经提供了现成的镜像，可以直接拉取使用：
@@ -106,7 +133,7 @@ $ docker start puti
 ### Usage
 
 ## Theme
-More themes is creating.
+更多主题制作中。目前提供默认主题 Emma。
 
 ## Documentation
 TODO
@@ -120,14 +147,14 @@ Detailed changes for each release are documented in the [changelog file]((https:
 | [gin-gonic/gin](https://github.com/gin-gonic/gin) |  HTTP web framework written in Go |
 | [jinzhu/gorm](https://github.com/jinzhu/gorm) | The ORM library for Golang|
 | [patrickmn/go-cache](https://github.com/patrickmn/go-cache) | An in-memory key:value store/cache|
-| [spf13/viper](https://github.com/spf13/viper) |  complete configuration solution|
-| [go.uber.org/zap](https://go.uber.org/zap) |  fast, structured, leveled logging|
+| [spf13/viper](https://github.com/spf13/viper) |  Complete configuration solution|
+| [go.uber.org/zap](https://go.uber.org/zap) |  Fast, structured, leveled logging|
 | [vuejs/vue](https://github.com/vuejs/vue) | JavaScript framework for building UI on the web |
 | [ElemeFE/element](https://github.com/ElemeFE/element) | A Vue.js 2.0 UI Toolkit for Web  |
 | [PanJiaChen/vue-element-admin](https://github.com/PanJiaChen/vue-element-admin) | A front-end management background integration solution |
+| [hinesboy/mavonEditor](https://github.com/hinesboy/mavonEditor) | A markdown editor |
 
 ## Q & A
-
 
 ## Authors
 Puti is a project by 

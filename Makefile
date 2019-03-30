@@ -23,7 +23,7 @@ gotool:
 	go tool vet .
 test:
 	@echo "Testing."
-	go test -v ./...
+	go test -v -mod=vendor ./...
 ca:
 	@echo "Generating ca files."
 	openssl req -new -nodes -x509 -out configs/server.crt -keyout configs/server.key -days 3650 -subj "/C=DE/ST=NRW/L=Earth/O=Random Company/OU=IT/CN=127.0.0.1/emailAddress=xxxxx@qq.com"
