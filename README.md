@@ -23,11 +23,11 @@
 Puti 项目现在仍在开发中。因为是作者接触 Go 语言的第一个项目，所以代码质量不到位之处，将会在未来不断优化，非常欢迎你的贡献。
 
 ## Environmental requirements
- - Golang 1.12+ (Build using modules)
+ - Golang 1.11+ (Build using modules)
  - MySQL 
  - Nginx (Optional)
   
-Golang 1.12 为正式支持go module版本，本项目使用了go module；Nginx 为可选配置。
+Golang 1.11 版本开始支持 go module，本项目使用了go module；Nginx 为可选配置。
 
 ## Features
 项目计划实现以及已经实现的功能如下：
@@ -74,9 +74,8 @@ Golang 1.12 为正式支持go module版本，本项目使用了go module；Nginx
   * [ ] 简单的统计系统
 
 ## Screenshot
-
-## Online Demo
-[Demo](https://demo.goozp.com)
+![Docker use](./docs/images/screenshot1.png)
+![Docker use](./docs/images/screenshot2.png)
 
 ## Getting Started
 
@@ -99,10 +98,10 @@ $ docker run --name=puti -p 80:8000 -p 443:8080 -v /data/puti:/data/puti -v /dat
 $ docker stop puti
 $ docker start puti
 ```
-更多内容查看：[Docker use](./script/docker.README.md)
+更多内容查看：[Docker use](./script/docker/README.md)
 
 ##### 使用可配置的部署脚本
-我们提供了简单方便地一键部署 Docker-compose 脚本文件，懒人必备。[puti-projects/puti-environment](https://github.com/puti-projects/puti-environment)
+我们提供了简单方便地一键部署 Docker-compose 脚本文件，懒人必备。具体使用查看：[puti-projects/puti-environment](https://github.com/puti-projects/puti-environment)
 
 ### Usage
 
@@ -120,6 +119,9 @@ Detailed changes for each release are documented in the [changelog file]((https:
 | :----- | :----- | 
 | [gin-gonic/gin](https://github.com/gin-gonic/gin) |  HTTP web framework written in Go |
 | [jinzhu/gorm](https://github.com/jinzhu/gorm) | The ORM library for Golang|
+| [patrickmn/go-cache](https://github.com/patrickmn/go-cache) | An in-memory key:value store/cache|
+| [spf13/viper](https://github.com/spf13/viper) |  complete configuration solution|
+| [go.uber.org/zap](https://go.uber.org/zap) |  fast, structured, leveled logging|
 | [vuejs/vue](https://github.com/vuejs/vue) | JavaScript framework for building UI on the web |
 | [ElemeFE/element](https://github.com/ElemeFE/element) | A Vue.js 2.0 UI Toolkit for Web  |
 | [PanJiaChen/vue-element-admin](https://github.com/PanJiaChen/vue-element-admin) | A front-end management background integration solution |
