@@ -74,8 +74,8 @@ The project plan implementation and the functions that have been implemented are
   * [ ] Simple statistical system
 
 ## Screenshot
-![Docker use](./docs/images/screenshot1.png)
-![Docker use](./docs/images/screenshot2.png)
+![Docker use](./docs/images/screenshot_one_.png)
+![Docker use](./docs/images/screenshot_two.png)
 
 ## Getting Started
 

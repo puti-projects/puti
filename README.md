@@ -19,17 +19,17 @@
 </p>
 
 
-## Project Status
+## 状态
 Puti 项目现在仍在开发中。因为是作者接触 Go 语言的第一个项目，所以代码质量不到位之处，将会在未来不断优化，非常欢迎你的贡献。
 
-## Environmental requirements
+## 环境依赖
  - Golang 1.11+ (Build using modules)
  - MySQL 
  - Nginx (Optional)
   
 Golang 1.11 版本开始支持 go module，本项目使用了go module；Nginx 为可选配置。
 
-## Features
+## 功能与计划
 项目计划实现以及已经实现的功能如下：
 * [ ] 功能
   * [ ] 登录注册
@@ -73,13 +73,12 @@ Golang 1.11 版本开始支持 go module，本项目使用了go module；Nginx �
   * [x] 配置化的自动部署脚本  
   * [ ] 简单的统计系统
 
-## Screenshot
-![Docker use](./docs/images/screenshot1.png)
-![Docker use](./docs/images/screenshot2.png)
+## 截图
+![Docker use](./docs/images/screenshot_one_.png)
+![Docker use](./docs/images/screenshot_two.png)
 
-## Getting Started
-
-### Configuration
+## 快速开始
+### 配置
 Puti 的配置文件位于configs下的config.yaml，初次使用可以从config.yaml.example 初始化配置文件。   
 需要注意的配置：
 | 配置 | 说明 |
@@ -95,7 +94,7 @@ Puti 的配置文件位于configs下的config.yaml，初次使用可以从config
 | db.username |  数据库登录名  |
 | db.password |  数据库密码  |
 
-### Installation
+### 安装
 #### 源码安装
 源码安装要求系统已经安装要求版本的 Go 语言，因为建议使用 Go 1.11 及以上版本，所以我们不关注 GOPATH 的问题。   
 鉴于某种因素，为了有更好的包下载体验，项目中已经内置了 Vendor 目录，并且统一用 go module 来管理。   
@@ -108,7 +107,7 @@ $ cd $GOPATH/src/github.com/puti-projects/puti
 $ make
 ```
 
-#### Using Docker
+#### 使用 Docker
 ##### 使用现成的镜像
 我们已经提供了现成的镜像，可以直接拉取使用：
 ```sh
@@ -130,19 +129,18 @@ $ docker start puti
 ##### 使用可配置的部署脚本
 我们提供了简单方便地一键部署 Docker-compose 脚本文件，懒人必备。具体使用查看：[puti-projects/puti-environment](https://github.com/puti-projects/puti-environment)
 
-### Usage
-
-## Theme
+### 使用
+## 主题
 更多主题制作中。目前提供默认主题 Emma。
 
-## Documentation
+## 文档
 TODO
 
-## Changelog
+## 更新日志
 Detailed changes for each release are documented in the [changelog file]((https://github.com/axetroy/vscode-gpm/blob/master/CHANGELOG.md)).
 
-## Dependencies
-| Dependency | About |
+## 依赖
+| 依赖 | 关于 |
 | :----- | :----- | 
 | [gin-gonic/gin](https://github.com/gin-gonic/gin) |  HTTP web framework written in Go |
 | [jinzhu/gorm](https://github.com/jinzhu/gorm) | The ORM library for Golang|
@@ -156,11 +154,11 @@ Detailed changes for each release are documented in the [changelog file]((https:
 
 ## Q & A
 
-## Authors
+## 作者
 Puti is a project by 
 - Goozp ([@goozp](https://www.goozp.com))
 
-## Contributors
+## 贡献
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
 | [<img src="https://avatars3.githubusercontent.com/u/17734933?s=460&v=4" width="100px;"/><br /><sub>goozp</sub>](https://www.goozp.com)<br />[💻](https://github.com/puti-projects/puti/commits?author=goozp "Code commitor")[📚](https://github.com/dawnlabs/carbon/commits?author=briandennis "Documentation")[🎨](#design "Design") | 
 | :---: |
