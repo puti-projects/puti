@@ -11,6 +11,7 @@ puti
 
 # Output of the go coverage tool, specifically when used with LiteIDE
 *.out
+coverage.txt
 
 # work files
 .vscode/

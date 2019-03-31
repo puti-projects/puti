@@ -6,11 +6,20 @@
     <em>:black_nib:Puti is a blog system written in Golang.</em>
 </p>
 <p align="center">
+    <a href="https://circleci.com/gh/puti-projects/puti">
+        <img src="https://circleci.com/gh/puti-projects/puti.svg?style=svg" alt="CircleCI">
+    </a>
     <a href="https://goreportcard.com/report/github.com/puti-projects/puti">
         <img src="https://goreportcard.com/badge/github.com/puti-projects/puti" alt="Go Report Card">
     </a>
     <a href="https://app.fossa.io/projects/git%2Bgithub.com%2Fputi-projects%2Fputi?ref=badge_shield">
         <img src="https://app.fossa.io/api/projects/git%2Bgithub.com%2Fputi-projects%2Fputi.svg?type=shield" alt="FOSSA Status">
+    </a>
+    <a href="https://github.com/puti-projects/puti/releases">
+        <img src="https://img.shields.io/github/release/puti-projects/puti.svg?style=flat" alt="Release">
+    </a>
+    <a href="https://github.com/puti-projects/puti/blob/master/LICENSE">
+        <img src="https://img.shields.io/badge/License-GPLv3.0-important.svg?style=flat" alt="License" />
     </a>
 </p>
 <p align="center">
