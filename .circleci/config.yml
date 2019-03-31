@@ -9,7 +9,7 @@ jobs:
       CGO_ENABLED: 0
     steps:
       - checkout
-      - run: go test -v -mod=vendor -race -coverprofile=coverage.txt -covermode=atomic ./...
+      - run: go test -v -mod=vendor -coverprofile=coverage.txt -covermode=atomic ./...
       - run: bash <(curl -s https://codecov.io/bash)
 workflows:
   version: 2
