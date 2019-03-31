@@ -9,6 +9,9 @@
     <a href="https://circleci.com/gh/puti-projects/puti">
         <img src="https://circleci.com/gh/puti-projects/puti.svg?style=svg" alt="CircleCI">
     </a>
+    <a href="https://codecov.io/gh/puti-projects/puti">
+        <img src="https://codecov.io/gh/puti-projects/puti/branch/master/graph/badge.svg" />
+    </a>
     <a href="https://goreportcard.com/report/github.com/puti-projects/puti">
         <img src="https://goreportcard.com/badge/github.com/puti-projects/puti" alt="Go Report Card">
     </a>
