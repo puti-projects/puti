@@ -1,5 +1,14 @@
-# v0.1.0 Fisrt Version
+# v0.1.1
+
+## 修复
+
+### 后台
+
+- 修复创建或者编辑文章时，选择分类的树形强关联，导致提交的数据不正确
+
+# v0.1.0 Fisrt Version [2019-04-01] 
 第一个版本，包含基本功能，已经初步成型。包含以下内容：
+
 - 登录
 - 文章
 - 页面
@@ -14,19 +23,3 @@
 - WebServer 转发
 - Docker 镜像支持
 - 等
-
-The first version, which contains basic features, has been initially formed. Contains the following:
-- Log in
-- Article
-- Page
-- Category
-- Tag
-- Subject
-- Media
-- User
-- Normal settings
-- Theme support
-- HTTPS
-- WebServer forwarding
-- Docker image support
-- etc.
