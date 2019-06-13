@@ -150,7 +150,7 @@ $ docker stop puti
 $ docker start puti
 ```
 
-更多内容查看：[Docker use](./script/docker/README.md)
+更多内容查看：[Docker use](./scripts/docker/README.md)
 
 ##### 使用可配置的部署脚本
 

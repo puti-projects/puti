@@ -30,19 +30,22 @@
  | Engilsh
 </p>
 
-
 ## Project Status
+
 This project is still developing. Because it is the first project of the author to contact the Go language, the quality of the code is not in place and will be optimized in the future. Your contribution is very welcome. Also, for these terrible English translations, welcome to improve.
 
 ## Environmental requirements
- - Golang 1.11+ (Build using modules)
- - MySQL 
- - Nginx (Optional)
+
+- Golang 1.11+ (Build using modules)
+- MySQL
+- Nginx (Optional)
   
 Golang version 1.11 supports go module, and this project uses go module; Nginx is optional.
 
 ## Features
+
 The project plan implementation and the functions that have been implemented are as follows:
+
 * [ ] Features
   * [ ] Loign and register
     * [x] Loign
@@ -86,17 +89,19 @@ The project plan implementation and the functions that have been implemented are
   * [ ] Simple statistical system
 
 ## Screenshot
+
 ![Docker use](./docs/images/screenshot_one_.png)
 ![Docker use](./docs/images/screenshot_two.png)
 
 ## Getting Started
 
 ### Configuration
-Puti's configuration file is `config.yaml` under path `configs`, and the configuration file can be initialized from `config.yaml.example` when first used.   
-Configuration to be aware of：   
+
+Puti's configuration file is `config.yaml` under path `configs`, and the configuration file can be initialized from `config.yaml.example` when first used.  
+Configuration to be aware of：
 
 | Configuration | Description |
-| :----- | :----- | 
+| :----- | :----- |
 | addr | HTTP Port |
 | jwt_secret |  Json web token secret key |
 | tls.https_open |  Open HTTPS  |
@@ -108,12 +113,14 @@ Configuration to be aware of：
 | db.username |  Database user  |
 | db.password |  Database password |
 
-
 ### Installation
+
 #### Source installation
-The source installation requires that the system has the required version of the Go language installed, as Go 1.11 and above is recommended, so we are not concerned about the GOPATH issue.    
+
+The source installation requires that the system has the required version of the Go language installed, as Go 1.11 and above is recommended, so we are not concerned about the GOPATH issue.  
 In view of certain factors, in order to have a better package download experience, the Vendor directory has been built into the project and managed with the go module.
-```
+
+```sh
 # Download
 $ go get -u github.com/puti-projects/puti
 
@@ -123,8 +130,11 @@ $ make
 ```
 
 #### Using Docker
+
 ##### Using Ready-made Docker Images
+
 We have provided a ready-made image that can be pulled directly:
+
 ```sh
 # Pull image from Docker Hub.
 $ docker pull puti/puti
@@ -139,26 +149,32 @@ $ docker run --name=puti -p 80:8000 -p 443:8080 -v /data/puti:/data/puti -v /dat
 $ docker stop puti
 $ docker start puti
 ```
-More information：[Docker use](./script/docker.README.md)
+
+More information：[Docker use](./scripts/docker.README.md)
 
 ##### Use configurable deployment script
+
 We provide a one-click deployment of the Docker-compose script file, which is convenience for build the working environment. [puti-projects/puti-environment](https://github.com/puti-projects/puti-environment)
 
 ### Usage
 
 ## Theme
+
 More themes is creating. The default theme Emma is currently available.
 
 ## Documentation
+
 TODO
 
 ## Changelog
+
 Detailed changes for each release are documented in the [changelog file]((https://github.com/axetroy/vscode-gpm/blob/master/CHANGELOG.md)).
 
 ## Dependencies
+
 Thanks for these great open source libraries:
 | Dependency | About |
-| :----- | :----- | 
+| :----- | :----- |
 | [gin-gonic/gin](https://github.com/gin-gonic/gin) |  HTTP web framework written in Go |
 | [jinzhu/gorm](https://github.com/jinzhu/gorm) | The ORM library for Golang|
 | [vuejs/vue](https://github.com/vuejs/vue) | JavaScript framework for building UI on the web |
@@ -167,17 +183,19 @@ Thanks for these great open source libraries:
 
 ## Q & A
 
-
 ## Authors
-Puti is a project by 
+
+Puti is a project by
+
 - Goozp ([@goozp](https://www.goozp.com))
 
 ## Contributors
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
-| [<img src="https://avatars3.githubusercontent.com/u/17734933?s=460&v=4" width="100px;"/><br /><sub>goozp</sub>](https://www.goozp.com)<br />[💻](https://github.com/puti-projects/puti/commits?author=goozp "Code commitor")[📚](https://github.com/dawnlabs/carbon/commits?author=briandennis "Documentation")[🎨](#design "Design") | 
+| [<img src="https://avatars3.githubusercontent.com/u/17734933?s=460&v=4" width="100px;"/><br /><sub>goozp</sub>](https://www.goozp.com)<br />[💻](https://github.com/puti-projects/puti/commits?author=goozp "Code commitor")[📚](https://github.com/dawnlabs/carbon/commits?author=briandennis "Documentation")[🎨](#design "Design") |
 | :---: |
 
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
 ## License
+
 [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fputi-projects%2Fputi.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fputi-projects%2Fputi?ref=badge_large)
