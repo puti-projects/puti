@@ -6,6 +6,8 @@ puti
 *.so
 *.dylib
 
+debug
+
 # Test binary, build with `go test -c`
 *.test
 
