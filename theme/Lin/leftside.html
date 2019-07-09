@@ -1,0 +1,35 @@
+{{define "Lin/leftside"}}
+<div class="ui center aligned one column grid padded">
+    <div class="column">
+        <img class="ui centered circular bordered small image sidebar-img" src="/theme/{{.Setting.CurrentTheme}}/public/images/self-default.png" alt="img" />
+        <h4><strong>{{.Setting.BlogName}}</strong></h4>
+        <p class="header">{{.Setting.BlogDescription}}</p>
+    </div>
+    
+    <div class="tablet computer only column">
+        <div class="ui secondary fluid four item menu labeled icon">
+            <a class="item" href="{{.Setting.SiteUrl}}">
+                <i class="home icon"></i> 首页
+            </a>
+                        
+            <a class="item" href="{{.Setting.SiteUrl}}/subject">
+                <i class="block layout icon"></i> 专题
+            </a>
+                        
+            <a class="item" href="{{.Setting.SiteUrl}}/archive">
+                <i class="archive icon"></i> 归档
+            </a>  
+                    
+            <a class="item" href="{{.Setting.SiteUrl}}/about-me">
+                <i class="hand peace icon"></i> 关于
+            </a>
+        </div>
+    </div>
+
+    <div class="tablet computer only column ui divider"></div>
+
+    <div class="tablet computer only column"> 
+        <span><i class="book icon"></i> “当你发现自己的才华撑不起野心时，就请安静下来学习吧。”</span>
+    </div>
+</div>
+{{end}}

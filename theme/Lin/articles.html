@@ -1,0 +1,44 @@
+{{ define "Lin/articles.html" }}
+<!DOCTYPE html>
+<html>
+<head>
+    {{ template "head/head" . }}
+    <link type="text/css" rel="stylesheet" href="{{.Config.StaticServer}}/theme/{{.Setting.CurrentTheme}}/public/semantic/semantic.min.css"/>
+    <link type="text/css" rel="stylesheet" href="{{.Config.StaticServer}}/theme/{{.Setting.CurrentTheme}}/public/css/global.css"/>
+</head>
+<body class="pushable">
+    <div class="ui vertical pusher">
+        <div class="left-container">
+            {{ template "Lin/leftside" . }}
+        </div>
+
+        <div class="main-container">
+            {{ template "Lin/header" . }}
+                  
+            <div class="ui grid padded content-container">
+                <div class="two column row">
+                    <div class="sixteen wide mobile eleven wide tablet twelve wide computer column list-container">
+                        {{ template "Lin/article-list" . }}
+                    </div>
+                  
+                    <div class="tablet computer only five wide tablet four wide computer column side-container">
+                        <div class="ui sticky">
+                            <div class="ui one column grid">
+                                {{ template "Lin/sticky-sidebar" . }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {{ template "Lin/footer" . }}        
+        </div>
+
+    </div>
+
+    <script type="text/javascript" src="{{.Config.StaticServer}}/theme/{{.Setting.CurrentTheme}}/public/js/jquery.min.js"></script>
+    <script type="text/javascript" src="{{.Config.StaticServer}}/theme/{{.Setting.CurrentTheme}}/public/semantic/semantic.min.js"></script>
+    <script type="text/javascript" src="{{.Config.StaticServer}}/theme/{{.Setting.CurrentTheme}}/public/js/global.js"></script>    
+</body>
+</html>
+{{ end }}

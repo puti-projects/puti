@@ -1,0 +1,31 @@
+{{define "Lin/pagination"}}
+{{if gt (len .Pagination.PageNums) 1}}
+<div class="ui pagination small menu attached borderless">
+        {{if gt .Pagination.PreviousPageNum 0}}
+            <a aria-label="上一页" class="item" href="{{.PageURL}}?page={{.Pagination.PreviousPageNum}}"><i class="angle double left icon"></i></a>
+        {{end}}
+        {{if gt .Pagination.FirstPageNum 1}}
+            <a class="item" href="{{.PageURL}}?page=1">1</a>
+            {{if ne .Pagination.FirstPageNum 2}}
+                <div class="disabled item">...</div>
+            {{end}}
+        {{end}} 
+        {{range .Pagination.PageNums}}
+            {{if eq . $.Pagination.CurrentPage}}
+                <span class="active item">{{.}}</span> 
+            {{else}}
+                <a href="{{$.PageURL}}?page={{.}}" class="item"><span>{{.}}</span></a>
+            {{end}}
+        {{end}}
+        {{if lt .Pagination.LastPageNum .Pagination.TotalPage}}
+            {{if ne .Pagination.LastPageNum (minus .Pagination.TotalPage 1)}}
+                <div class="disabled item">...</div>
+            {{end}}
+            <a class="item" href="{{.PageURL}}?page={{.Pagination.TotalPage}}">{{.Pagination.TotalPage}}</a>
+        {{end}}
+        {{if lt .Pagination.CurrentPage .Pagination.TotalPage}}
+            <a aria-label="下一页" class="item" href="{{.PageURL}}?page={{.Pagination.NextPageNum}}"><i class="angle double right icon"></i></a>
+        {{end}}
+</div>
+{{end}}
+{{end}}

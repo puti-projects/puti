@@ -1,0 +1,145 @@
+{{ define "Lin/article-detail.html" }}
+<!DOCTYPE html>
+<html>
+<head>
+    {{ template "head/head" . }}
+    <link type="text/css" rel="stylesheet" href="{{.Config.StaticServer}}/theme/{{.Setting.CurrentTheme}}/public/semantic/semantic.min.css"/>
+    <link type="text/css" rel="stylesheet" href="{{.Config.StaticServer}}/theme/{{.Setting.CurrentTheme}}/public/css/global.css"/>
+    <link type="text/css" rel="stylesheet" href="{{.Config.StaticServer}}/assets/library/github-markdown-css/github-markdown.css"/>
+    <link type="text/css" rel="stylesheet" href="{{.Config.StaticServer}}/assets/library/highlight/styles/github.css"/>
+    <link type="text/css" rel="stylesheet" href="{{.Config.StaticServer}}/assets/library/katex/katex.min.css"/>
+</head>
+<body class="pushable">
+    <div class="ui vertical pusher">
+        <div class="left-container">
+            {{ template "Lin/leftside" . }}
+        </div>
+    
+        <div class="main-container">
+            {{ template "Lin/header" . }}
+                      
+            <div class="ui grid padded content-container">
+                <div class="two column row">
+                    <div class="sixteen wide mobile eleven wide tablet twelve wide computer column list-container">
+                        <div class="ui grid">
+                            <div class="one column row">
+                                <div class="column post-header">
+                                            <h1 class="ui dividing header">
+                                                <div class="content post-title">
+                                                            {{.Article.Title}}
+                                                            <div class="sub header post_meta">
+                                                                <div class="ui horizontal relaxed divided list">
+                                                                    <div class="item ">
+                                                                        <div class="middle aligned content"><i class="calendar alternate icon"></i>{{.Article.PostedTime}}</div>
+                                                                    </div>
+                                                                    <div class="item">
+                                                                        <div class="middle aligned content">
+                                                                            <i class="tags icon"></i>
+                                                                            {{range .Article.Categories}}
+                                                                                <a href="{{.URL}}" rel="category">{{.Title}}</a>&nbsp;
+                                                                            {{end}}
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="item">
+                                                                        <div class="middle aligned content">
+                                                                            <i class="eye icon"></i>{{.Article.ViewCount}} 阅读
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="item">
+                                                                        <div class="middle aligned content">
+                                                                            <i class="comments icon"></i><a href="#comments">{{.Article.CommentCount}} 回复</a> 
+                                                                        </div>    
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                </div>
+                                            </h1>
+                                </div>
+                            </div>
+                            
+                            <div class="one column row">
+                                <div class="column post-content">
+                                    <div id="editormd-view" class=" editormd">
+                                        <div class="editormd-html-textarea markdown-body" name="editormd-view-html-code">{{.Article.ContentHTML}}</div>
+                                    </div>
+                                </div>
+                            </div>
+                
+                            <div class="one column row">
+                                <div class="column post-tags">
+                                    <div class="ui hidden divider"></div>
+                                    <div class="ui horizontal divider">End</div>
+                                    <i class="tags icon"></i> 标签：
+                                    {{range .Article.Tags}}
+                                        <a href="{{.URL}}" rel="tag"><span>{{.Title}}</span></a>
+                                    {{end}}
+                                </div>
+                            </div>
+
+                            <div class="one column row">
+                                <div class="column">
+                                    <div class="ui yellow message">
+                                        <div>
+                                            <b><i class="copyright outline icon" aria-hidden="true"></i> 版权声明：</b>本站文章如无说明，则为原创。本站采用 <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank"><i class="creative commons icon" aria-hidden="true"></i>知识共享署名-非商业性使用-禁止演绎 4.0 国际许可协议</a> 进行许可。
+                                        </div>
+
+                                        <div>
+                                            <b><i class="linkify icon" aria-hidden="true"></i> 本文链接：</b><a href="{{.Article.GUID}}" title="{{.Article.Title}}">{{.Article.GUID}}</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="left floated left aligned sixteen wide mobile eight wide tablet eight wide computer column">
+                                    <p>上一篇：{{if .LastArticle.Title}}<a href="{{.LastArticle.URL}}" rel="prev">{{.LastArticle.Title}}</a>{{else}}没有了，已经是最后文章{{end}}</p>
+                                </div>
+
+                                <div class="right floated right aligned sixteen wide mobile eight wide tablet eight wide computer column">
+                                    <p>下一篇：{{if .NextArticle.Title}}<a href="{{.NextArticle.URL}}" rel="prev">{{.NextArticle.Title}}</a>{{else}}没有了，已经是最新文章{{end}}</p>
+                                </div>
+                            </div>
+
+                            <div class="ui section hidden divider"></div>
+
+                            <div class="one column row">
+                                <div class="column post-comments">
+                                    {{ template "Lin/comments" . }}
+                                </div>
+                            </div>    
+                        </div>
+                    </div>
+                      
+                    <div class="tablet computer only five wide tablet four wide computer column side-container">
+                        <div class="ui sticky">
+                            <div class="ui one column grid">
+                                <div class="column widget widget-toc">
+                                    <h4 class="ui header">
+                                        <div class="middle aligned content"><i class="paperclip icon"></i>&nbsp;<b>目录</b></div>
+                                    </h4>
+                                    <div class="ui divider"></div>
+                                    <div id="custom-toc-container" class="editormd-preview-container">
+                                        <ul data-toc="div#editormd-view" class="ui list post-toc"></ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    
+            {{ template "Lin/footer" . }}        
+        </div>
+    
+    </div>
+
+    <script type="text/javascript" src="{{.Config.StaticServer}}/theme/{{.Setting.CurrentTheme}}/public/js/jquery.min.js"></script>
+    <script type="text/javascript" src="{{.Config.StaticServer}}/theme/{{.Setting.CurrentTheme}}/public/semantic/semantic.min.js"></script>
+    <script type="text/javascript" src="{{.Config.StaticServer}}/theme/{{.Setting.CurrentTheme}}/public/js/global.js"></script>    
+    <script type="text/javascript" src="{{.Config.StaticServer}}/assets/library/highlight/highlight.pack.js"></script>
+    <script type="text/javascript" src="{{.Config.StaticServer}}/assets/library/katex/katex.min.js"></script>
+    <script type="text/javascript" src="{{.Config.StaticServer}}/theme/{{.Setting.CurrentTheme}}/public/js/jquery.toc.min.js"></script>
+    <script type="text/javascript" src="{{.Config.StaticServer}}/theme/{{.Setting.CurrentTheme}}/public/js/article.js"></script>
+</body>
+</html>
+{{ end }}

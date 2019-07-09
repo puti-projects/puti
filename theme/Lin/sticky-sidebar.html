@@ -1,0 +1,35 @@
+{{ define "Lin/sticky-sidebar" }}
+
+<div class="column widget widget-category">
+        <h4 class="ui header">
+            <div class="content"><i class="tags icon"></i> <b>分类</b></div>
+        </h4>
+        <div class="ui divider"></div>
+        <div class="ui labels">
+        {{range .Widgets.CategoryList}}
+            <a id="category-item-{{.TermID}}" class="ui basic label" href="{{.URL}}">{{.Name}}</a>
+            {{range .Children}}
+                <a id="category-item-{{.TermID}}" class="ui basic label" href="{{.URL}}">{{.Name}}</a>
+            {{end}}
+        {{end}}
+        </div>
+</div>
+
+<div class="column widget widget-news">
+        <h4 class="ui header">
+            <div class="content"><i class="list ul icon "></i> <b>最新文章</b></div>
+        </h4>
+        <div class="ui divider"></div>
+        <div class="ui large middle aligned selection animated list news-list">
+            {{range .Widgets.LatestArticles}}
+                <div class="item news-item news-item-{{.ID}}">
+                    <i class="right triangle icon"></i>
+                    <div class="content">
+                      <a class="" href="{{.GUID}}" title="{{.Title}}">{{.Title}}</a>
+                      <div class="description">{{ formatNullTime .PostedTime "2006-01-02 15:04" }} 发布</div>
+                    </div>
+                </div>
+            {{end}}
+        </div>
+</div>
+{{end}}

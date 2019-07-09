@@ -1,0 +1,185 @@
+{{ define "Lin/comments" }}
+<h6 class="ui horizontal divider header"><i class="comments outline grey icon"></i></h6>
+<form id="main-reply" class="ui reply form">
+  <div class="ui grid">
+        <div class="ui dimmer linshi-dimmer">
+          <div class="content">
+            <h2 class="ui inverted header">暂未开放</h2>
+          </div>
+        </div>
+
+        <div class="sixteen wide mobile sixteen wide tablet nine wide computer column">
+            <div class="field">
+                <textarea rows="12" placeholder="写点什么..." disabled></textarea>
+            </div>
+        </div>
+        <div class="sixteen wide mobile sixteen wide tablet seven wide computer column">
+          <div class="ui grid">
+            <div class="sixteen wide column">
+                <div class="required field">
+                    <div class="ui corner labeled left icon input">
+                      <input type="text" placeholder="昵称" disabled>
+                        <i class="user outline icon"></i>
+                        <div class="ui corner label">
+                          <i class="asterisk icon"></i>
+                        </div>
+                    </div>
+                  </div>
+            </div>
+            <div class="sixteen wide column">
+                <div class="required field">
+                    <div class="ui corner labeled left icon input">
+                      <input type="text" placeholder="邮箱" disabled>
+                        <i class="envelope outline icon"></i>
+                        <div class="ui corner label">
+                          <i class="asterisk icon"></i>
+                        </div>
+                      </div>
+                  </div>
+            </div>
+            <div class="sixteen wide column">
+                <div class="field">
+                    <div class="ui left icon input">
+                      <input type="text" placeholder="站点（https://example.com）" disabled>
+                        <i class="linkify icon"></i>
+                    </div>
+                  </div>
+            </div>
+            <div class="left floated left aligned six wide column">
+              <div class="inline fields">
+                <div class="ui test checkbox" data-inverted="" data-tooltip="有回复时通知我" data-position="bottom left">
+                  <input type="checkbox" disabled> 
+                  <label>接收邮件</label>
+                </div>
+              </div>
+            </div>
+            <div class="right floated right aligned six wide column">
+                <button class="ui submit basic icon button" disabled> <i class="paper plane outline icon"></i> 发表评论 </button>
+            </div>
+          </div>
+        </div>
+  </div>
+</form> 
+
+<h4 class="ui horizontal divider header"> 0 条评论</h4>
+
+<!-- <div class="ui large comments"> 
+  <div class="comment">
+      <a class="avatar">
+        <img src="/theme/{{.Setting.CurrentTheme}}/public/images/self-default.png">
+      </a>
+      <div class="content">
+        <a class="author">Elliot Fu</a>
+        <div class="metadata">
+          <span class="date">昨天上午12:30</span>
+        </div>
+        <div class="text">
+          <p>這對我的研究是非常有用.謝謝!</p>
+        </div>
+        <div class="actions">
+          <a id="comment-2" class="reply">回复</a>
+        </div>
+        <div id="comment-2-reply" class="ui clearing segment raised reply-form">
+            <form class="ui reply form">
+                <div class="field">
+                    <textarea rows="6" placeholder="写点什么..."></textarea>
+                </div>
+                <div class="required field">
+                  <div class="ui corner labeled left icon input">
+                    <input type="text" placeholder="昵称">
+                      <i class="user outline icon"></i>
+                      <div class="ui corner label">
+                        <i class="asterisk icon"></i>
+                      </div>
+                  </div>
+                </div>
+                <div class="required field">
+                  <div class="ui corner labeled left icon input">
+                    <input type="text" placeholder="邮箱">
+                      <i class="envelope outline icon"></i>
+                      <div class="ui corner label">
+                        <i class="asterisk icon"></i>
+                      </div>
+                    </div>
+                </div>
+                <div class="field">
+                  <div class="ui left icon input">
+                    <input type="text" placeholder="站点（https://example.com）">
+                      <i class="linkify icon"></i>
+                  </div>
+                </div>
+                <div class="inline fields">
+                    <div class="ui test checkbox" data-inverted="" data-tooltip="有回复时通知我" data-position="bottom left">
+                        <input type="checkbox">
+                        <label>接收邮件</label>
+                    </div>
+                </div>
+                <button class="ui right floated submit basic icon button"> <i class="paper plane outline icon"></i> 发表评论 </button>
+            </form>
+        </div>
+      </div>
+      <div class="comments">
+        <div class="comment">
+          <a class="avatar">
+            <img src="/theme/{{.Setting.CurrentTheme}}/public/images/self-default.png">
+          </a>
+          <div class="content">
+            <a class="author">Jenny Hess</a>
+            <div class="metadata">
+              <span class="date">刚刚</span>
+            </div>
+            <div class="text">艾略特你永远是多么正确 :) </div>
+            <div class="actions">
+              <a id="comment-3" class="reply">回复</a>
+            </div>
+            <div id="comment-3-reply" class="ui clearing segment raised reply-form">
+                <form class="ui reply form">
+                    <div class="field">
+                        <textarea rows="6" placeholder="写点什么..."></textarea>
+                    </div>
+                    <div class="required field">
+                      <div class="ui corner labeled left icon input">
+                        <input type="text" placeholder="昵称">
+                          <i class="user outline icon"></i>
+                          <div class="ui corner label">
+                            <i class="asterisk icon"></i>
+                          </div>
+                      </div>
+                    </div>
+                    <div class="required field">
+                      <div class="ui corner labeled left icon input">
+                        <input type="text" placeholder="邮箱">
+                          <i class="envelope outline icon"></i>
+                          <div class="ui corner label">
+                            <i class="asterisk icon"></i>
+                          </div>
+                        </div>
+                    </div>
+                    <div class="field">
+                      <div class="ui left icon input">
+                        <input type="text" placeholder="站点（https://example.com）">
+                          <i class="linkify icon"></i>
+                      </div>
+                    </div>
+                    <div class="inline fields">
+                        <div class="ui test checkbox" data-inverted="" data-tooltip="有回复时通知我" data-position="bottom left">
+                            <input type="checkbox">
+                            <label>接收邮件</label>
+                        </div>
+                    </div>
+                    <button class="ui right floated submit basic icon button"> <i class="paper plane outline icon"></i> 发表评论 </button>
+                </form>
+            </div>
+          </div>
+        </div>
+      </div>
+  </div>
+</div> -->
+
+<div class="ui basic center aligned segment">
+    <h5 class="ui header inline">
+      来做第一个留言的人吧！
+    </h5>
+</div>
+
+{{ end }}

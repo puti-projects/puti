@@ -1,0 +1,15 @@
+{{ define "Lin/error.html" }}
+<!DOCTYPE html>
+<html>
+<head>
+    {{ template "head/head" . }}
+
+</head>
+<body class="d-flex flex-column">
+    <h1>{{.code}}</h1>
+    <p>
+        {{.message}}
+    </p>
+</body>
+</html>
+{{ end }}

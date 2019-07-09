@@ -1,0 +1,72 @@
+{{define "Lin/article-list"}}
+<div class="ui divided items">
+{{if gt .Pagination.TotalPage 0}}
+{{range .Articles}}
+    {{if .CoverPicture}}
+        <div class="item">
+            <div class="ui small bordered image">  
+                <img class="ui small bordered image" src="{{.CoverPicture}}" alt="img"/>
+            </div>
+            <div class="content">
+                <a class="ui header" href="{{.GUID}}">{{.Title}}</a>
+                <div class="meta">
+                        <i class="calendar outline icon"></i> {{.PostedTime}}
+                        &nbsp;&nbsp;
+                        <i class="tags icon"></i>
+                        {{range .Categories}}
+                            <a href="{{.URL}}">{{.Title}}</a>        
+                        {{end}}
+                        &nbsp;
+                        <i class="eye icon"></i>{{.ViewCount}} 阅读
+                        &nbsp;
+                        <i class="comments icon"></i> {{.CommentCount}}条回复
+                </div>
+                <div class="description">
+                    <p>{{.Abstract}}</p>
+                </div>
+                <div class="extra">
+                    <div class="ui tag labels">
+                        {{range .Tags}}
+                            <a href="{{.URL}}" class="ui label"><span>{{.Title}}</span></a>
+                        {{end}}
+                    </div>
+                </div>
+            </div>
+        </div>
+    {{else}}
+        <div class="item">
+            <div class="content">
+                <a class="ui header" href="{{.GUID}}">{{.Title}}</a>
+                <div class="meta">
+                        <i class="calendar outline icon"></i> {{.PostedTime}}
+                        &nbsp;&nbsp;
+                        <i class="tags icon"></i>
+                        {{range .Categories}}
+                            <a href="{{.URL}}">{{.Title}}</a>        
+                        {{end}}
+                        &nbsp;&nbsp;
+                        <i class="eye icon"></i>{{.ViewCount}} 阅读
+                        &nbsp;&nbsp;
+                        <i class="comments icon"></i> {{.CommentCount}}条回复
+                </div>
+                <div class="description">
+                    <p>{{.Abstract}}</p>
+                </div>
+                <div class="extra">
+                    <div class="ui tag labels">
+                        {{range .Tags}}
+                            <a href="{{.URL}}" class="ui label"><span>{{.Title}}</span></a>
+                        {{end}}
+                    </div>
+                </div>
+            </div>
+        </div>
+    {{end}}
+{{end}}
+{{else}}
+<div class="item"><span>无</span></div>
+{{end}}
+
+{{ template "Lin/pagination" . }}
+</div>
+{{end}}
