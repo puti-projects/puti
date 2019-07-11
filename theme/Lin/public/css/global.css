@@ -68,6 +68,24 @@
   
 }
 
+/* 返回顶部 */
+.bottom-tools {
+  position: fixed;
+  bottom: 100px;
+  right: 15px;
+  z-index: 2000;
+}
+
+#back-to-top {
+  display: block;
+  cursor: pointer;
+  color: #D8E1F1;
+}
+
+#back-to-top:hover {
+  color: #C3CFE2;
+}
+
 /* footer */
 .footer{
   background-color: #c3cfe2;

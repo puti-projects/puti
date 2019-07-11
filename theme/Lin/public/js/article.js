@@ -16,37 +16,15 @@ $(document).ready(function() {
         tex.find(".katex").css("font-size", "1.6em");
     });
 
-    /**
-     * 回复框
-     */
-    $('.reply-form')
-        .transition('hide')
-    ;
-    $('.reply').click(function(){
-        var id = $(this).attr("id");
-        $('#' + id + '-reply')
-            .transition('slide down')
-        ;
-    });
-
-    /**
-     * TODO 临时遮罩层
-     */
-    $('.linshi-dimmer')
-        .dimmer({
-            on: 'hover'
-        })
-    ;
-
     /* 回到顶部 */
     var $backToTop = $(".bottom-tools");
     /* 隐藏回顶部按钮 */
-    $backToTop.hide();
+    $backToTop.transition('hide');
     $(window).on('scroll', function() {
         if ($(this).scrollTop() > 200) {
-            $backToTop.fadeIn();
+            $backToTop.transition('show');
         } else {
-            $backToTop.fadeOut();
+            $backToTop.transition('hide');
         }
     });
     $backToTop.on('click', function(e) {

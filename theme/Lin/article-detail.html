@@ -28,7 +28,7 @@
                                                 <div class="content post-title">
                                                             {{.Article.Title}}
                                                             <div class="sub header post_meta">
-                                                                <div class="ui horizontal relaxed divided list">
+                                                                <div class="ui horizontal list">
                                                                     <div class="item ">
                                                                         <div class="middle aligned content"><i class="calendar alternate icon"></i>{{.Article.PostedTime}}</div>
                                                                     </div>
@@ -127,7 +127,11 @@
                     </div>
                 </div>
             </div>
-    
+
+            <div class="bottom-tools">
+                <a id="back-to-top" title="返回顶部"><i class="arrow circle up huge icon"></i></a>
+            </div>
+
             {{ template "Lin/footer" . }}        
         </div>
     
@@ -140,6 +144,7 @@
     <script type="text/javascript" src="{{.Config.StaticServer}}/assets/library/katex/katex.min.js"></script>
     <script type="text/javascript" src="{{.Config.StaticServer}}/theme/{{.Setting.CurrentTheme}}/public/js/jquery.toc.min.js"></script>
     <script type="text/javascript" src="{{.Config.StaticServer}}/theme/{{.Setting.CurrentTheme}}/public/js/article.js"></script>
+    <script type="text/javascript" src="{{.Config.StaticServer}}/theme/{{.Setting.CurrentTheme}}/public/js/comment.js"></script>
 </body>
 </html>
 {{ end }}
