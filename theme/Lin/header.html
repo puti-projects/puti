@@ -1,34 +1,25 @@
 {{define "Lin/header"}}
 
-    <!-- Following Menu -->
-    <!-- <div class="ui top fixed sticky menu transition hidden">
-            <div class="ui container">
-              <a class="active item">Home</a>
-              <a class="item">Work</a>
-              <a class="item">Company</a>
-              <a class="item">Careers</a>
-              <div class="right menu">
-                <div class="item">
-                  <a class="ui button">Log in</a>
-                </div>
-                <div class="item">
-                  <a class="ui primary button">Sign Up</a>
-                </div>
-              </div>
-            </div>
-        </div> -->
-
 <!-- top menu -->
-<div class="ui secondary pointing menu">
-    <a class="toc item">
-        <i class="sidebar icon large"></i>
-    </a>
-    
-    <div class="right item">
-      <div class="ui icon input right aligned">
-        <input type="text" placeholder="搜索...">
-        <i class="circular search link icon"></i>
-      </div> 
+<div class="ui pointing icon menu lin-header">
+  <a class="toc item">
+    <i class="sidebar icon large"></i>
+  </a>
+
+  <a class="hidden item" href="{{.Setting.SiteUrl}}">
+    <i class="home icon"></i>
+  </a>
+
+  <a class="hidden item" href="javascript:history.go(-1);">
+    <i class="undo icon"></i>
+  </a>
+
+  <div class="right item">
+    <div class="ui icon input right aligned">
+      <input type="text" placeholder="搜索...">
+      <i class="circular search link icon"></i>
     </div>
+  </div>
 </div>
+
 {{end}}

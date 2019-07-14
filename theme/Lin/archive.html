@@ -1,0 +1,71 @@
+{{ define "Lin/archive.html" }}
+<!DOCTYPE html>
+<html>
+<head>
+    {{ template "head/head" . }}
+    <link type="text/css" rel="stylesheet" href="{{.Config.StaticServer}}/theme/{{.Setting.CurrentTheme}}/public/semantic/semantic.min.css"/>
+    <link type="text/css" rel="stylesheet" href="{{.Config.StaticServer}}/theme/{{.Setting.CurrentTheme}}/public/css/global.css"/>
+</head>
+<body class="pushable">
+    <div class="ui vertical pusher">
+        <div class="left-container">
+            {{ template "Lin/leftside" . }}
+        </div>
+
+        <div class="main-container">
+            {{ template "Lin/header" . }}
+                  
+            <div class="ui grid padded content-container">
+                <div class="two column row">
+                    <div class="sixteen wide mobile eleven wide tablet twelve wide computer column list-container">
+                        <h2 class="ui top attached header">
+                            
+                            <div class="content"><i class="archive icon"></i><b>归档</b></div>
+                        </h2>
+                        <div class="ui attached segment" id="archives">
+                            {{if .Archive}}
+                                {{range  $year := .ArchiveSortYear}}
+                                <h3 class="ui header"><b>{{$year}} 年</b></h3>
+                                    {{ range $theMonth := index $.ArchiveSortMonth $year }}
+                                    <h4 class="ui header"><b>{{$theMonth}} 月</b></h4>
+                                    <div class="ui list">
+                                        {{ range index $.Archive $year $theMonth }}
+                                        <div class="item">
+                                            <div class="header">
+                                                <p>
+                                                    {{.PostedDay}} 日：&nbsp;&nbsp;
+                                                    <a href="{{.GUID}}">{{.Title}}</a>&nbsp;&nbsp;&nbsp;&nbsp;
+                                                    {{.ViewCount}} 阅读
+                                                </p>
+                                            </div>
+                                        </div>
+                                        {{end}}
+                                    </div>
+                                    {{end}}
+                                {{end}}
+                            {{else}}
+                                <h4 class="ui header">暂无文章 <div class="sub header">快动手写作吧</div></h4>
+                            {{end}}
+                        </div>
+                    </div>
+                  
+                    <div class="tablet computer only five wide tablet four wide computer column side-container">
+                        <div class="ui sticky">
+                            <div class="ui one column grid">
+                                {{ template "Lin/sticky-sidebar" . }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {{ template "Lin/footer" . }}        
+        </div>
+    </div>
+
+    <script type="text/javascript" src="{{.Config.StaticServer}}/theme/{{.Setting.CurrentTheme}}/public/js/jquery.min.js"></script>
+    <script type="text/javascript" src="{{.Config.StaticServer}}/theme/{{.Setting.CurrentTheme}}/public/semantic/semantic.min.js"></script>
+    <script type="text/javascript" src="{{.Config.StaticServer}}/theme/{{.Setting.CurrentTheme}}/public/js/global.js"></script>    
+</body>
+</html>
+{{ end }}

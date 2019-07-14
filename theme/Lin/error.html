@@ -1,15 +1,46 @@
 {{ define "Lin/error.html" }}
 <!DOCTYPE html>
 <html>
+
 <head>
     {{ template "head/head" . }}
-
+    <link type="text/css" rel="stylesheet"
+        href="{{.Config.StaticServer}}/theme/{{.Setting.CurrentTheme}}/public/semantic/semantic.min.css" />
+    <link type="text/css" rel="stylesheet"
+        href="{{.Config.StaticServer}}/theme/{{.Setting.CurrentTheme}}/public/css/global.css" />
 </head>
-<body class="d-flex flex-column">
-    <h1>{{.code}}</h1>
-    <p>
-        {{.message}}
-    </p>
+
+<body class="pushable">
+    {{ template "Lin/sidebar" . }}
+
+    <div class="ui vertical pusher">
+        <div class="left-container">
+            {{ template "Lin/leftside" . }}
+        </div>
+
+        <div class="main-container">
+            {{ template "Lin/header" . }}
+
+            <div class="ui grid padded content-container">
+                <div class="one column row">
+                    <div class="sixteen column list-container">
+                        <h1 class="ui header">{{.code}}<div class="sub header">{{.message}}</div></h1>
+                        <a class="ui basic blue button" href="{{.Setting.SiteUrl}}">返回首页</a>
+                    </div>
+                </div>
+            </div>
+
+            {{ template "Lin/footer" . }}
+        </div>
+    </div>
+
+    <script type="text/javascript"
+        src="{{.Config.StaticServer}}/theme/{{.Setting.CurrentTheme}}/public/js/jquery.min.js"></script>
+    <script type="text/javascript"
+        src="{{.Config.StaticServer}}/theme/{{.Setting.CurrentTheme}}/public/semantic/semantic.min.js"></script>
+    <script type="text/javascript"
+        src="{{.Config.StaticServer}}/theme/{{.Setting.CurrentTheme}}/public/js/global.js"></script>
 </body>
+
 </html>
 {{ end }}

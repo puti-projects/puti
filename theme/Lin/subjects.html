@@ -1,4 +1,4 @@
-{{ define "Lin/articles.html" }}
+{{ define "Lin/subjects.html" }}
 <!DOCTYPE html>
 <html>
 <head>
@@ -18,17 +18,9 @@
             {{ template "Lin/header" . }}
                   
             <div class="ui grid padded content-container">
-                <div class="two column row">
-                    <div class="sixteen wide mobile eleven wide tablet twelve wide computer column list-container">
-                        {{ template "Lin/article-list" . }}
-                    </div>
-                  
-                    <div class="tablet computer only five wide tablet four wide computer column side-container">
-                        <div class="ui sticky">
-                            <div class="ui one column grid">
-                                {{ template "Lin/sticky-sidebar" . }}
-                            </div>
-                        </div>
+                <div class="one column row">
+                    <div class="column list-container">
+                        {{ template "Lin/subject-list" . }}
                     </div>
                 </div>
             </div>

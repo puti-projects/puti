@@ -22,13 +22,13 @@
         <div class="ui divider"></div>
         <div class="ui large middle aligned selection animated list news-list">
             {{range .Widgets.LatestArticles}}
-                <div class="item news-item news-item-{{.ID}}">
+                <a class="item news-item news-item-{{.ID}}" href="{{.GUID}}">
                     <i class="right triangle icon"></i>
-                    <div class="content">
-                      <a class="" href="{{.GUID}}" title="{{.Title}}">{{.Title}}</a>
-                      <div class="description">{{ formatNullTime .PostedTime "2006-01-02 15:04" }} 发布</div>
+                    <div class="middle aligned content">
+                        <div class="header" href="{{.GUID}}" title="{{.Title}}">{{.Title}}</div>
+                        <div class="description">{{ formatNullTime .PostedTime "2006-01-02 15:04" }} 发布</div>
                     </div>
-                </div>
+                </a>
             {{end}}
         </div>
 </div>

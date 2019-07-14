@@ -31,8 +31,13 @@
 }
 
 .content-container{
+  visibility:hidden;
   flex: 1;
   padding: 0 10px !important;
+}
+
+.lin-header{
+  height: 50px;
 }
 
 /* sticky */
@@ -99,25 +104,21 @@
   margin: 0;
 }
 
-
-.hidden.menu {
-    display: none;
+/* header 菜单 */
+.ui.pointing.menu{
+  background-color: white;
+  /* border-radius: 0%; */
+  border-bottom: 1px solid #DDDDDD;
 }
-
-.secondary.pointing.menu .toc.item {
-    display: none;
+.ui.pointing.menu .toc.item {
+  display: none;
 }
 
 @media only screen and (max-width: 768px) { 
-
-  .ui.fixed.menu {
-    display: none !important;
+  .ui.pointing.menu .hidden.item{
+    display:none;
   }
-  .secondary.pointing.menu .item,
-  .secondary.pointing.menu .menu {
-    display: none;
-  }
-  .secondary.pointing.menu .toc.item {
+  .ui.pointing.menu .toc.item {
     display: block;
   }
 }

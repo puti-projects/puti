@@ -1,11 +1,20 @@
 {{define "Lin/sidebar"}}
     <!-- Sidebar Menu -->
-    <div class="ui vertical inverted sidebar menu left">
-        <a class="active item">Home</a>
-        <a class="item">Wor2k</a>
-        <a class="item">Company</a>
-        <a class="item">Careers</a>
-        <a class="item">Login</a>
-        <a class="item">Signup</a>
+    <div class="ui vertical inverted sidebar menu left labeled icon">
+        <a class="item" href="{{.Setting.SiteUrl}}">
+            <i class="home icon"></i> 首页
+        </a>
+                        
+        <a class="item" href="{{.Setting.SiteUrl}}/subject">
+            <i class="block layout icon"></i> 专题
+        </a>
+                        
+        <a class="item" href="{{.Setting.SiteUrl}}/archive">
+            <i class="archive icon"></i> 归档
+        </a>  
+                    
+        <a class="item" href="{{.Setting.SiteUrl}}/about-me">
+            <i class="hand peace icon"></i> 关于
+        </a>
     </div>
 {{end}}

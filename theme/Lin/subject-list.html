@@ -1,0 +1,83 @@
+{{ define "Lin/subject-list" }}
+
+<div class="ui one column grid">
+    <!-- 头部 -->
+    <div class="column">
+        {{ if .SubjectInfo }}
+        <div class="ui items">
+            <div class="item">
+                <div class="ui small bordered image">
+                    <img src="{{.SubjectInfo.CoverImageURL}}">
+                </div>
+                <div class="middle aligned content">
+                    <div class="header">{{.SubjectInfo.Name}}</div>
+                    <div class="meta">
+                        <span>当前共有 {{.SubjectInfo.Count}} 篇文章</span>
+                    </div>
+                    <div class="description">
+                    <p>{{.SubjectInfo.Description}}</p>
+                    </div>
+                    <div class="extra">
+                        <a class="circular ui icon button" href="{{.SubjectInfo.ParentURL}}" data-tooltip="返回上级专题" data-position="right center" data-inverted="">
+                            <i class="undo small icon"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {{ else }}
+        <h2 class="ui dividing header">
+            <i class="folder open outline icon"></i>
+            <div class="content">
+                专题
+                <div class="sub header">相同类型的特定文章归到特定专题中</div>
+            </div>
+        </h2>
+        {{ end }}
+    </div>
+
+    <!-- 专题列表 -->
+    <div class="column">
+        <div class="ui link stackable six doubling cards">
+            {{range .SubjectList}}
+            <div class="card">
+                <a class="image" href="/subject/{{.Slug}}">
+                    <img src="{{.CoverImageURL}}" alt="{{.Slug}}"/>
+                </a>
+                <div class="center aligned content">
+                    <a class="header" href="/subject/{{.Slug}}">{{.Name}}</a>
+                    <div class="meta">
+                        <p>{{.Count}} 篇文章</p>
+                    </div>
+                    <div class="description">{{.Description}}</div>
+                </div>
+                <div class="center aligned extra content">
+                    <span>{{.SubLastUpdatedDay}} </span>
+                </div>
+                <a class="ui bottom attached button" href="/subject/{{.Slug}}">查看专题</a>
+            </div>
+            {{ end }}
+        </div>
+    </div>
+
+    <!-- 专题文章列表 -->
+    <div class="column">
+        <div class="ui huge selection list">
+            {{range .SubjectArticles}}                  
+            <a class="item" href="{{.GUID}}">
+                <div class="middle aligned content">
+                    <div class="header"><i class="right triangle icon"></i>{{.Title}}</div>
+                    <div class="description">
+                        <p>
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ formatNullTime .PostedTime "2006-01-02 15:04" }} 发布
+                            &nbsp;&nbsp;&nbsp;{{.ViewCount}} 阅读
+                            &nbsp;&nbsp;&nbsp;{{.CommentCount}} 评论
+                        </p>
+                    </div>
+                </div>
+            </a>
+            {{end}}
+        </div>
+    </div>
+</div>
+{{ end }}
