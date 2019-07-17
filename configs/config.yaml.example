@@ -1,8 +1,8 @@
 runmode: release                 # 开发模式, debug, release, test
-addr: :8000                  # HTTP绑定端口
+addr: 8000                  # HTTP绑定端口
 name: puti              # API Server的名字
-url: http://127.0.0.1:8000   # pingServer函数请求的API服务器的ip:port
-max_ping_count: 10           # pingServer函数try的次数
+ping_url: http://127.0.0.1:8000   # pingServer函数请求的API服务器的ip:port
+ping_max_num: 10           # pingServer函数try的次数
 jwt_secret: putidemojwtseCrect013keyideO
 gormlog: false
 
@@ -16,7 +16,7 @@ tls:
 # logger
 log:
   logger_file: logs/server.log
-  logger_max_size: 500 # megabytes
+  logger_max_size: 1024 # megabytes
   logger_max_backups: 7
   logger_max_age: 31 # days
 

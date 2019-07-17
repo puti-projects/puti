@@ -62,6 +62,10 @@ func GetDefaultOptionsByType(settingType string) []string {
 		optionNames = []string{"blog_name", "blog_description", "site_url", "admin_email", "users_can_register", "timezone_string", "site_language"}
 	case "property":
 		optionNames = []string{"site_description", "site_keywords", "footer_copyright"}
+	case "menu":
+		optionNames = []string{""}
+	case "theme":
+		optionNames = []string{""}
 	case "pubic-account":
 		optionNames = []string{""}
 	case "github":

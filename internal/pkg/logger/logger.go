@@ -1,3 +1,14 @@
+// Package logger
+//
+// The differents between development logger add production logger
+// is that development logger include caller.
+// Thus, a production log should like
+// {"level":"ERROR","time":"2019-07-18T03:09:46.098+0800","message":"cert and key can not be empty, failed to listen https port"}
+// a development log should like
+// {"level":"ERROR","time":"2019-07-18T03:12:45.599+0800","caller":"logger/logger.go:129","message":"cert and key can not be empty, failed to listen https port"}
+//
+// Development logger output through log file and console
+// Production logger output just log file
 package logger
 
 import (
@@ -36,13 +47,13 @@ func InitProductionLogger(w zapcore.WriteSyncer) *zap.Logger {
 	highPriority := zap.LevelEnablerFunc(func(lvl zapcore.Level) bool {
 		return lvl >= zapcore.ErrorLevel
 	})
-	consoleErrors := zapcore.Lock(os.Stderr)
-	jsonEncoder := zapcore.NewJSONEncoder(zap.NewProductionEncoderConfig())
-	consoleEncoder := zapcore.NewConsoleEncoder(zap.NewProductionEncoderConfig())
 
-	core := zapcore.NewTee(
-		zapcore.NewCore(jsonEncoder, w, highPriority),
-		zapcore.NewCore(consoleEncoder, consoleErrors, highPriority),
+	jsonEncoder := zapcore.NewJSONEncoder(newPutiEncoderConfig())
+
+	core := zapcore.NewCore(
+		jsonEncoder,
+		w,
+		highPriority,
 	)
 	logger := zap.New(core)
 	defer logger.Sync()
@@ -52,22 +63,51 @@ func InitProductionLogger(w zapcore.WriteSyncer) *zap.Logger {
 
 // InitDevelopmentLogger init the logger for development environment
 func InitDevelopmentLogger(w zapcore.WriteSyncer) *zap.Logger {
+	highPriority := zap.LevelEnablerFunc(func(lvl zapcore.Level) bool {
+		return lvl >= zapcore.ErrorLevel
+	})
 	lowPriority := zap.LevelEnablerFunc(func(lvl zapcore.Level) bool {
 		return lvl < zapcore.ErrorLevel
 	})
-	consoleDebugging := zapcore.Lock(os.Stdout)
-	jsonEncoder := zapcore.NewJSONEncoder(zap.NewDevelopmentEncoderConfig())
-	consoleEncoder := zapcore.NewConsoleEncoder(zap.NewDevelopmentEncoderConfig())
 
+	consoleDebugging := zapcore.Lock(os.Stdout)
+	consoleErrors := zapcore.Lock(os.Stderr)
+
+	jsonEncoder := zapcore.NewJSONEncoder(newPutiEncoderConfig())
+	consoleEncoder := zapcore.NewConsoleEncoder(newPutiEncoderConfig())
+
+	fmt.Println(jsonEncoder)
 	core := zapcore.NewTee(
-		zapcore.NewCore(jsonEncoder, w, lowPriority),
+		// lumberjack writer
+		zapcore.NewCore(jsonEncoder, w, zap.InfoLevel),
+		// console
 		zapcore.NewCore(consoleEncoder, consoleDebugging, lowPriority),
+		zapcore.NewCore(consoleEncoder, consoleErrors, highPriority),
 	)
-	logger := zap.New(core)
+	logger := zap.New(core, zap.AddCaller(), zap.AddCallerSkip(1))
 	defer logger.Sync()
 
 	return logger
 }
+
+func newPutiEncoderConfig() zapcore.EncoderConfig {
+	return zapcore.EncoderConfig{
+		// Keys can be anything except the empty string.
+		TimeKey:        "time",
+		LevelKey:       "level",
+		NameKey:        "name",
+		CallerKey:      "caller",
+		MessageKey:     "message",
+		StacktraceKey:  "stack-trace",
+		LineEnding:     zapcore.DefaultLineEnding,
+		EncodeLevel:    zapcore.CapitalLevelEncoder,
+		EncodeTime:     zapcore.ISO8601TimeEncoder,
+		EncodeDuration: zapcore.StringDurationEncoder,
+		EncodeCaller:   zapcore.ShortCallerEncoder,
+	}
+}
+
+// TODO f de func 无法 skip1
 
 // Info logs a message at InfoLevel. The message includes any fields passed at the log site.
 func Info(msg string, fields ...zapcore.Field) {

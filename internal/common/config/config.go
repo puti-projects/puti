@@ -59,7 +59,6 @@ func (c *Config) initConfig() error {
 // initLog init log config 初始化日志配置
 func (c *Config) initLog() {
 	logger.InitLogger(viper.GetString("runmode"))
-
 	logger.Info("zap logger construction succeeded")
 }
 

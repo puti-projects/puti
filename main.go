@@ -12,12 +12,12 @@ import (
 	"github.com/puti-projects/puti/internal/common/config"
 	"github.com/puti-projects/puti/internal/common/model"
 	"github.com/puti-projects/puti/internal/common/router"
+	"github.com/puti-projects/puti/internal/pkg/logger"
 	"github.com/puti-projects/puti/internal/pkg/option"
 	"github.com/puti-projects/puti/internal/pkg/tickers"
 	v "github.com/puti-projects/puti/internal/pkg/version"
 
 	"github.com/gin-gonic/gin"
-	"github.com/puti-projects/puti/internal/pkg/logger"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
@@ -28,7 +28,8 @@ var (
 	version    = pflag.BoolP("version", "v", false, "show version info.")
 )
 
-func main() {
+// init function
+func init() {
 	pflag.Parse()
 
 	// Show version info
@@ -44,21 +45,29 @@ func main() {
 		return
 	}
 
-	// init config
+	// load config include logger
 	if err := config.Init(*configPath); err != nil {
 		panic(fmt.Errorf("fatal error init configuration: %s", err))
 	}
 	logger.Info("configuration load succeeded.", zap.String("config file", viper.ConfigFileUsed()))
 
+	// Set gin mode.
+	if "debug" == viper.GetString("runmode") {
+		gin.SetMode(gin.DebugMode)
+	} else if "test" == viper.GetString("runmode") {
+		gin.SetMode(gin.TestMode)
+	} else {
+		gin.SetMode(gin.ReleaseMode)
+	}
+}
+
+func main() {
 	// init db
 	model.DB.Init()
 	defer model.DB.Close()
 
 	// load default options
 	option.LoadOptions()
-
-	// Set gin mode.
-	gin.SetMode(viper.GetString("runmode"))
 
 	// create the gin engine
 	g := gin.New()
@@ -74,32 +83,32 @@ func main() {
 		logger.Info("The router has been deployed successfully.")
 	}()
 
-	// If open https, start listening https request
-	openHTTPS := viper.GetBool("tls.https_open")
-	if openHTTPS == true {
-		cert := viper.GetString("tls.cert")
-		key := viper.GetString("tls.key")
-		if cert != "" && key != "" {
-			go func() {
-				logger.Infof("Start to listening the incoming requests on https address: %s", viper.GetString("tls.addr"))
-				logger.Info(http.ListenAndServeTLS(viper.GetString("tls.addr"), cert, key, g).Error())
-			}()
-		}
-	}
-
 	// init ticker
 	tickers.InitCountTicker()
 	logger.Info("Start to running the count ticker.")
 
-	logger.Infof("Start to listening the incoming requests on http address: %s", viper.GetString("addr"))
-	logger.Info(http.ListenAndServe(viper.GetString("addr"), g).Error())
+	// If open https, start listening https request
+	if true == viper.GetBool("tls.https_open") {
+		cert := viper.GetString("tls.cert")
+		key := viper.GetString("tls.key")
+		if cert != "" && key != "" {
+			go func() {
+				logger.Info("Start to listening the incoming https requests", zap.String("port", viper.GetString("tls.addr")))
+				logger.Info(http.ListenAndServeTLS("0.0.0.0:"+viper.GetString("tls.addr"), cert, key, g).Error())
+			}()
+		} else {
+			logger.Errorf("cert and key can not be empty, failed to listen https port")
+		}
+	}
+	logger.Info("Start to listening the incoming http requests", zap.String("port", viper.GetString("addr")))
+	logger.Info(http.ListenAndServe("0.0.0.0:"+viper.GetString("addr"), g).Error())
 }
 
-// pingServer pings the http server to make sure the router is working.
+// pingServer pings the http server to make sure the service is working.
 func pingServer() error {
-	for i := 0; i < viper.GetInt("max_ping_count"); i++ {
+	for i := 0; i < viper.GetInt("ping_max_num"); i++ {
 		// Ping the server by sending a GET request to `/health`.
-		resp, err := http.Get(viper.GetString("url") + "/check/health")
+		resp, err := http.Get(viper.GetString("ping_url") + "/check/health")
 		if err == nil && resp.StatusCode == 200 {
 			return nil
 		}
@@ -108,5 +117,6 @@ func pingServer() error {
 		logger.Info("Waiting for the router, retry in 1 second.")
 		time.Sleep(time.Second)
 	}
+
 	return errors.New("Cannot connect to the router")
 }
