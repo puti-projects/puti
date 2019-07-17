@@ -29,7 +29,7 @@ func LoadOptions() error {
 		return err
 	}
 
-	logger.Info("Options has been deployed successfully.")
+	logger.Info("options has been deployed successfully")
 
 	return nil
 }

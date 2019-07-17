@@ -107,8 +107,6 @@ func newPutiEncoderConfig() zapcore.EncoderConfig {
 	}
 }
 
-// TODO f de func 无法 skip1
-
 // Info logs a message at InfoLevel. The message includes any fields passed at the log site.
 func Info(msg string, fields ...zapcore.Field) {
 	logger.Info(msg, fields...)
@@ -116,7 +114,7 @@ func Info(msg string, fields ...zapcore.Field) {
 
 // Infof uses fmt.Sprintf to log a templated message.
 func Infof(template string, args ...interface{}) {
-	Info(fmt.Sprintf(template, args...))
+	logger.Info(fmt.Sprintf(template, args...))
 }
 
 // Warn logs a message at WarnLevel. The message includes any fields passed at the log site.
@@ -126,7 +124,7 @@ func Warn(msg string, args ...zapcore.Field) {
 
 // Warnf uses fmt.Sprintf to log a templated message.
 func Warnf(template string, args ...interface{}) {
-	Warn(fmt.Sprintf(template, args...))
+	logger.Warn(fmt.Sprintf(template, args...))
 }
 
 // Error logs a message at ErrorLevel. The message includes any fields passed at the log site.
@@ -136,7 +134,7 @@ func Error(msg string, args ...zapcore.Field) {
 
 // Errorf uses fmt.Sprintf to log a templated message.
 func Errorf(template string, args ...interface{}) {
-	Error(fmt.Sprintf(template, args...))
+	logger.Error(fmt.Sprintf(template, args...))
 }
 
 // DPanic logs a message at DPanicLevel. The message includes any fields passed at the log site.
@@ -147,7 +145,7 @@ func DPanic(msg string, args ...zapcore.Field) {
 // DPanicf uses fmt.Sprintf to log a templated message.
 // In development, the logger then panics. (See DPanicLevel for details.)
 func DPanicf(template string, args ...interface{}) {
-	DPanic(fmt.Sprintf(template, args...))
+	logger.DPanic(fmt.Sprintf(template, args...))
 }
 
 // Panic logs a message at PanicLevel. The message includes any fields passed at the log site.
@@ -157,15 +155,15 @@ func Panic(msg string, args ...zapcore.Field) {
 
 // Panicf uses fmt.Sprintf to log a templated message, then panics.
 func Panicf(template string, args ...interface{}) {
-	Panic(fmt.Sprintf(template, args...))
+	logger.Panic(fmt.Sprintf(template, args...))
 }
 
 // Fatal logs a message at FatalLevel. The message includes any fields passed at the log site.
 func Fatal(msg string, args ...zapcore.Field) {
-	logger.Panic(msg, args...)
+	logger.Fatal(msg, args...)
 }
 
 // Fatalf uses fmt.Sprintf to log a templated message, then calls os.Exit.
 func Fatalf(template string, args ...interface{}) {
-	Fatal(fmt.Sprintf(template, args...))
+	logger.Fatal(fmt.Sprintf(template, args...))
 }

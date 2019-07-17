@@ -66,6 +66,6 @@ func (c *Config) initLog() {
 func (c *Config) watchConfig() {
 	viper.WatchConfig()
 	viper.OnConfigChange(func(e fsnotify.Event) {
-		logger.Infof("Config file changed: %s", e.Name)
+		logger.Infof("config file changed: %s", e.Name)
 	})
 }

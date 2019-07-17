@@ -49,7 +49,7 @@ func init() {
 	if err := config.Init(*configPath); err != nil {
 		panic(fmt.Errorf("fatal error init configuration: %s", err))
 	}
-	logger.Info("configuration load succeeded.", zap.String("config file", viper.ConfigFileUsed()))
+	logger.Info("configuration load succeeded", zap.String("config file", viper.ConfigFileUsed()))
 
 	// Set gin mode.
 	if "debug" == viper.GetString("runmode") {
@@ -78,14 +78,14 @@ func main() {
 	// Ping the server to make sure the router is working.
 	go func() {
 		if err := pingServer(); err != nil {
-			log.Fatal("The router has no response, or it might took too long to start up.", err)
+			log.Fatal("The router has no response, or it might took too long to start up", err)
 		}
-		logger.Info("The router has been deployed successfully.")
+		logger.Info("the router has been deployed successfully")
 	}()
 
 	// init ticker
 	tickers.InitCountTicker()
-	logger.Info("Start to running the count ticker.")
+	logger.Info("start to running the count ticker")
 
 	// If open https, start listening https request
 	if true == viper.GetBool("tls.https_open") {
@@ -93,14 +93,14 @@ func main() {
 		key := viper.GetString("tls.key")
 		if cert != "" && key != "" {
 			go func() {
-				logger.Info("Start to listening the incoming https requests", zap.String("port", viper.GetString("tls.addr")))
+				logger.Info("start to listening the incoming https requests", zap.String("port", viper.GetString("tls.addr")))
 				logger.Info(http.ListenAndServeTLS("0.0.0.0:"+viper.GetString("tls.addr"), cert, key, g).Error())
 			}()
 		} else {
 			logger.Errorf("cert and key can not be empty, failed to listen https port")
 		}
 	}
-	logger.Info("Start to listening the incoming http requests", zap.String("port", viper.GetString("addr")))
+	logger.Info("start to listening the incoming http requests", zap.String("port", viper.GetString("addr")))
 	logger.Info(http.ListenAndServe("0.0.0.0:"+viper.GetString("addr"), g).Error())
 }
 
@@ -114,9 +114,9 @@ func pingServer() error {
 		}
 
 		// Sleep for a second to continue the next ping.
-		logger.Info("Waiting for the router, retry in 1 second.")
+		logger.Info("waiting for the router, retry in 1 second")
 		time.Sleep(time.Second)
 	}
 
-	return errors.New("Cannot connect to the router")
+	return errors.New("cannot connect to the router")
 }
