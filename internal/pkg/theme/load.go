@@ -1,24 +1,37 @@
-// package theme
+package theme
 
-// import (
-// 	"os"
-// 	"path/filepath"
-// )
+import (
+	"fmt"
+	"os"
+	"path/filepath"
 
-// // LoadInstalled laod all installed themes
-// func LoadInstalled() {
+	"github.com/puti-projects/puti/internal/common/config"
+	"github.com/puti-projects/puti/internal/pkg/logger"
 
-// 	f, _ := os.Open(filepath.ToSlash(filepath.Join(model.Conf.StaticRoot, "theme/x")))
-// 	names, _ := f.Readdirnames(-1)
-// 	f.Close()
+	"go.uber.org/zap"
+)
 
-// 	for _, name := range names {
-// 		if !util.IsNumOrLetter(rune(name[0])) {
-// 			continue
-// 		}
+// Themes saves all theme names.
+var Themes []string
 
-// 		Themes = append(Themes, name)
-// 	}
+// LoadInstalled load all installed themes
+func LoadInstalled() {
+	f, err := os.Open(filepath.ToSlash(config.StaticPathTheme))
+	if err != nil {
+		logger.Errorf("load theme error: %s", err)
+	}
 
-// 	logger.Debugf("loaded [%d] themes", len(Themes))
-// }
+	dirName, err := f.Readdirnames(-1)
+	if err != nil {
+		logger.Errorf("load theme error: %s", err)
+	}
+	f.Close()
+
+	for _, theme := range dirName {
+		if "common" != theme {
+			Themes = append(Themes, theme)
+		}
+	}
+
+	logger.Info(fmt.Sprintf("loaded %d themes", len(Themes)), zap.Any("themes", Themes))
+}

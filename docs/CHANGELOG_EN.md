@@ -1,12 +1,19 @@
-# v0.1.1
+# Changelog
 
-## Fixes
+## v0.2.0 New Theme [2019-07-18]
 
-### Console
+### Feature and Enhancement
 
-- Fix catergory select to strectly tree when creating or editing article.
+- Added new theme Lin
+- Optimized logger component
 
-# v0.1.0 Fisrt Version [2019-04-01]
+### Bug Fixed
+
+- Fixed catergory select to strectly tree when creating or editing article.
+- Fixed theme Emma import katex css in wrong way
+
+## v0.1.0 Fisrt Version [2019-04-01]
+
 The first version, which contains basic features, has been initially formed. Contains the following:
 
 - Log in

@@ -1,7 +1,6 @@
 package tickers
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/puti-projects/puti/internal/common/model"
@@ -39,13 +38,15 @@ func InitCountTicker() {
 					utils.CounterCache.DeleteCounterCache(utils.PostCounterKey)
 				}
 			case <-CountTickerStopChan:
-				fmt.Println("Ticker will be Stop")
+				logger.Info("Ticker will be Stop")
 				countTicker.Stop()
-				fmt.Println("Ticker stopped")
+				logger.Info("Ticker stopped")
 				return
 			}
 		}
 	}()
+
+	logger.Info("start to running the count ticker")
 }
 
 // StopCountTicker stop the count ticker

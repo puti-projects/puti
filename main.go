@@ -14,6 +14,7 @@ import (
 	"github.com/puti-projects/puti/internal/common/router"
 	"github.com/puti-projects/puti/internal/pkg/logger"
 	"github.com/puti-projects/puti/internal/pkg/option"
+	"github.com/puti-projects/puti/internal/pkg/theme"
 	"github.com/puti-projects/puti/internal/pkg/tickers"
 	v "github.com/puti-projects/puti/internal/pkg/version"
 
@@ -46,10 +47,10 @@ func init() {
 	}
 
 	// load config include logger
-	if err := config.Init(*configPath); err != nil {
-		panic(fmt.Errorf("fatal error init configuration: %s", err))
-	}
-	logger.Info("configuration load succeeded", zap.String("config file", viper.ConfigFileUsed()))
+	config.Init(*configPath)
+
+	// load theme path
+	theme.LoadInstalled()
 
 	// Set gin mode.
 	if "debug" == viper.GetString("runmode") {
@@ -85,7 +86,6 @@ func main() {
 
 	// init ticker
 	tickers.InitCountTicker()
-	logger.Info("start to running the count ticker")
 
 	// If open https, start listening https request
 	if true == viper.GetBool("tls.https_open") {

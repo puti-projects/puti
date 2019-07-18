@@ -2,7 +2,6 @@ package router
 
 import (
 	"html/template"
-	"log"
 	"net/http"
 	"path/filepath"
 
@@ -18,10 +17,13 @@ import (
 	"github.com/puti-projects/puti/internal/backend/handler/taxonomy"
 	"github.com/puti-projects/puti/internal/backend/handler/user"
 	apiMiddleware "github.com/puti-projects/puti/internal/backend/middleware"
+	"github.com/puti-projects/puti/internal/common/config"
 	"github.com/puti-projects/puti/internal/common/utils"
 	webHandler "github.com/puti-projects/puti/internal/frontend/handler"
 	webMiddleware "github.com/puti-projects/puti/internal/frontend/middleware"
+	"github.com/puti-projects/puti/internal/pkg/logger"
 	optionCache "github.com/puti-projects/puti/internal/pkg/option"
+	"github.com/puti-projects/puti/internal/pkg/theme"
 
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
@@ -29,7 +31,7 @@ import (
 
 // Load loads the middlewares, routes, handles.
 func Load(g *gin.Engine, mw ...gin.HandlerFunc) *gin.Engine {
-	theme := optionCache.Options.Get("current_theme")
+	currentTheme := optionCache.Options.Get("current_theme")
 
 	g = setFuncMap(g)
 
@@ -40,8 +42,8 @@ func Load(g *gin.Engine, mw ...gin.HandlerFunc) *gin.Engine {
 
 	loadHealthTest(g)
 	loadAPI(g)
-	loadWeb(g, theme)
-	loadStatic(g, theme)
+	loadWeb(g, currentTheme)
+	loadStatic(g, currentTheme)
 
 	return g
 }
@@ -60,7 +62,7 @@ func setFuncMap(g *gin.Engine) *gin.Engine {
 }
 
 // loadWeb load frontend and backend entrance(SPA web)
-func loadWeb(g *gin.Engine, theme string) *gin.Engine {
+func loadWeb(g *gin.Engine, currentTheme string) *gin.Engine {
 	// Group for backend
 	admin := g.Group("/admin")
 	admin.GET("", func(c *gin.Context) {
@@ -90,31 +92,37 @@ func loadWeb(g *gin.Engine, theme string) *gin.Engine {
 }
 
 // loadStatic load static resource
-func loadStatic(g *gin.Engine, theme string) *gin.Engine {
-	g.Static("/static", "console/static")
-	g.Static("/uploads", "uploads/")
-	g.Static("/assets", "assets/")
-	g.StaticFile("/favicon.ico", "assets/favicon.ico")
+func loadStatic(g *gin.Engine, currentTheme string) *gin.Engine {
+	// resource
+	g.Static("/static", config.StaticPath("console/static"))
+	g.Static("/uploads", config.StaticPath("uploads/"))
+	g.Static("/assets", config.StaticPath("assets/"))
+	g.StaticFile("/favicon.ico", config.StaticPath("assets/favicon.ico"))
 
-	g.Static("theme/"+theme+"/public", "theme/"+theme+"/public")
-
-	// load frontend templates file
-	themeTemplates, err := filepath.Glob("theme/*/*.html")
-	if nil != err {
-		log.Fatal("load theme templates failed: " + err.Error())
+	// load theme templates file
+	var themeTemplates []string
+	for _, theme := range theme.Themes {
+		themePath := config.StaticPath("theme/" + theme)
+		g.Static("/theme/"+theme+"/public", themePath+"/public")
+		g.StaticFile("/theme/"+theme+"/thumbnail.jpg", themePath+"/thumbnail.jpg")
+		themeTemplate, err := filepath.Glob(themePath + "/*.html")
+		if nil != err {
+			logger.Fatalf("load theme %s templates failed: %s", theme, err.Error())
+		}
+		themeTemplates = append(themeTemplates, themeTemplate...)
 	}
-	commentTemplates, err := filepath.Glob("theme/common/comment/*.html")
+	commentTemplates, err := filepath.Glob(config.StaticPath("theme/common/comment/*.html"))
 	if nil != err {
-		log.Fatal("load comment templates failed: " + err.Error())
+		logger.Fatal("load comment templates failed: " + err.Error())
 	}
-	headTemplates, err := filepath.Glob("theme/common/head/*.html")
+	headTemplates, err := filepath.Glob(config.StaticPath("theme/common/head/*.html"))
 	if nil != err {
-		log.Fatal("load head templates failed: " + err.Error())
+		logger.Fatal("load head templates failed: " + err.Error())
 	}
 	templates := append(themeTemplates, commentTemplates...)
 	templates = append(templates, headTemplates...)
 	// load backend console html
-	templates = append(templates, "console/console.html")
+	templates = append(templates, config.StaticPath("console/console.html"))
 	// load all files
 	g.LoadHTMLFiles(templates...)
 

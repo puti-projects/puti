@@ -1,12 +1,14 @@
 package config
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/puti-projects/puti/internal/pkg/logger"
 
 	"github.com/fsnotify/fsnotify"
 	"github.com/spf13/viper"
+	"go.uber.org/zap"
 )
 
 // Config config struct
@@ -15,14 +17,14 @@ type Config struct {
 }
 
 // Init sets all configs using config file setting.
-func Init(cfg string) error {
+func Init(cfg string) {
 	c := Config{
 		Name: cfg,
 	}
 
 	// 初始化配置文件
 	if err := c.initConfig(); err != nil {
-		return err
+		panic(fmt.Errorf("fatal error init configuration: %s", err))
 	}
 
 	// 初始化日志包
@@ -31,7 +33,7 @@ func Init(cfg string) error {
 	// 监控配置文件变化并热加载程序
 	c.watchConfig()
 
-	return nil
+	logger.Info("configuration load succeeded", zap.String("config file", viper.ConfigFileUsed()))
 }
 
 // initConfig int config

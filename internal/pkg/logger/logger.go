@@ -1,4 +1,4 @@
-// Package logger
+// Package logger logger base on zap
 //
 // The differents between development logger add production logger
 // is that development logger include caller.
@@ -76,7 +76,6 @@ func InitDevelopmentLogger(w zapcore.WriteSyncer) *zap.Logger {
 	jsonEncoder := zapcore.NewJSONEncoder(newPutiEncoderConfig())
 	consoleEncoder := zapcore.NewConsoleEncoder(newPutiEncoderConfig())
 
-	fmt.Println(jsonEncoder)
 	core := zapcore.NewTee(
 		// lumberjack writer
 		zapcore.NewCore(jsonEncoder, w, zap.InfoLevel),

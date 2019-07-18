@@ -1,12 +1,19 @@
-# v0.1.1
+# Changelog
 
-## 修复
+## v0.2.0 New Theme [2019-07-18]
 
-### 后台
+### Feature and Enhancement
+
+- 新增新主题 Lin
+- 优化 logger 日志组件
+
+### Bug Fixed
 
 - 修复创建或者编辑文章时，选择分类的树形强关联，导致提交的数据不正确
+- 修复 Emma 主题 katex css 引入的 bug
 
-# v0.1.0 Fisrt Version [2019-04-01] 
+## v0.1.0 Fisrt Version [2019-04-01]
+
 第一个版本，包含基本功能，已经初步成型。包含以下内容：
 
 - 登录
