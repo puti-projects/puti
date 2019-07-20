@@ -20,6 +20,10 @@ func GetOptionsByType(settingType string) (map[string]string, error) {
 		optionsMap[option.OptionName] = option.OptionValue
 	}
 
+	if "theme" == settingType {
+		
+	}
+
 	return optionsMap, nil
 }
 
@@ -65,7 +69,7 @@ func GetDefaultOptionsByType(settingType string) []string {
 	case "menu":
 		optionNames = []string{""}
 	case "theme":
-		optionNames = []string{""}
+		optionNames = []string{"current_theme"}
 	case "pubic-account":
 		optionNames = []string{""}
 	case "github":

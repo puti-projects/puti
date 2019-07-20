@@ -63,17 +63,17 @@ The project plan implementation and the functions that have been implemented are
   * [ ] Settings
     * [x] Normal setting
     * [ ] Third party settings (GitHub, WeChat, etc.)
-  * [ ] Frontend theme
+  * [ ] Theme
     * [X] Theme support
     * [X] Default theme (Emma)
-    * [ ] Free switching 
+    * [X] Free switching
   * [ ] Plugin
     * [ ] Plugin support
     * [ ] Plugin management (upload, delete, etc.)
   * [ ] Email
     * [ ] Mail configuration
     * [ ] Mail delivery
-* [ ] Technical Support 
+* [ ] Technical Support
   * [ ] Complete i18n support
   * [ ] Mail service configuration
   * [ ] Toc support (not theme)

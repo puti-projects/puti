@@ -1,10 +1,11 @@
 # Changelog
 
-## v0.2.0 New Theme [2019-07-18]
+## v0.2.0 New Theme [2019-07-20]
 
 ### Feature and Enhancement
 
 - 新增新主题 Lin
+- 新增主题管理，可以自由切换不同的主题
 - 优化 logger 日志组件
 
 ### Bug Fixed

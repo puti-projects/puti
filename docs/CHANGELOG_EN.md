@@ -5,6 +5,7 @@
 ### Feature and Enhancement
 
 - Added new theme Lin
+- Added theme management, now we can switch installed theme simply
 - Optimized logger component
 
 ### Bug Fixed
