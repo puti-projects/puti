@@ -160,7 +160,7 @@ We provide a one-click deployment of the Docker-compose script file, which is co
 
 ## Theme
 
-More themes is creating. The default theme Emma is currently available.
+More themes is creating. Now we have two different style default themes, Emma and Lin.
 
 ## Documentation
 

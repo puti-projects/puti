@@ -24,14 +24,12 @@ type optionCache struct {
 }
 
 // LoadOptions load default options
-func LoadOptions() error {
+func LoadOptions() {
 	if err := getAutoLoadOptions(); err != nil {
-		return err
+		logger.Errorf("load options failed, %s", err)
 	}
 
 	logger.Info("options has been deployed successfully")
-
-	return nil
 }
 
 // getAutoLoadOptions get options need to load
@@ -67,7 +65,7 @@ func (cache *optionCache) Get(optionName string) string {
 		return ""
 	}
 
-	// if the cache invalid is a autoload type option, reload all autoloaded options
+	// if the cache invalid is a autoed load type option, reload all autoed load options
 	if option.Autoload == 1 {
 		// option reload
 		if err := getAutoLoadOptions(); err != nil {
@@ -94,6 +92,7 @@ func (cache *optionCache) Flush() {
 	cache.gocacheBody.Flush()
 }
 
-func (cache *optionCache) All() map[string](gocache.Item) {
+// All get all options from the cache
+func (cache *optionCache) All() map[string]gocache.Item {
 	return cache.gocacheBody.Items()
 }

@@ -21,7 +21,7 @@ func GetOptionsByType(settingType string) (map[string]string, error) {
 	}
 
 	if "theme" == settingType {
-		
+
 	}
 
 	return optionsMap, nil

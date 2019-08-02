@@ -33,10 +33,10 @@ var (
 func init() {
 	pflag.Parse()
 
-	// Show version info
+	// if a -v was receive, show version info
 	if *version {
-		v := v.Get()
-		marshalled, err := json.MarshalIndent(&v, "", "  ")
+		versionParams := v.Get()
+		marshalled, err := json.MarshalIndent(&versionParams, "", "  ")
 		if err != nil {
 			fmt.Printf("%v\n", err)
 			os.Exit(1)

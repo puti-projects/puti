@@ -41,7 +41,7 @@ type CreateResponse struct {
 	GUID string `json:"guid"`
 }
 
-// Create create a new aricle(published or draft)
+// Create create a new article (published or draft)
 func Create(c *gin.Context) {
 	logger.Info("article create function called", zap.String("X-request-Id", utils.GetReqID(c)))
 
@@ -126,7 +126,7 @@ func handleCreate(r *CreateRequest, userID uint64) (rsp *CreateResponse, err err
 
 	// set category and tag
 	valueStrings := make([]string, 0, len(r.Category)+len(r.Tag))
-	valueArgs := make([]interface{}, 0, (len(r.Category) + len(r.Tag)*3))
+	valueArgs := make([]interface{}, 0, len(r.Category) + len(r.Tag)*3)
 	for _, category := range r.Category {
 		termTaxonomy, _ := model.GetTermTaxonomy(category, "category")
 		valueStrings = append(valueStrings, "(?, ?, ?)")

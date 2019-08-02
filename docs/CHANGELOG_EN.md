@@ -1,6 +1,6 @@
 # Changelog
 
-## v0.2.0 New Theme [2019-07-18]
+## v0.2.0 New Theme [2019-07-21]
 
 ### Feature and Enhancement
 
