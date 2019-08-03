@@ -1,17 +1,29 @@
 # Changelog
 
+## v0.2.1 Bug fixed and small adjustment [2019-08]
+
+### 功能和优化
+- 优化后台管理样式
+
+### Bug 修复
+- 修复创建或编辑文章时，选择专题的树形结构取值不正确导致文章数计算不对
+
+***
+
 ## v0.2.0 New Theme [2019-07-21]
 
-### Feature and Enhancement
+### 功能和优化
 
 - 新增新主题 Lin
 - 新增主题管理，可以自由切换不同的主题
 - 优化 logger 日志组件
 
-### Bug Fixed
+### Bug 修复
 
 - 修复创建或者编辑文章时，选择分类的树形强关联，导致提交的数据不正确
 - 修复 Emma 主题 katex css 引入的 bug
+
+***
 
 ## v0.1.0 Fisrt Version [2019-04-01]
 
