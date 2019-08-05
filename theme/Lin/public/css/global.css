@@ -73,6 +73,18 @@
   
 }
 
+/* archive */
+.archive-year{
+  margin-bottom: 30px;
+}
+.archive-month{
+  margin-left: 30px;
+  margin-bottom: 20px;
+}
+.archives-list{
+  margin-left: 20px;
+}
+
 /* 返回顶部 */
 .bottom-tools {
   position: fixed;

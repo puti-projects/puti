@@ -8,6 +8,8 @@
     <link type="text/css" rel="stylesheet" href="{{.Config.StaticServer}}/theme/{{.Setting.CurrentTheme}}/public/css/global.css"/>
 </head>
 <body class="pushable">
+    {{ template "Lin/sidebar" . }}
+
     <div class="ui vertical pusher">
         <div class="left-container">
             {{ template "Lin/leftside" . }}

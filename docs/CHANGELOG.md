@@ -1,12 +1,15 @@
 # Changelog
 
-## v0.2.1 Bug fixed and small adjustment [2019-08]
+## v0.2.1 Bug fixed and small adjustment [2019-08-06]
 
 ### 功能和优化
-- 优化后台管理样式
+- 调整后台管理样式
+- 优化 Lin 主题的一些样式
 
 ### Bug 修复
 - 修复创建或编辑文章时，选择专题的树形结构取值不正确导致文章数计算不对
+- 修复 Lin 主题页面和归档页侧栏无法展开
+- 修复仪表盘系统信息 widget 的显示错误
 
 ***
 

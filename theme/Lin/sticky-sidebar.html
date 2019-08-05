@@ -2,7 +2,7 @@
 
 <div class="column widget widget-category">
         <h4 class="ui header">
-            <div class="content"><i class="tags icon"></i> <b>分类</b></div>
+            <span class="content"><i class="tags icon"></i> <b>分类</b></span>
         </h4>
         <div class="ui divider"></div>
         <div class="ui labels">
@@ -17,14 +17,14 @@
 
 <div class="column widget widget-news">
         <h4 class="ui header">
-            <div class="content"><i class="list ul icon "></i> <b>最新文章</b></div>
+            <span class="content"><i class="list ul icon "></i> <b>最新文章</b></span>
         </h4>
         <div class="ui divider"></div>
         <div class="ui large middle aligned selection animated list news-list">
             {{range .Widgets.LatestArticles}}
                 <a class="item news-item news-item-{{.ID}}" href="{{.GUID}}">
                     <i class="right triangle icon"></i>
-                    <div class="middle aligned content">
+                    <div class="content">
                         <div class="header" href="{{.GUID}}" title="{{.Title}}">{{.Title}}</div>
                         <div class="description">{{ formatNullTime .PostedTime "2006-01-02 15:04" }} 发布</div>
                     </div>
