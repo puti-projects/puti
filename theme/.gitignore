@@ -1,0 +1,5 @@
+# only common path and offical theme should be tracked
+*
+!common/
+!Emma/
+!Lin/
