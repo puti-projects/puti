@@ -17,6 +17,11 @@ var Themes []string
 // LoadInstalled load all installed themes
 func LoadInstalled() {
 	f, err := os.Open(filepath.ToSlash(config.StaticPathTheme))
+	defer func() {
+		if err := f.Close(); err != nil {
+			logger.Warnf("load theme error when closing dir: %s", err)
+		}
+	}()
 	if err != nil {
 		logger.Errorf("load theme error: %s", err)
 	}
@@ -25,10 +30,13 @@ func LoadInstalled() {
 	if err != nil {
 		logger.Errorf("load theme error: %s", err)
 	}
-	f.Close()
 
 	for _, theme := range dirName {
-		if "common" != theme {
+		// if it is a dir (it may be a file)
+		f, _ := os.Stat(filepath.ToSlash(config.StaticPathTheme + "/" + theme))
+		isDir := f.IsDir()
+
+		if "common" != theme && true == isDir {
 			Themes = append(Themes, theme)
 		}
 	}

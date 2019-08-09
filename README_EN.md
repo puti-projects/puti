@@ -65,8 +65,9 @@ The project plan implementation and the functions that have been implemented are
     * [ ] Third party settings (GitHub, WeChat, etc.)
   * [ ] Theme
     * [X] Theme support
-    * [X] Default theme (Emma)
+    * [X] Default theme (Emma and Lin)
     * [X] Free switching
+    * [ ] Theme template files modification(backend console)
   * [ ] Plugin
     * [ ] Plugin support
     * [ ] Plugin management (upload, delete, etc.)
