@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.2.2 Article Cover Picture [2019-08-14]
+
+### Feature and Enhancement
+- You can now choose a cover image when you add or edit an article now.
+- Optimize background management media library style display
+- Optimize theme Lin's styles
+
+### Bug Fixed
+- Fixed loading wrong files (non-folder) when loading theme
+
+---
+
 ## v0.2.1 Bug fixed and small adjustment [2019-08-06]
 
 ### Feature and Enhancement

@@ -10,7 +10,7 @@
   flex: 0 0 auto;
   width: 300px;
   height: 100%;
-  background: -webkit-linear-gradient(left top,#c3cfe2, #f5f7fa); 
+  background: -webkit-linear-gradient(left top,#c3cfe2, #f5f7fa);
   background: -o-linear-gradient(bottom right, #c3cfe2, #f5f7fa);
   background: -moz-linear-gradient(bottom right,#c3cfe2, #f5f7fa);
   background: linear-gradient(to bottom right, #c3cfe2, #f5f7fa);
@@ -119,11 +119,15 @@
 /* header 菜单 */
 .ui.pointing.menu{
   background-color: white;
-  /* border-radius: 0%; */
   border-bottom: 1px solid #DDDDDD;
 }
 .ui.pointing.menu .toc.item {
   display: none;
+}
+
+/* subject image handle */
+.subject-image{
+  height: 180px !important;
 }
 
 @media only screen and (max-width: 768px) { 
@@ -132,6 +136,10 @@
   }
   .ui.pointing.menu .toc.item {
     display: block;
+  }
+
+  .subject-image{
+    height: auto !important;
   }
 }
 

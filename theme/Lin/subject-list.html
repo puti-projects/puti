@@ -7,7 +7,7 @@
         <div class="ui items">
             <div class="item">
                 <div class="ui small bordered image">
-                    <img src="{{.SubjectInfo.CoverImageURL}}">
+                    <img src="{{.SubjectInfo.CoverImageURL}}" alt="{{.SubjectInfo.Name}}">
                 </div>
                 <div class="middle aligned content">
                     <div class="header">{{.SubjectInfo.Name}}</div>
@@ -27,11 +27,11 @@
         </div>
         {{ else }}
         <h2 class="ui dividing header">
-            <i class="folder open outline icon"></i>
-            <div class="content">
+            <i class="cubes icon"></i>
+            <span class="content">
                 专题
-                <div class="sub header">相同类型的特定文章归到特定专题中</div>
-            </div>
+                <span class="sub header">相同类型的特定文章归到特定专题中</span>
+            </span>
         </h2>
         {{ end }}
     </div>
@@ -42,7 +42,7 @@
             {{range .SubjectList}}
             <div class="card">
                 <a class="image" href="/subject/{{.Slug}}">
-                    <img src="{{.CoverImageURL}}" alt="{{.Slug}}"/>
+                    <img class="subject-image" src="{{.CoverImageURL}}" alt="{{.Slug}}"/>
                 </a>
                 <div class="center aligned content">
                     <a class="header" href="/subject/{{.Slug}}">{{.Name}}</a>
