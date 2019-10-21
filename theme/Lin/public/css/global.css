@@ -144,15 +144,19 @@
 
   /* Katex */
   .katex-display{
-    width: 100%;
+    width: 100%; 
   }
   .katex{
     width: 100%;
   }
   .katex-html{
+    margin-bottom: -7px; 
     max-width: 100%;
     overflow-x: auto;
     overflow-y: hidden;
+  }
+  .katex-html::-webkit-scrollbar{
+    display: none !important; 
   }
 }
 
