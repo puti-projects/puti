@@ -141,6 +141,19 @@
   .subject-image{
     height: auto !important;
   }
+
+  /* Katex */
+  .katex-display{
+    width: 100%;
+  }
+  .katex{
+    width: 100%;
+  }
+  .katex-html{
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
 }
 
 @media only screen and (max-width: 933px) { 

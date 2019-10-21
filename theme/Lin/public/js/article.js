@@ -9,12 +9,12 @@ $(document).ready(function() {
     /**
      * 科学公式TeX(KaTeX)
      */
-    $("#editormd-view").find(".editormd-tex").each(function(){
-        var tex  = $(this);
-        katex.render(tex.text(), tex[0]);
+    // $("#post-toc").find(".a").each(function(){
+    //     var tex = $(this);
+    //     katex.render(tex.text(), tex[0]);
 
-        tex.find(".katex").css("font-size", "1.6em");
-    });
+    //     tex.find(".katex").css("font-size", "1.6em");
+    // });
 
     /* 回到顶部 */
     var $backToTop = $(".bottom-tools");
