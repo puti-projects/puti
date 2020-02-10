@@ -1,5 +1,15 @@
 # Changelog
 
+## v0.2.3
+
+### 功能和优化
+- 优化 Lin 主题 Latex 公式样式在移动端的展示
+
+### Bug 修复
+
+
+---
+
 ## v0.2.2 Article Cover Picture [2019-08-14]
 
 ### 功能和优化
