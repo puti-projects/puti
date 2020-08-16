@@ -2,7 +2,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: circleci/golang:1.12
+      - image: circleci/golang:1.14
     environment:
       GOOS: linux
       GOARCH: amd64
@@ -10,7 +10,7 @@ jobs:
     steps:
       - checkout
       - run: cp ./configs/config.yaml.example  ./configs/config.yaml
-      - run: go test -v -mod=vendor -coverprofile=coverage.txt -covermode=atomic ./...
+      - run: go test -v -coverprofile=coverage.txt -covermode=atomic ./...
       - run: bash <(curl -s https://codecov.io/bash)
 workflows:
   version: 2
