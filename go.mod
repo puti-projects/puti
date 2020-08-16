@@ -1,5 +1,7 @@
 module github.com/puti-projects/puti
 
+go 1.14
+
 require (
 	cloud.google.com/go v0.28.0 // indirect
 	github.com/BurntSushi/toml v0.3.1 // indirect

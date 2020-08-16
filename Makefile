@@ -13,17 +13,16 @@ ldflags="-extldflags -static -w -X ${versionDir}.gitTag=${gitTag} -X ${versionDi
 all: build
 build:
 	@echo "Building binary file."
-	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -mod=vendor -v -ldflags ${ldflags} -o ./puti
+	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -v -ldflags ${ldflags} -o ./puti
 clean:
 	@echo "Cleaning."
-	rm -f puti
-	find . -name "[._]*.s[a-w][a-z]" | xargs -i rm -f {}
+	go clean
 gotool:
 	@echo "Running go tool."
-	go tool vet .
+	go vet .
 test:
 	@echo "Testing."
-	go test -v -mod=vendor ./...
+	go test -v ./...
 ca:
 	@echo "Generating ca files."
 	openssl req -new -nodes -x509 -out configs/server.crt -keyout configs/server.key -days 3650 -subj "/C=DE/ST=NRW/L=Earth/O=Random Company/OU=IT/CN=127.0.0.1/emailAddress=xxxxx@qq.com"
@@ -31,7 +30,7 @@ ca:
 help:
 	@echo "make - run gotool and build"
 	@echo "make build - compile the source code"
-	@echo "make clean - remove binary file and vim swp files"
+	@echo "make clean - run go clean"
 	@echo "make gotool - run go tool 'vet'"
 	@echo "make test - run go test"
 	@echo "make ca - generate ca files"

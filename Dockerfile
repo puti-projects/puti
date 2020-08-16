@@ -1,10 +1,14 @@
 ############################
 # Builder image
 ############################
-ARG GOLANG_BUILDER_VERSION=1.12-alpine
+ARG GOLANG_BUILDER_VERSION=1.14-alpine
 FROM golang:${GOLANG_BUILDER_VERSION} AS builder
 
 RUN apk update && apk add --no-cache build-base git tzdata ca-certificates && update-ca-certificates
+
+RUN go env -w GO111MODULE=on
+# If you are in china， set goproxy to speed up installation
+RUN go env -w GOPROXY=https://goproxy.cn,direct
 
 COPY . /puti
 WORKDIR /puti
