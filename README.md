@@ -5,7 +5,11 @@
 <p align="center">
     <em>:black_nib: Puti is a blog system written in Golang.</em>
 </p>
+
 <p align="center">
+    <a href="https://github.com/puti-projects/puti/actions?query=workflow%3Abuild">
+        <img src="https://github.com/puti-projects/puti/workflows/build/badge.svg" alt="Github Actions">
+    </a>
     <a href="https://circleci.com/gh/puti-projects/puti">
         <img src="https://circleci.com/gh/puti-projects/puti.svg?style=svg" alt="CircleCI">
     </a>
@@ -22,7 +26,7 @@
         <img src="https://img.shields.io/github/release/puti-projects/puti.svg?style=flat" alt="Release">
     </a>
     <a href="https://github.com/puti-projects/puti/blob/master/LICENSE">
-        <img src="https://img.shields.io/badge/License-GPLv3.0-important.svg?style=flat" alt="License" />
+        <img src="https://img.shields.io/badge/License-GPLv3.0-important.svg?style=flat" alt="license" />
     </a>
 </p>
 <p align="center">
@@ -38,11 +42,11 @@ Puti 项目现在仍在开发中。因为是作者接触 Go 语言的第一个�
 
 ## 环境依赖
 
-- Golang 1.11+ (Build using modules)
+- Golang 1.13+ (Build using modules)
 - MySQL
 - Nginx (Optional)
   
-Golang 1.11 版本开始支持 go module，本项目使用了go module；Nginx 为可选配置。
+本项目使用了 Go Modules，所以建议使用 Go 1.13 以上版本；Nginx 为可选配置。
 
 ## 功能与计划
 

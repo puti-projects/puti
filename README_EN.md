@@ -6,6 +6,9 @@
     <em>:black_nib:Puti is a blog system written in Golang.</em>
 </p>
 <p align="center">
+    <a href="https://github.com/puti-projects/puti/actions?query=workflow%3Abuild">
+        <img src="https://github.com/puti-projects/puti/workflows/build/badge.svg" alt="Github Actions">
+    </a>
     <a href="https://circleci.com/gh/puti-projects/puti">
         <img src="https://circleci.com/gh/puti-projects/puti.svg?style=svg" alt="CircleCI">
     </a>
@@ -22,7 +25,7 @@
         <img src="https://img.shields.io/github/release/puti-projects/puti.svg?style=flat" alt="Release">
     </a>
     <a href="https://github.com/puti-projects/puti/blob/master/LICENSE">
-        <img src="https://img.shields.io/badge/License-GPLv3.0-important.svg?style=flat" alt="License" />
+        <img src="https://img.shields.io/badge/License-GPLv3.0-important.svg?style=flat" alt="license" />
     </a>
 </p>
 <p align="center">
@@ -36,11 +39,11 @@ This project is still developing. Because it is the first project of the author 
 
 ## Environmental requirements
 
-- Golang 1.11+ (Build using modules)
+- Golang 1.13+ (Build using modules)
 - MySQL
 - Nginx (Optional)
   
-Golang version 1.11 supports go module, and this project uses go module; Nginx is optional.
+This project uses Go Modules, so it is recommended to use Go 1.13 or above; Nginx is optional.
 
 ## Features
 
