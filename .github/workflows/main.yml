@@ -11,7 +11,7 @@ on:
 
 jobs:
   build:
-    name: Build
+    name: Go build
     runs-on: ubuntu-latest
     env:
       GOOS: linux
@@ -30,8 +30,11 @@ jobs:
     - name: Build
       run: go build -v .
 
-    - name: Go test
-      run: go test -v -coverprofile=coverage.txt -covermode=atomic ./...
+    - name: Copy config file and run go test
+    - run: |
+      cp ./configs/config.yaml.example  ./configs/config.yaml
+      go test -v -coverprofile=coverage.txt -covermode=atomic ./...
 
-    - name: Upload go test coverage file
+    - name: Upload coverage
+      if: ${{ success() }}
       run: bash <(curl -s https://codecov.io/bash)
