@@ -30,8 +30,8 @@ jobs:
     - name: Build
       run: go build -v .
 
-    - name: Set config
-      run: cp ./configs/config.yaml.example ./configs/config.yaml
-      
-    - name: Test
-      run: go test -v .
+    - name: Go test
+      run: go test -v -coverprofile=coverage.txt -covermode=atomic ./...
+
+    - name: Upload go test coverage file
+      run: bash <(curl -s https://codecov.io/bash)
