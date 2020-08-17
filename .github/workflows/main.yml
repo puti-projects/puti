@@ -23,18 +23,14 @@ jobs:
       with:
         go-version: ^1.14
       id: go
-
     - name: Check out code into the Go module directory
       uses: actions/checkout@v2
-
     - name: Build
       run: go build -v .
-
-    - name: Copy config file and run go test
-    - run: |
-      cp ./configs/config.yaml.example  ./configs/config.yaml
-      go test -v -coverprofile=coverage.txt -covermode=atomic ./...
-
+    - name: Setup environment configuration
+      run: cp ./configs/config.yaml.example ./configs/config.yaml
+    - name: Run go test
+      run: go test -v -coverprofile=coverage.txt -covermode=atomic ./...
     - name: Upload coverage
       if: ${{ success() }}
       run: bash <(curl -s https://codecov.io/bash)
