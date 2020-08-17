@@ -5,6 +5,7 @@
 ### 功能和优化
 - 优化 Lin 主题 Latex 公式样式在移动端的展示
 - 移除 vendor 目录和依赖，使用 goproxy
+- 支持 Github Actions
 
 ### Bug 修复
 
