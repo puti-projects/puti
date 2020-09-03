@@ -3,7 +3,8 @@ package service
 import (
 	"fmt"
 
-	"github.com/puti-projects/puti/internal/common/model"
+	"github.com/puti-projects/puti/internal/model"
+	"github.com/puti-projects/puti/internal/pkg/db"
 )
 
 // GetOptionsByType get default options by setting type
@@ -29,7 +30,7 @@ func GetOptionsByType(settingType string) (map[string]string, error) {
 
 // UpdateOptions update options
 func UpdateOptions(options map[string]interface{}) error {
-	tx := model.DB.Local.Begin()
+	tx := db.DBEngine.Begin()
 	defer func() {
 		if r := recover(); r != nil {
 			tx.Rollback()

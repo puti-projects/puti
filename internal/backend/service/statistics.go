@@ -1,6 +1,9 @@
 package service
 
-import "github.com/puti-projects/puti/internal/common/model"
+import (
+	"github.com/puti-projects/puti/internal/model"
+	"github.com/puti-projects/puti/internal/pkg/db"
+)
 
 // DashboardData some statistics index
 type DashboardData struct {
@@ -15,12 +18,12 @@ type DashboardData struct {
 func GetDashboardStatisticsData() (*DashboardData, error) {
 	var totalViews, totalComments, totalArticles, totalMedia uint64
 	postModel := &model.PostModel{}
-	totalViewsRow := model.DB.Local.Table(postModel.TableName()).Where("`status` != ? AND `deleted_time` is null", "deleted").
+	totalViewsRow := db.DBEngine.Table(postModel.TableName()).Where("`status` != ? AND `deleted_time` is null", "deleted").
 		Select("sum(`view_count`) as total_views").
 		Row()
 	_ = totalViewsRow.Scan(&totalViews)
 
-	if err := model.DB.Local.Table(postModel.TableName()).
+	if err := db.DBEngine.Table(postModel.TableName()).
 		Where("`post_type` = ? AND `status` != ? AND `deleted_time` is null", model.PostTypeArticle, "deleted").
 		Count(&totalArticles).
 		Error; err != nil {
@@ -28,7 +31,7 @@ func GetDashboardStatisticsData() (*DashboardData, error) {
 	}
 
 	mediaModel := &model.MediaModel{}
-	if err := model.DB.Local.Table(mediaModel.TableName()).Where("`deleted_time` is null").Count(&totalMedia).Error; err != nil {
+	if err := db.DBEngine.Table(mediaModel.TableName()).Where("`deleted_time` is null").Count(&totalMedia).Error; err != nil {
 		return nil, err
 	}
 

@@ -1,5 +1,7 @@
 package model
 
+import "github.com/puti-projects/puti/internal/pkg/db"
+
 // SubjectRelationshipsModel `pt_subject_relationships` 's struct
 type SubjectRelationshipsModel struct {
 	ObjectID  uint64 `gorm:"column:object_id;not null;primary_key"`
@@ -15,7 +17,7 @@ func (c *SubjectRelationshipsModel) TableName() string {
 // GetArticleSubject get article's connection subject
 func GetArticleSubject(articleID uint64) ([]*SubjectRelationshipsModel, error) {
 	var subjectRelationships []*SubjectRelationshipsModel
-	result := DB.Local.Where("`object_id` = ?", articleID).Find(&subjectRelationships)
+	result := db.DBEngine.Where("`object_id` = ?", articleID).Find(&subjectRelationships)
 
 	return subjectRelationships, result.Error
 }

@@ -8,8 +8,9 @@ import (
 	"time"
 
 	"github.com/go-sql-driver/mysql"
-	"github.com/puti-projects/puti/internal/common/model"
-	"github.com/puti-projects/puti/internal/common/utils"
+	"github.com/puti-projects/puti/internal/model"
+	"github.com/puti-projects/puti/internal/pkg/db"
+	"github.com/puti-projects/puti/internal/utils"
 
 	"github.com/jinzhu/gorm"
 )
@@ -221,7 +222,7 @@ func GetPageDetail(pageID string) (*PageDetail, error) {
 // UpdateArticle update article info
 // In this version, article meta data just update description, it should be more than one choise.TODO
 func UpdateArticle(article *model.PostModel, description string, category []uint64, tag []uint64, subject []uint64) (err error) {
-	tx := model.DB.Local.Begin()
+	tx := db.DBEngine.Begin()
 	defer func() {
 		if r := recover(); r != nil {
 			tx.Rollback()
@@ -383,7 +384,7 @@ func calSliceDiff(slice1, slice2 []uint64) (diffslice []uint64) {
 
 // UpdatePage udpate page info
 func UpdatePage(page *model.PostModel, description, pageTemplate string) (err error) {
-	tx := model.DB.Local.Begin()
+	tx := db.DBEngine.Begin()
 	defer func() {
 		if r := recover(); r != nil {
 			tx.Rollback()
@@ -442,7 +443,7 @@ func UpdatePage(page *model.PostModel, description, pageTemplate string) (err er
 // DeletePost delete post by soft delete
 // meta data was reserved
 func DeletePost(postType string, articleID uint64) error {
-	tx := model.DB.Local.Begin()
+	tx := db.DBEngine.Begin()
 	defer func() {
 		if r := recover(); r != nil {
 			tx.Rollback()
@@ -526,7 +527,7 @@ func TrashPost(postID uint64) error {
 
 	oldPost.Status = "deleted"
 
-	if err = model.DB.Local.Model(&model.PostModel{}).Save(oldPost).Error; err != nil {
+	if err = db.DBEngine.Model(&model.PostModel{}).Save(oldPost).Error; err != nil {
 		return err
 	}
 
@@ -543,7 +544,7 @@ func RestorePost(articleID uint64) error {
 
 	oldArticle.Status = "draft"
 
-	if err = model.DB.Local.Model(&model.PostModel{}).Save(oldArticle).Error; err != nil {
+	if err = db.DBEngine.Model(&model.PostModel{}).Save(oldArticle).Error; err != nil {
 		return err
 	}
 

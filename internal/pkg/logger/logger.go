@@ -15,35 +15,32 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/spf13/viper"
+	"github.com/puti-projects/puti/internal/pkg/config"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	lumberjack "gopkg.in/natefinch/lumberjack.v2"
 )
 
-// Logger zap logger
 var logger *zap.Logger
 
 // InitLogger init zap logger
-func InitLogger(runmode string) *zap.Logger {
+func InitLogger(runmode string) {
 	w := zapcore.AddSync(&lumberjack.Logger{
-		Filename:   viper.GetString("log.logger_file"),
-		MaxSize:    viper.GetInt("log.logger_max_size"), // megabytes
-		MaxBackups: viper.GetInt("log.logger_max_backups"),
-		MaxAge:     viper.GetInt("log.logger_max_age"), // days
+		Filename:   config.Log.LoggerFile,
+		MaxSize:    config.Log.LoggerMaxSize, // megabytes
+		MaxBackups: config.Log.LoggerMaxBackups,
+		MaxAge:     config.Log.LoggerMaxAge, // days
 	})
 
 	if runmode == "release" {
-		logger = InitProductionLogger(w)
+		InitProductionLogger(w)
 	} else {
-		logger = InitDevelopmentLogger(w)
+		InitDevelopmentLogger(w)
 	}
-
-	return logger
 }
 
 // InitProductionLogger init the logger for production environment
-func InitProductionLogger(w zapcore.WriteSyncer) *zap.Logger {
+func InitProductionLogger(w zapcore.WriteSyncer) {
 	highPriority := zap.LevelEnablerFunc(func(lvl zapcore.Level) bool {
 		return lvl >= zapcore.ErrorLevel
 	})
@@ -55,14 +52,12 @@ func InitProductionLogger(w zapcore.WriteSyncer) *zap.Logger {
 		w,
 		highPriority,
 	)
-	logger := zap.New(core)
+	logger = zap.New(core)
 	defer logger.Sync()
-
-	return logger
 }
 
 // InitDevelopmentLogger init the logger for development environment
-func InitDevelopmentLogger(w zapcore.WriteSyncer) *zap.Logger {
+func InitDevelopmentLogger(w zapcore.WriteSyncer) {
 	highPriority := zap.LevelEnablerFunc(func(lvl zapcore.Level) bool {
 		return lvl >= zapcore.ErrorLevel
 	})
@@ -83,10 +78,8 @@ func InitDevelopmentLogger(w zapcore.WriteSyncer) *zap.Logger {
 		zapcore.NewCore(consoleEncoder, consoleDebugging, lowPriority),
 		zapcore.NewCore(consoleEncoder, consoleErrors, highPriority),
 	)
-	logger := zap.New(core, zap.AddCaller(), zap.AddCallerSkip(1))
+	logger = zap.New(core, zap.AddCaller(), zap.AddCallerSkip(1))
 	defer logger.Sync()
-
-	return logger
 }
 
 func newPutiEncoderConfig() zapcore.EncoderConfig {
@@ -100,7 +93,7 @@ func newPutiEncoderConfig() zapcore.EncoderConfig {
 		StacktraceKey:  "stack-trace",
 		LineEnding:     zapcore.DefaultLineEnding,
 		EncodeLevel:    zapcore.CapitalLevelEncoder,
-		EncodeTime:     zapcore.ISO8601TimeEncoder,
+		EncodeTime:     zapcore.ISO8601TimeEncoder, // TODO 时区
 		EncodeDuration: zapcore.StringDurationEncoder,
 		EncodeCaller:   zapcore.ShortCallerEncoder,
 	}

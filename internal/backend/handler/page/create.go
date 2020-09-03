@@ -4,11 +4,12 @@ import (
 	"fmt"
 
 	Response "github.com/puti-projects/puti/internal/backend/handler"
-	"github.com/puti-projects/puti/internal/common/model"
-	"github.com/puti-projects/puti/internal/common/utils"
+	"github.com/puti-projects/puti/internal/model"
+	"github.com/puti-projects/puti/internal/pkg/db"
 	"github.com/puti-projects/puti/internal/pkg/errno"
 	"github.com/puti-projects/puti/internal/pkg/logger"
 	"github.com/puti-projects/puti/internal/pkg/token"
+	"github.com/puti-projects/puti/internal/utils"
 
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
@@ -68,7 +69,7 @@ func Create(c *gin.Context) {
 func handleCreate(r *CreateRequest, userID uint64) (rsp *CreateResponse, err error) {
 	rsp = new(CreateResponse)
 
-	tx := model.DB.Local.Begin()
+	tx := db.DBEngine.Begin()
 	defer func() {
 		if r := recover(); r != nil {
 			tx.Rollback()

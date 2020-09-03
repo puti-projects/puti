@@ -5,8 +5,9 @@ import (
 	"time"
 
 	"github.com/go-sql-driver/mysql"
-	"github.com/puti-projects/puti/internal/common/model"
-	"github.com/puti-projects/puti/internal/common/utils"
+	"github.com/puti-projects/puti/internal/model"
+	"github.com/puti-projects/puti/internal/pkg/db"
+	"github.com/puti-projects/puti/internal/utils"
 
 	"github.com/jinzhu/gorm"
 )
@@ -109,7 +110,7 @@ func GetSubjectInfo(subjectID uint64) (*SubjectDetail, error) {
 // UpdateSubject udpate subject info
 func UpdateSubject(subject *model.SubjectModel) error {
 	// begin transcation
-	tx := model.DB.Local.Begin()
+	tx := db.DBEngine.Begin()
 	defer func() {
 		if r := recover(); r != nil {
 			tx.Rollback()
@@ -281,7 +282,7 @@ func IfSubjectHasChild(subjectID uint64) bool {
 // DeleteSubject delete subject directly
 func DeleteSubject(subjectID uint64) error {
 	// begin transcation
-	tx := model.DB.Local.Begin()
+	tx := db.DBEngine.Begin()
 	defer func() {
 		if r := recover(); r != nil {
 			tx.Rollback()

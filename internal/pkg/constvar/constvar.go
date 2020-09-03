@@ -1,3 +1,6 @@
+// constvar const definition
+// the different compare with config const and constvar is these constvar would not change (fixed configuration)
+
 package constvar
 
 const (

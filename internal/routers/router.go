@@ -1,11 +1,10 @@
-package router
+package routers
 
 import (
 	"html/template"
 	"net/http"
 	"path/filepath"
 
-	"github.com/go-sql-driver/mysql"
 	apiHandler "github.com/puti-projects/puti/internal/backend/handler"
 	"github.com/puti-projects/puti/internal/backend/handler/article"
 	"github.com/puti-projects/puti/internal/backend/handler/auth"
@@ -17,25 +16,30 @@ import (
 	"github.com/puti-projects/puti/internal/backend/handler/taxonomy"
 	"github.com/puti-projects/puti/internal/backend/handler/user"
 	apiMiddleware "github.com/puti-projects/puti/internal/backend/middleware"
-	"github.com/puti-projects/puti/internal/common/config"
-	"github.com/puti-projects/puti/internal/common/utils"
 	webHandler "github.com/puti-projects/puti/internal/frontend/handler"
 	webMiddleware "github.com/puti-projects/puti/internal/frontend/middleware"
 	"github.com/puti-projects/puti/internal/pkg/logger"
 	optionCache "github.com/puti-projects/puti/internal/pkg/option"
 	"github.com/puti-projects/puti/internal/pkg/theme"
+	"github.com/spf13/viper"
 
 	"github.com/gin-gonic/gin"
-	"github.com/spf13/viper"
+	"github.com/go-sql-driver/mysql"
+	"github.com/puti-projects/puti/internal/pkg/config"
+	"github.com/puti-projects/puti/internal/utils"
 )
 
-// Load loads the middlewares, routes, handles.
-func Load(g *gin.Engine, mw ...gin.HandlerFunc) *gin.Engine {
-	currentTheme := optionCache.Options.Get("current_theme")
+func NewRouter() *gin.Engine {
+	// create the gin engine
+	g := gin.New()
 
 	g = setFuncMap(g)
 
-	g.Use(gin.Recovery())
+	// r.Use(gin.Logger())   // default logger middleware
+	g.Use(gin.Recovery()) // default recovery middleware
+
+	currentTheme := optionCache.Options.Get("current_theme")
+
 	if viper.GetString("runmode") == gin.DebugMode {
 		g.Use(apiMiddleware.Options)
 	}
@@ -62,7 +66,7 @@ func setFuncMap(g *gin.Engine) *gin.Engine {
 }
 
 // loadWeb load frontend and backend entrance(SPA web)
-func loadWeb(g *gin.Engine, currentTheme string) *gin.Engine {
+func loadWeb(g *gin.Engine, currentTheme string) {
 	// Group for backend
 	admin := g.Group("/admin")
 	admin.GET("", func(c *gin.Context) {
@@ -87,12 +91,10 @@ func loadWeb(g *gin.Engine, currentTheme string) *gin.Engine {
 
 	// no route handle
 	g.NoRoute(webMiddleware.Renderer, webHandler.ShowNotFound)
-
-	return g
 }
 
 // loadStatic load static resource
-func loadStatic(g *gin.Engine, currentTheme string) *gin.Engine {
+func loadStatic(g *gin.Engine, currentTheme string) {
 	// resource
 	g.Static("/static", config.StaticPath("console/static"))
 	g.Static("/uploads", config.StaticPath("uploads/"))
@@ -125,12 +127,10 @@ func loadStatic(g *gin.Engine, currentTheme string) *gin.Engine {
 	templates = append(templates, config.StaticPath("console/console.html"))
 	// load all files
 	g.LoadHTMLFiles(templates...)
-
-	return g
 }
 
 // loadAPI load api part
-func loadAPI(g *gin.Engine) *gin.Engine {
+func loadAPI(g *gin.Engine) {
 	// Group for api
 	api := g.Group("/api")
 
@@ -179,17 +179,13 @@ func loadAPI(g *gin.Engine) *gin.Engine {
 		api.PUT("/subject/:id", subject.Update)
 		api.DELETE("/subject/:id", subject.Delete)
 	}
-
-	return g
 }
 
 // loadHelthTest the health check handlers
-func loadHealthTest(g *gin.Engine) *gin.Engine {
+func loadHealthTest(g *gin.Engine) {
 	// Group for health check
 	svcd := g.Group("/check")
 	{
 		svcd.GET("/health", apiHandler.HealthCheck)
 	}
-
-	return g
 }

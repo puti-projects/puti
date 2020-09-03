@@ -1,11 +1,14 @@
 package service
 
-import "github.com/puti-projects/puti/internal/common/model"
+import (
+	"github.com/puti-projects/puti/internal/model"
+	"github.com/puti-projects/puti/internal/pkg/db"
+)
 
 // GetcategoryList get category tree for widget
 func GetcategoryList() (taxonomyTree []*model.ShowWidgetCategoryTreeNode, err error) {
 	var termTaxonomy []*model.TermTaxonomyModel
-	err = model.DB.Local.Where("taxonomy = ? AND term_id != ?", "category", model.DefaultUnCategorizedID).Preload("Term").Find(&termTaxonomy).Error
+	err = db.DBEngine.Where("taxonomy = ? AND term_id != ?", "category", model.DefaultUnCategorizedID).Preload("Term").Find(&termTaxonomy).Error
 	if err != nil {
 		return nil, err
 	}

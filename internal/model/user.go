@@ -3,6 +3,7 @@ package model
 import (
 	"github.com/puti-projects/puti/internal/pkg/auth"
 	"github.com/puti-projects/puti/internal/pkg/constvar"
+	"github.com/puti-projects/puti/internal/pkg/db"
 )
 
 // UserModel user model
@@ -26,7 +27,7 @@ func (c *UserModel) TableName() string {
 
 // Create creates a new user account
 func (c *UserModel) Create() error {
-	return DB.Local.Create(&c).Error
+	return db.DBEngine.Create(&c).Error
 }
 
 // Encrypt the user password.
@@ -38,14 +39,14 @@ func (c *UserModel) Encrypt() (err error) {
 // GetUser gets an user by the user identifier.
 func GetUser(username string) (*UserModel, error) {
 	u := &UserModel{}
-	d := DB.Local.Where("status = 1 AND deleted_time is null AND account = ?", username).First(&u)
+	d := db.DBEngine.Where("status = 1 AND deleted_time is null AND account = ?", username).First(&u)
 	return u, d.Error
 }
 
 // GetUserByID gets an user by ID
 func GetUserByID(id uint64) (*UserModel, error) {
 	u := &UserModel{}
-	d := DB.Local.Model(&UserModel{}).Where("`id` = ?", id).Find(&u)
+	d := db.DBEngine.Model(&UserModel{}).Where("`id` = ?", id).Find(&u)
 	return u, d.Error
 }
 
@@ -53,12 +54,12 @@ func GetUserByID(id uint64) (*UserModel, error) {
 func DeleteUser(id uint64) error {
 	user := UserModel{}
 	user.ID = id
-	return DB.Local.Delete(&user).Error
+	return db.DBEngine.Delete(&user).Error
 }
 
 // Update updates an user account information.
 func (c *UserModel) Update() (err error) {
-	return DB.Local.Model(&UserModel{}).Save(c).Error
+	return db.DBEngine.Model(&UserModel{}).Save(c).Error
 }
 
 // ListUser List all users
@@ -87,12 +88,12 @@ func ListUser(username, role string, number, page, status int) ([]*UserModel, ui
 		whereArgs = append(whereArgs, status)
 	}
 
-	if err := DB.Local.Model(&UserModel{}).Where(where, whereArgs...).Count(&count).Error; err != nil {
+	if err := db.DBEngine.Model(&UserModel{}).Where(where, whereArgs...).Count(&count).Error; err != nil {
 		return users, count, err
 	}
 
 	offset := (page - 1) * number
-	if err := DB.Local.Where(where, whereArgs...).Offset(offset).Limit(number).Order("id desc").Find(&users).Error; err != nil {
+	if err := db.DBEngine.Where(where, whereArgs...).Offset(offset).Limit(number).Order("id desc").Find(&users).Error; err != nil {
 		return users, count, err
 	}
 

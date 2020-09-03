@@ -3,8 +3,8 @@ package service
 import (
 	"sync"
 
-	"github.com/puti-projects/puti/internal/common/config"
-	"github.com/puti-projects/puti/internal/common/model"
+	"github.com/puti-projects/puti/internal/model"
+	"github.com/puti-projects/puti/internal/pkg/config"
 )
 
 // MediaInfo is the media struct for media list

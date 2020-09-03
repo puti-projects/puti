@@ -3,7 +3,7 @@ package utils
 import (
 	"time"
 
-	"github.com/puti-projects/puti/internal/common/config"
+	"github.com/puti-projects/puti/internal/pkg/config"
 
 	"github.com/go-sql-driver/mysql"
 )

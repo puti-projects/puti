@@ -339,7 +339,7 @@ function getRelocatable(re) {
     // https://people.mozilla.org/~jorendorff/es6-draft.html#sec-patterns
     var source = re.source + "|()";
 
-    // We always make the new regex global.
+    // We always make the new regex config.
     var flags = "g" + (re.ignoreCase ? "i" : "") + (re.multiline ? "m" : "") + (re.unicode ? "u" : "")
     // sticky (/.../y) doesn't make sense in conjunction with our relocation
     // logic, so we ignore it here.

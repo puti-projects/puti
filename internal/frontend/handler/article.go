@@ -5,8 +5,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/puti-projects/puti/internal/common/utils"
 	"github.com/puti-projects/puti/internal/frontend/service"
+	"github.com/puti-projects/puti/internal/pkg/counter"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
@@ -112,7 +112,7 @@ func ShowArticleDetail(c *gin.Context) {
 		return
 	}
 
-	utils.CounterCache.CountOne(c.ClientIP(), aID)
+	counter.CounterCache.CountOne(c.ClientIP(), aID)
 
 	renderData["Article"] = articleDetail
 	renderData["LastArticle"] = service.GetLastArticle(aID)

@@ -4,23 +4,21 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 	"time"
 
-	"github.com/puti-projects/puti/internal/common/config"
-	"github.com/puti-projects/puti/internal/common/model"
-	"github.com/puti-projects/puti/internal/common/router"
+	"github.com/puti-projects/puti/internal/pkg/config"
+	"github.com/puti-projects/puti/internal/pkg/counter"
+	"github.com/puti-projects/puti/internal/pkg/db"
 	"github.com/puti-projects/puti/internal/pkg/logger"
 	"github.com/puti-projects/puti/internal/pkg/option"
 	"github.com/puti-projects/puti/internal/pkg/theme"
-	"github.com/puti-projects/puti/internal/pkg/tickers"
 	v "github.com/puti-projects/puti/internal/pkg/version"
+	"github.com/puti-projects/puti/internal/routers"
 
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/pflag"
-	"github.com/spf13/viper"
 	"go.uber.org/zap"
 )
 
@@ -46,16 +44,23 @@ func init() {
 		return
 	}
 
-	// load config include logger
-	config.Init(*configPath)
+	// set up config
+	err := config.InitConfig(*configPath)
+	if err != nil {
+		panic(fmt.Sprintf("setupConfig err: %v", err))
+	}
+
+	// set up logger
+	logger.InitLogger(config.Server.Runmode)
+	logger.Info("logger construction succeeded")
 
 	// load theme path
 	theme.LoadInstalled()
 
 	// Set gin mode.
-	if "debug" == viper.GetString("runmode") {
+	if "debug" == config.Server.Runmode {
 		gin.SetMode(gin.DebugMode)
-	} else if "test" == viper.GetString("runmode") {
+	} else if "test" == config.Server.Runmode {
 		gin.SetMode(gin.TestMode)
 	} else {
 		gin.SetMode(gin.ReleaseMode)
@@ -64,51 +69,60 @@ func init() {
 
 func main() {
 	// init db
-	model.DB.Init()
-	defer model.DB.Close()
+	if err := db.InitDB(); err != nil {
+		logger.Errorf("sql.Open() error(%v)", err)
+		panic(fmt.Sprintf("database connection failed. err: %v", err))
+	}
+	defer db.DBEngine.Close()
 
 	// load default options
 	option.LoadOptions()
 
-	// create the gin engine
-	g := gin.New()
-
-	// routes
-	router.Load(g)
+	// routers
+	router := routers.NewRouter()
 
 	// Ping the server to make sure the router is working.
 	go func() {
 		if err := pingServer(); err != nil {
-			log.Fatal("The router has no response, or it might took too long to start up", err)
+			logger.Fatal("The router has no response, or it might took too long to start up. Error Detail:" + err.Error())
 		}
 		logger.Info("the router has been deployed successfully")
 	}()
 
 	// init ticker
-	tickers.InitCountTicker()
+	counter.InitCountTicker()
 
 	// If open https, start listening https request
-	if true == viper.GetBool("tls.https_open") {
-		cert := viper.GetString("tls.cert")
-		key := viper.GetString("tls.key")
+	if true == config.Server.HttpsOpen {
+		cert := config.Server.TlsCert
+		key := config.Server.TlsKey
 		if cert != "" && key != "" {
 			go func() {
-				logger.Info("start to listening the incoming https requests", zap.String("port", viper.GetString("tls.addr")))
-				logger.Info(http.ListenAndServeTLS("0.0.0.0:"+viper.GetString("tls.addr"), cert, key, g).Error())
+				logger.Info("start to listening the incoming https requests", zap.String("port", config.Server.HttpsPort))
+				logger.Info(
+					http.ListenAndServeTLS(
+						"0.0.0.0:"+config.Server.HttpsPort,
+						cert,
+						key,
+						router,
+					).Error())
 			}()
 		} else {
 			logger.Errorf("cert and key can not be empty, failed to listen https port")
 		}
 	}
-	logger.Info("start to listening the incoming http requests", zap.String("port", viper.GetString("addr")))
-	logger.Info(http.ListenAndServe("0.0.0.0:"+viper.GetString("addr"), g).Error())
+	logger.Info("start to listening the incoming http requests", zap.String("port", config.Server.HttpPort))
+	logger.Info(http.ListenAndServe(
+		"0.0.0.0:"+config.Server.HttpPort,
+		router,
+	).Error())
 }
 
 // pingServer pings the http server to make sure the service is working.
 func pingServer() error {
-	for i := 0; i < viper.GetInt("ping_max_num"); i++ {
+	for i := 0; i < config.Server.PingMaxNum; i++ {
 		// Ping the server by sending a GET request to `/health`.
-		resp, err := http.Get(viper.GetString("ping_url") + "/check/health")
+		resp, err := http.Get(config.Server.PingUrl + "/check/health")
 		if err == nil && resp.StatusCode == 200 {
 			return nil
 		}

@@ -1,6 +1,9 @@
 package model
 
-import "github.com/go-sql-driver/mysql"
+import (
+	"github.com/go-sql-driver/mysql"
+	"github.com/puti-projects/puti/internal/pkg/db"
+)
 
 // SubjectModel the definition of subject model
 type SubjectModel struct {
@@ -23,12 +26,12 @@ func (c *SubjectModel) TableName() string {
 
 // Create creates a new subject
 func (c *SubjectModel) Create() error {
-	return DB.Local.Create(&c).Error
+	return db.DBEngine.Create(&c).Error
 }
 
 // Update update subject
 func (c *SubjectModel) Update() (err error) {
-	if err = DB.Local.Model(&SubjectModel{}).Save(c).Error; err != nil {
+	if err = db.DBEngine.Model(&SubjectModel{}).Save(c).Error; err != nil {
 		return err
 	}
 
@@ -38,14 +41,14 @@ func (c *SubjectModel) Update() (err error) {
 // GetSubjectByID get subject info by ID
 func GetSubjectByID(id uint64) (*SubjectModel, error) {
 	s := &SubjectModel{}
-	result := DB.Local.Where("id = ?", id).First(&s)
+	result := db.DBEngine.Where("id = ?", id).First(&s)
 	return s, result.Error
 }
 
 // GetAllSubjects get all subjects
 func GetAllSubjects() ([]*SubjectModel, error) {
 	var subjects []*SubjectModel
-	result := DB.Local.Find(&subjects)
+	result := db.DBEngine.Find(&subjects)
 
 	return subjects, result.Error
 }
@@ -54,7 +57,7 @@ func GetAllSubjects() ([]*SubjectModel, error) {
 func SubjectCheckNameExistWhileCreate(name string) bool {
 	count := 0
 	subjectModel := &SubjectModel{}
-	DB.Local.Table(subjectModel.TableName()).
+	db.DBEngine.Table(subjectModel.TableName()).
 		Where("`name` = ?", name).
 		Count(&count)
 
@@ -69,7 +72,7 @@ func SubjectCheckNameExistWhileCreate(name string) bool {
 func SubjectCheckNameExistWhileUpdate(subjectID uint64, name string) bool {
 	count := 0
 	subjectModel := &SubjectModel{}
-	DB.Local.Table(subjectModel.TableName()).
+	db.DBEngine.Table(subjectModel.TableName()).
 		Where("`id` != ? AND `name` = ?", subjectID, name).
 		Count(&count)
 
@@ -82,6 +85,6 @@ func SubjectCheckNameExistWhileUpdate(subjectID uint64, name string) bool {
 
 // GetSubjectChildrenNumber calcuelate the total number of subject's children
 func GetSubjectChildrenNumber(subjectID uint64) (count int) {
-	DB.Local.Model(&SubjectModel{}).Where("`parent_id` = ?", subjectID).Count(&count)
+	db.DBEngine.Model(&SubjectModel{}).Where("`parent_id` = ?", subjectID).Count(&count)
 	return count
 }

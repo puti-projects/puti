@@ -200,6 +200,6 @@ Puti is a project by
 
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
-## License
+## License [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fputi-projects%2Fputi.svg?type=small)](https://app.fossa.com/projects/git%2Bgithub.com%2Fputi-projects%2Fputi?ref=badge_small)
 
-[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fputi-projects%2Fputi.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fputi-projects%2Fputi?ref=badge_large)
+Puti is under the GPL-3.0 license. See the [LICENSE](https://github.com/puti-projects/puti/blob/master/LICENSE) file for details.

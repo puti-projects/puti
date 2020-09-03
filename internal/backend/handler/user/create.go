@@ -2,9 +2,9 @@ package user
 
 import (
 	Response "github.com/puti-projects/puti/internal/backend/handler"
-	"github.com/puti-projects/puti/internal/common/model"
-	"github.com/puti-projects/puti/internal/common/utils"
+	"github.com/puti-projects/puti/internal/model"
 	"github.com/puti-projects/puti/internal/pkg/errno"
+	"github.com/puti-projects/puti/internal/utils"
 
 	"github.com/gin-gonic/gin"
 	"github.com/puti-projects/puti/internal/pkg/logger"

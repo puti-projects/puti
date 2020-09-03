@@ -1,8 +1,8 @@
 package handler
 
 import (
-	"github.com/puti-projects/puti/internal/common/model"
 	"github.com/puti-projects/puti/internal/frontend/service"
+	"github.com/puti-projects/puti/internal/model"
 	"github.com/puti-projects/puti/internal/pkg/logger"
 )
 

@@ -9,11 +9,12 @@ import (
 	"sync"
 
 	"github.com/go-sql-driver/mysql"
-	"github.com/puti-projects/puti/internal/common/config"
-	"github.com/puti-projects/puti/internal/common/model"
-	"github.com/puti-projects/puti/internal/common/utils"
+	"github.com/puti-projects/puti/internal/model"
+	"github.com/puti-projects/puti/internal/pkg/config"
+	"github.com/puti-projects/puti/internal/pkg/db"
 	"github.com/puti-projects/puti/internal/pkg/logger"
 	optionCache "github.com/puti-projects/puti/internal/pkg/option"
+	"github.com/puti-projects/puti/internal/utils"
 )
 
 // List post list
@@ -31,7 +32,7 @@ func GetArticleListByTaxonomy(currentPage int, taxonomyType, taxonomySlug, keywo
 
 	// get term id
 	var termTaxonomyID uint64
-	getTermTaxonomyID := model.DB.Local.Table("pt_term t").
+	getTermTaxonomyID := db.DBEngine.Table("pt_term t").
 		Select("t.`name`, tt.`term_taxonomy_id`").
 		Joins("INNER JOIN pt_term_taxonomy tt ON tt.term_id = t.term_id").
 		Where("t.`slug` = ? AND tt.`taxonomy` = ?", taxonomySlug, taxonomyType).
@@ -47,7 +48,7 @@ func GetArticleListByTaxonomy(currentPage int, taxonomyType, taxonomySlug, keywo
 	}
 
 	articles := []*model.PostModel{}
-	result := model.DB.Local.Table("pt_post p").
+	result := db.DBEngine.Table("pt_post p").
 		Select("p.`id`, p.`title`, p.`if_top`, p.`content_html`, p.`guid`, p.`cover_picture`, p.`comment_count`, p.`view_count`, p.`posted_time`").
 		Joins("INNER JOIN pt_term_relationships tr ON tr.object_id = p.id").
 		Unscoped().
@@ -146,7 +147,7 @@ func GetArticleList(currentPage int, keyword string) (articleResult []*model.Sho
 	}
 
 	articles := []*model.PostModel{}
-	result := model.DB.Local.Model(&model.PostModel{}).
+	result := db.DBEngine.Model(&model.PostModel{}).
 		Select("`id`, `title`, `if_top`, `content_html`, `guid`, `cover_picture`, `comment_count`, `view_count`, `posted_time`").
 		Where(where, whereArgs...).Count(&count).
 		Order("`if_top` DESC, `posted_time` DESC").
@@ -230,7 +231,7 @@ func GetArticleList(currentPage int, keyword string) (articleResult []*model.Sho
 
 func getArticleTaxonomyInfo(articleID uint64, siteURL string) ([]*model.ShowCategory, []*model.ShowTag, error) {
 	sql := "SELECT t.`name`, t.`slug`, tt.`taxonomy` FROM pt_term t LEFT JOIN pt_term_taxonomy tt ON tt.`term_id` = t.`term_id` LEFT JOIN pt_term_relationships tr ON tr.`term_taxonomy_id` = tt.`term_taxonomy_id` WHERE tr.`object_id` = ?"
-	rows, err := model.DB.Local.Raw(sql, articleID).Rows()
+	rows, err := db.DBEngine.Raw(sql, articleID).Rows()
 	if err != nil {
 		return nil, nil, err
 	}
@@ -281,7 +282,7 @@ func GetLatestArticlesList(getNums int) ([]*model.ShowWidgetLatestArticles, erro
 
 	articles := []*model.ShowWidgetLatestArticles{}
 	postModel := &model.PostModel{}
-	result := model.DB.Local.Table(postModel.TableName()).
+	result := db.DBEngine.Table(postModel.TableName()).
 		Select("`id`, `title`, `guid`, `comment_count`, `view_count`, `posted_time`").
 		Where(where, whereArgs...).
 		Order("`posted_time` DESC").
@@ -298,7 +299,7 @@ func GetLatestArticlesList(getNums int) ([]*model.ShowWidgetLatestArticles, erro
 // GetArticleDetailByID get article detail by article id
 func GetArticleDetailByID(articleID uint64) (*model.ShowArticleDetail, error) {
 	a := &model.PostModel{}
-	err := model.DB.Local.Where("id = ? AND post_type = ? AND parent_id = ? AND status =?", articleID, model.PostTypeArticle, 0, model.PostStatusPublish).First(&a).Error
+	err := db.DBEngine.Where("id = ? AND post_type = ? AND parent_id = ? AND status =?", articleID, model.PostTypeArticle, 0, model.PostStatusPublish).First(&a).Error
 	if err != nil {
 		return nil, err
 	}
@@ -340,7 +341,7 @@ func GetLastArticle(currentArticleID uint64) *model.ShowLastOrNextArticle {
 	var title string
 	var url string
 	postModel := &model.PostModel{}
-	row := model.DB.Local.Table(postModel.TableName()).
+	row := db.DBEngine.Table(postModel.TableName()).
 		Where("`id` < ? AND `post_type` = ? AND `parent_id` = ? AND `status` = ? AND `deleted_time` IS NULL", currentArticleID, model.PostTypeArticle, 0, model.PostStatusPublish).
 		Select("`title`, `guid`").Order("`id` DESC").Row()
 	row.Scan(&title, &url)
@@ -358,7 +359,7 @@ func GetNextArticle(currentArticleID uint64) *model.ShowLastOrNextArticle {
 	var title string
 	var url string
 	postModel := &model.PostModel{}
-	row := model.DB.Local.Table(postModel.TableName()).
+	row := db.DBEngine.Table(postModel.TableName()).
 		Where("`id` > ? AND `post_type` = ? AND `parent_id` = ? AND `status` = ? AND `deleted_time` IS NULL", currentArticleID, model.PostTypeArticle, 0, model.PostStatusPublish).
 		Select("`title`, `guid`").Order("`id` ASC").Row()
 	row.Scan(&title, &url)
@@ -377,7 +378,7 @@ func GetSubjectArticleList(subjectID uint64) ([]*map[string]interface{}, error) 
 
 	postModel := &model.PostModel{}
 	srModel := &model.SubjectRelationshipsModel{}
-	rows, err := model.DB.Local.Table(postModel.TableName()+" p").
+	rows, err := db.DBEngine.Table(postModel.TableName()+" p").
 		Select("p.`id`, p.`title`, p.`guid`, p.`comment_count`, p.`view_count`, p.`posted_time`").
 		Joins("INNER JOIN "+srModel.TableName()+" sr ON sr.`object_id` = p.`id`").
 		Where("p.`post_type` = ? AND p.`parent_id` = ? AND p.`status` = ? AND sr.`subject_id` = ? AND p.`deleted_time` is null",

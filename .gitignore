@@ -29,3 +29,7 @@ configs/config.yaml
 
 # the theme building path
 puti-themes/
+
+# macOS
+.DS_Store 
+*/.DS_Store 

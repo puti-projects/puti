@@ -3,10 +3,10 @@ package option
 import (
 	Response "github.com/puti-projects/puti/internal/backend/handler"
 	"github.com/puti-projects/puti/internal/backend/service"
-	"github.com/puti-projects/puti/internal/common/config"
-	"github.com/puti-projects/puti/internal/common/utils"
+	"github.com/puti-projects/puti/internal/pkg/config"
 	"github.com/puti-projects/puti/internal/pkg/errno"
 	"github.com/puti-projects/puti/internal/pkg/theme"
+	"github.com/puti-projects/puti/internal/utils"
 
 	"github.com/gin-gonic/gin"
 )

@@ -1,6 +1,9 @@
 package model
 
-import "github.com/go-sql-driver/mysql"
+import (
+	"github.com/go-sql-driver/mysql"
+	"github.com/puti-projects/puti/internal/pkg/db"
+)
 
 // PostModel is the struct model for post
 type PostModel struct {
@@ -57,21 +60,21 @@ func (c *PostMetaModel) TableName() string {
 // GetPost gets the post by post id
 func GetPost(postID uint64) (*PostModel, error) {
 	a := &PostModel{}
-	d := DB.Local.Where("id = ? AND deleted_time is null", postID).First(&a)
+	d := db.DBEngine.Where("id = ? AND deleted_time is null", postID).First(&a)
 	return a, d.Error
 }
 
 // GetPostMetaData gets the extral data of post
 func GetPostMetaData(postID uint64) ([]*PostMetaModel, error) {
 	am := []*PostMetaModel{}
-	d := DB.Local.Where("post_id = ?", postID).Find(&am)
+	d := db.DBEngine.Where("post_id = ?", postID).Find(&am)
 	return am, d.Error
 }
 
 // GetOnePostMetaData get one specific meta by metakey and post id
 func GetOnePostMetaData(postID uint64, metaKey string) (*PostMetaModel, error) {
 	am := &PostMetaModel{}
-	d := DB.Local.Where("post_id = ? AND meta_key = ?", postID, metaKey).First(&am)
+	d := db.DBEngine.Where("post_id = ? AND meta_key = ?", postID, metaKey).First(&am)
 	return am, d.Error
 }
 
@@ -92,7 +95,7 @@ func ListPost(postType, title string, page, number int, sort, status string) ([]
 		whereArgs = append(whereArgs, status)
 	}
 
-	if err := DB.Local.Model(&PostModel{}).Where(where, whereArgs...).Count(&count).Error; err != nil {
+	if err := db.DBEngine.Model(&PostModel{}).Where(where, whereArgs...).Count(&count).Error; err != nil {
 		return posts, count, err
 	}
 
@@ -104,7 +107,7 @@ func ListPost(postType, title string, page, number int, sort, status string) ([]
 		order = "id DESC"
 	}
 
-	if err := DB.Local.Where(where, whereArgs...).Offset(offset).Limit(number).Order(order).Find(&posts).Error; err != nil {
+	if err := db.DBEngine.Where(where, whereArgs...).Offset(offset).Limit(number).Order(order).Find(&posts).Error; err != nil {
 		return posts, count, err
 	}
 
@@ -117,9 +120,9 @@ func PageCheckSlugExist(pageID uint64, Slug string) bool {
 
 	var ifNotFound bool
 	if pageID > 0 {
-		ifNotFound = DB.Local.Where("id != ? AND slug = ?", pageID, Slug).First(&post).RecordNotFound()
+		ifNotFound = db.DBEngine.Where("id != ? AND slug = ?", pageID, Slug).First(&post).RecordNotFound()
 	} else {
-		ifNotFound = DB.Local.Where("slug = ?", Slug).First(&post).RecordNotFound()
+		ifNotFound = db.DBEngine.Where("slug = ?", Slug).First(&post).RecordNotFound()
 	}
 
 	if ifNotFound {

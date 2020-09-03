@@ -3,7 +3,8 @@ package service
 import (
 	"strconv"
 
-	"github.com/puti-projects/puti/internal/common/model"
+	"github.com/puti-projects/puti/internal/model"
+	"github.com/puti-projects/puti/internal/pkg/db"
 
 	"github.com/jinzhu/gorm"
 )
@@ -93,7 +94,7 @@ func GetTaxonomyInfo(termID string) (*TermInfo, error) {
 // reset the parent's count number and child's level
 func UpdateTaxonomy(term *model.TermModel, termTaxonomy *model.TermTaxonomyModel, taxonomyType string) (err error) {
 	// begin transcation
-	tx := model.DB.Local.Begin()
+	tx := db.DBEngine.Begin()
 	defer func() {
 		if r := recover(); r != nil {
 			tx.Rollback()
@@ -237,7 +238,7 @@ func IfTaxonomyHasChild(termID uint64, taxonomyType string) bool {
 // DeleteTaxonomy delete term directly
 func DeleteTaxonomy(termID uint64, taxonomyType string) error {
 	// begin transcation
-	tx := model.DB.Local.Begin()
+	tx := db.DBEngine.Begin()
 	defer func() {
 		if r := recover(); r != nil {
 			tx.Rollback()

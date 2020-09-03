@@ -5,8 +5,9 @@ import (
 	"sync"
 
 	"github.com/go-sql-driver/mysql"
-	"github.com/puti-projects/puti/internal/common/model"
-	"github.com/puti-projects/puti/internal/common/utils"
+	"github.com/puti-projects/puti/internal/model"
+	"github.com/puti-projects/puti/internal/pkg/db"
+	"github.com/puti-projects/puti/internal/utils"
 )
 
 // SubjectList subject list
@@ -43,7 +44,7 @@ type ChildrenSubejctsResult struct {
 func GetChildrenSubejcts(parentID uint64) (subjectResult []*model.ShowSubjectList, err error) {
 	subjects := make([]*ChildrenSubejctsResult, 0)
 	subjectModel := &model.SubjectModel{}
-	rows, err := model.DB.Local.Table(subjectModel.TableName()+" s").
+	rows, err := db.DBEngine.Table(subjectModel.TableName()+" s").
 		Select("s.`id`, s.`parent_id`, s.`name`, s.`slug`, s.`description`, r.`guid` as cover_image_url, s.`count`, s.`last_updated`").
 		Joins("LEFT JOIN pt_resource r ON r.id = s.`cover_image`").
 		Where("s.`parent_id` = ? AND s.`deleted_time` is null", parentID).
@@ -55,7 +56,7 @@ func GetChildrenSubejcts(parentID uint64) (subjectResult []*model.ShowSubjectLis
 	for rows.Next() {
 		subject := &ChildrenSubejctsResult{}
 		// ScanRows scan a row into subject
-		if err := model.DB.Local.ScanRows(rows, &subject); err != nil {
+		if err := db.DBEngine.ScanRows(rows, &subject); err != nil {
 			return nil, err
 		}
 
@@ -135,7 +136,7 @@ func getDifferDayBetweenLastUpdatedTimeAndNow(lastUpdatedTime *mysql.NullTime) s
 func GetSubjectInfoBySlug(subjectSlug string) (*model.ShowSubjectInfo, error) {
 	subjectResult := &SubejctInfoResult{}
 	subjectModel := &model.SubjectModel{}
-	result := model.DB.Local.Table(subjectModel.TableName()+" s").
+	result := db.DBEngine.Table(subjectModel.TableName()+" s").
 		Select("s.`id`, s.`parent_id`, s.`name`, s.`slug`, s.`description`, r.`guid` as cover_image_url, s.`count`").
 		Joins("LEFT JOIN pt_resource r ON r.id = s.`cover_image`").
 		Where("s.`slug` = ? AND s.`deleted_time` is null", subjectSlug).

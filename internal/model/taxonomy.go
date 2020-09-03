@@ -1,5 +1,7 @@
 package model
 
+import "github.com/puti-projects/puti/internal/pkg/db"
+
 // TermTaxonomyModel `pt_term_taxonomy`'s struct using GORM Has-One model
 type TermTaxonomyModel struct {
 	ID           uint64    `gorm:"column:term_taxonomy_id;not null;primary_key"`
@@ -35,28 +37,28 @@ func (c *TermModel) TableName() string {
 
 // Create creates a new taxonomy term
 func (c *TermModel) Create() error {
-	return DB.Local.Create(&c).Error
+	return db.DBEngine.Create(&c).Error
 }
 
 // Update updates the taxonomy term
 func (c *TermModel) Update() error {
-	return DB.Local.Model(&TermModel{}).Save(c).Error
+	return db.DBEngine.Model(&TermModel{}).Save(c).Error
 }
 
 // Create creates a new taxonomy
 func (c *TermTaxonomyModel) Create() error {
-	return DB.Local.Create(&c).Error
+	return db.DBEngine.Create(&c).Error
 }
 
 // Update updates the taxonomy term taxonomy
 func (c *TermTaxonomyModel) Update() (err error) {
-	return DB.Local.Model(&TermTaxonomyModel{}).Save(c).Error
+	return db.DBEngine.Model(&TermTaxonomyModel{}).Save(c).Error
 }
 
 // GetAllTermsByType gets terms and taxonomy_terms by type(category, tag)
 func GetAllTermsByType(taxomonyType string) ([]*TermTaxonomyModel, error) {
 	var termTaxonomys []*TermTaxonomyModel
-	result := DB.Local.Where("taxonomy = ?", taxomonyType).Preload("Term").Find(&termTaxonomys)
+	result := db.DBEngine.Where("taxonomy = ?", taxomonyType).Preload("Term").Find(&termTaxonomys)
 
 	return termTaxonomys, result.Error
 }
@@ -65,19 +67,19 @@ func GetAllTermsByType(taxomonyType string) ([]*TermTaxonomyModel, error) {
 func GetTermsInfo(termID uint64) (*TermTaxonomyModel, error) {
 	termTaxonomy := &TermTaxonomyModel{}
 
-	model := DB.Local.Where("term_id = ?", termID).First(&termTaxonomy)
+	model := db.DBEngine.Where("term_id = ?", termID).First(&termTaxonomy)
 	if model.Error != nil {
 		return nil, model.Error
 	}
 
-	result := DB.Local.Model(&termTaxonomy).Related(&termTaxonomy.Term, "TermID")
+	result := db.DBEngine.Model(&termTaxonomy).Related(&termTaxonomy.Term, "TermID")
 	return termTaxonomy, result.Error
 }
 
 // TaxonomyCheckNameExist check the taxonomy name if is already exist
 func TaxonomyCheckNameExist(name, taxonomy string) bool {
 	count := 0
-	DB.Local.Table("pt_term t").
+	db.DBEngine.Table("pt_term t").
 		Select("t.term_id, t.name").
 		Joins("inner join pt_term_taxonomy tt on tt.term_id = t.term_id").
 		Where("t.name = ? AND tt.taxonomy = ?", name, taxonomy).
@@ -95,7 +97,7 @@ func GetTaxonomyLevel(parentID uint64, taxonomy string) (level uint64, err error
 	if taxonomy == "category" && parentID != 0 {
 		// get parent level
 		termTaxonomy := &TermTaxonomyModel{}
-		d := DB.Local.Where("term_id = ? AND taxonomy = 'category'", parentID).First(&termTaxonomy)
+		d := db.DBEngine.Where("term_id = ? AND taxonomy = 'category'", parentID).First(&termTaxonomy)
 
 		return termTaxonomy.Level + 1, d.Error
 	}
@@ -106,7 +108,7 @@ func GetTaxonomyLevel(parentID uint64, taxonomy string) (level uint64, err error
 // GetTermByID get term info by term_id
 func GetTermByID(termID uint64) (*TermModel, error) {
 	m := &TermModel{}
-	d := DB.Local.Where("term_id = ?", termID).First(&m)
+	d := db.DBEngine.Where("term_id = ?", termID).First(&m)
 	return m, d.Error
 }
 
@@ -114,11 +116,11 @@ func GetTermByID(termID uint64) (*TermModel, error) {
 func GetTermTaxonomy(termID uint64, taxonomyType string) (*TermTaxonomyModel, error) {
 	m := &TermTaxonomyModel{}
 	if taxonomyType == "" {
-		d := DB.Local.Where("term_id = ?", termID).First(&m)
+		d := db.DBEngine.Where("term_id = ?", termID).First(&m)
 		return m, d.Error
 	}
 
-	d := DB.Local.Where("term_id = ? AND taxonomy = ?", termID, taxonomyType).First(&m)
+	d := db.DBEngine.Where("term_id = ? AND taxonomy = ?", termID, taxonomyType).First(&m)
 	return m, d.Error
 }
 
@@ -129,6 +131,6 @@ func GetTermChildrenNumber(termID uint64, taxonomyType string) (count int) {
 		return count
 	}
 
-	DB.Local.Model(&TermTaxonomyModel{}).Where("parent_term_id = ? AND taxonomy = ?", termID, taxonomyType).Count(&count)
+	db.DBEngine.Model(&TermTaxonomyModel{}).Where("parent_term_id = ? AND taxonomy = ?", termID, taxonomyType).Count(&count)
 	return count
 }

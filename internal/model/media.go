@@ -1,7 +1,8 @@
 package model
 
 import (
-	"github.com/puti-projects/puti/internal/common/utils"
+	"github.com/puti-projects/puti/internal/pkg/db"
+	"github.com/puti-projects/puti/internal/utils"
 
 	"github.com/jinzhu/gorm"
 )
@@ -46,12 +47,12 @@ func (c *MediaModel) BeforeCreate(scope *gorm.Scope) error {
 
 // Create save the new media file info
 func (c *MediaModel) Create() error {
-	return DB.Local.Create(&c).Error
+	return db.DBEngine.Create(&c).Error
 }
 
 // Update update media info
 func (c *MediaModel) Update() (err error) {
-	if err = DB.Local.Model(&MediaModel{}).Save(c).Error; err != nil {
+	if err = db.DBEngine.Model(&MediaModel{}).Save(c).Error; err != nil {
 		return err
 	}
 
@@ -62,7 +63,7 @@ func (c *MediaModel) Update() (err error) {
 func DeleteMedia(id uint64) error {
 	media := MediaModel{}
 	media.ID = id
-	return DB.Local.Delete(&media).Error
+	return db.DBEngine.Delete(&media).Error
 }
 
 // ListMedia returns the media list in condition
@@ -71,12 +72,12 @@ func ListMedia(limit, page int) ([]*MediaModel, uint64, error) {
 	var count uint64
 
 	where := "deleted_time is null"
-	if err := DB.Local.Model(&MediaModel{}).Where(where).Count(&count).Error; err != nil {
+	if err := db.DBEngine.Model(&MediaModel{}).Where(where).Count(&count).Error; err != nil {
 		return medias, count, err
 	}
 
 	offset := (page - 1) * limit
-	if err := DB.Local.Where(where).Offset(offset).Limit(limit).Order("created_time DESC").Find(&medias).Error; err != nil {
+	if err := db.DBEngine.Where(where).Offset(offset).Limit(limit).Order("created_time DESC").Find(&medias).Error; err != nil {
 		return medias, count, err
 	}
 
@@ -86,6 +87,6 @@ func ListMedia(limit, page int) ([]*MediaModel, uint64, error) {
 // GetMediaByID get media info by id
 func GetMediaByID(id uint64) (*MediaModel, error) {
 	m := &MediaModel{}
-	d := DB.Local.Where("status = 1 AND deleted_time is null AND id = ?", id).First(&m)
+	d := db.DBEngine.Where("status = 1 AND deleted_time is null AND id = ?", id).First(&m)
 	return m, d.Error
 }

@@ -1,10 +1,10 @@
-package tickers
+package counter
 
 import (
 	"time"
 
-	"github.com/puti-projects/puti/internal/common/model"
-	"github.com/puti-projects/puti/internal/common/utils"
+	"github.com/puti-projects/puti/internal/model"
+	"github.com/puti-projects/puti/internal/pkg/db"
 	"github.com/puti-projects/puti/internal/pkg/logger"
 
 	"github.com/jinzhu/gorm"
@@ -27,15 +27,15 @@ func InitCountTicker() {
 		for {
 			select {
 			case <-countTickerChan:
-				if counterCache, found := utils.CounterCache.GetCounterCache(); found {
+				if counterCache, found := CounterCache.GetCounterCache(); found {
 					for postID, number := range counterCache {
-						err := model.DB.Local.Model(&model.PostModel{}).Where("`id` = ?", postID).Update("view_count", gorm.Expr("view_count + ?", number)).Error
+						err := db.DBEngine.Model(&model.PostModel{}).Where("`id` = ?", postID).Update("view_count", gorm.Expr("view_count + ?", number)).Error
 						if err != nil {
 							logger.Errorf("ticker: post count falied to update into database. %s", err)
 						}
-						utils.CounterCache.DeleteCounterCache(utils.GetPostCounterIPPoolKey(postID))
+						CounterCache.DeleteCounterCache(GetPostCounterIPPoolKey(postID))
 					}
-					utils.CounterCache.DeleteCounterCache(utils.PostCounterKey)
+					CounterCache.DeleteCounterCache(PostCounterKey)
 				}
 			case <-CountTickerStopChan:
 				logger.Info("Ticker will be Stop")

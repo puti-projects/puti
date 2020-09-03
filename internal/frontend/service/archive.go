@@ -3,9 +3,10 @@ package service
 import (
 	"sort"
 
-	"github.com/puti-projects/puti/internal/common/model"
-	"github.com/puti-projects/puti/internal/common/utils"
+	"github.com/puti-projects/puti/internal/model"
+	"github.com/puti-projects/puti/internal/pkg/db"
 	"github.com/puti-projects/puti/internal/pkg/logger"
+	"github.com/puti-projects/puti/internal/utils"
 )
 
 // GetArchive get archive list and list sort
@@ -15,7 +16,7 @@ func GetArchive() (map[string]map[string][]*model.ShowArchive, []string, map[str
 	where := "`post_type` = ? AND `parent_id` = ? AND `status` = ?"
 	whereArgs := []interface{}{model.PostTypeArticle, 0, model.PostStatusPublish}
 	postModel := &model.PostModel{}
-	rows, err := model.DB.Local.Table(postModel.TableName()).
+	rows, err := db.DBEngine.Table(postModel.TableName()).
 		Select("`id`, `title`, `guid`, `comment_count`, `view_count`, `posted_time`").
 		Where(where, whereArgs...).
 		Order("`posted_time` DESC").
@@ -28,7 +29,7 @@ func GetArchive() (map[string]map[string][]*model.ShowArchive, []string, map[str
 	for rows.Next() {
 		var archive model.PostModel
 		// ScanRows scan a row into archive
-		model.DB.Local.ScanRows(rows, &archive)
+		db.DBEngine.ScanRows(rows, &archive)
 		archives = append(archives, archive)
 	}
 

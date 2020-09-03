@@ -4,8 +4,8 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/puti-projects/puti/internal/common/model"
-	"github.com/puti-projects/puti/internal/common/utils"
+	"github.com/puti-projects/puti/internal/model"
+	"github.com/puti-projects/puti/internal/utils"
 )
 
 // UserInfo is the user struct for user list

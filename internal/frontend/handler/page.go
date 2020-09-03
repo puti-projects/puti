@@ -4,8 +4,8 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/puti-projects/puti/internal/common/utils"
 	"github.com/puti-projects/puti/internal/frontend/service"
+	"github.com/puti-projects/puti/internal/pkg/counter"
 )
 
 // ShowPageDetail handle page info
@@ -19,7 +19,7 @@ func ShowPageDetail(c *gin.Context, pageID uint64) {
 		return
 	}
 
-	utils.CounterCache.CountOne(c.ClientIP(), pageID)
+	counter.CounterCache.CountOne(c.ClientIP(), pageID)
 
 	renderData["Page"] = pageDetail
 

@@ -1,5 +1,7 @@
 package model
 
+import "github.com/puti-projects/puti/internal/pkg/db"
+
 // OptionModel site options
 type OptionModel struct {
 	ID          uint64 `gorm:"primary_key;AUTO_INCREMENT;column:id"`
@@ -16,7 +18,7 @@ func (c *OptionModel) TableName() string {
 // GetOption get one option by name
 func GetOption(optionName string) (*OptionModel, error) {
 	option := &OptionModel{}
-	result := DB.Local.Where("option_name = ?", optionName).First(&option)
+	result := db.DBEngine.Where("option_name = ?", optionName).First(&option)
 	return option, result.Error
 }
 
@@ -24,7 +26,7 @@ func GetOption(optionName string) (*OptionModel, error) {
 func GetOptionsByNames(optionNames []string) ([]*OptionModel, error) {
 	options := make([]*OptionModel, len(optionNames))
 
-	if err := DB.Local.Where("option_name in (?)", optionNames).Find(&options).Error; err != nil {
+	if err := db.DBEngine.Where("option_name in (?)", optionNames).Find(&options).Error; err != nil {
 		return options, err
 	}
 
@@ -35,7 +37,7 @@ func GetOptionsByNames(optionNames []string) ([]*OptionModel, error) {
 func GetAutoLoadOptions() ([]*OptionModel, error) {
 	var options []*OptionModel
 
-	if err := DB.Local.Where("autoload = 1").Find(&options).Error; err != nil {
+	if err := db.DBEngine.Where("autoload = 1").Find(&options).Error; err != nil {
 		return options, err
 	}
 
