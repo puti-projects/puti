@@ -1,4 +1,6 @@
-package middleware
+package api
+
+// header handlerFunc
 
 import (
 	"net/http"

@@ -1,4 +1,4 @@
-package middleware
+package api
 
 import (
 	"github.com/puti-projects/puti/internal/backend/handler"

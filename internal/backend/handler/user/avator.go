@@ -1,51 +1,19 @@
 package user
 
 import (
-	"strconv"
-
 	Response "github.com/puti-projects/puti/internal/backend/handler"
 	"github.com/puti-projects/puti/internal/backend/service"
-	"github.com/puti-projects/puti/internal/model"
-	"github.com/puti-projects/puti/internal/pkg/errno"
-	"github.com/puti-projects/puti/internal/utils"
 
 	"github.com/gin-gonic/gin"
 )
 
-// savePath defines the use avatar save path
-const savePath string = "/uploads/users/"
-
-// Avatar saves the upload avatar for user
+// Avatar upload user avatar handler
 func Avatar(c *gin.Context) {
 	userID := c.PostForm("userId")
 	file, _ := c.FormFile("img")
 
-	fileExt := utils.GetFileExt(file)
-	newFileName := "user_" + userID + fileExt
-
-	// Upload the file to specific dst.
-	pathName := savePath + newFileName
-	dst := "." + pathName
-	if err := c.SaveUploadedFile(file, dst); err != nil {
-		Response.SendResponse(c, errno.ErrSaveAvatar, nil)
-		return
-	}
-
-	// update user info for avatar
-	ID, err := strconv.Atoi(userID)
-	if err != nil {
-		Response.SendResponse(c, errno.ErrSaveAvatar, nil)
-		return
-	}
-	user := &model.UserModel{
-		Model: model.Model{ID: uint64(ID)},
-
-		Avatar: pathName,
-	}
-
-	// Update changed fields.
-	if err := service.UpdateUserAvatar(user); err != nil {
-		Response.SendResponse(c, errno.ErrDatabase, nil)
+	if err := service.UpdateUserAvatar(c, userID, file); err != nil {
+		Response.SendResponse(c, err, nil)
 		return
 	}
 

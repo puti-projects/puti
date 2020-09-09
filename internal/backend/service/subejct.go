@@ -1,15 +1,16 @@
 package service
 
 import (
+	"database/sql"
+	"errors"
 	"strings"
 	"time"
 
-	"github.com/go-sql-driver/mysql"
 	"github.com/puti-projects/puti/internal/model"
 	"github.com/puti-projects/puti/internal/pkg/db"
 	"github.com/puti-projects/puti/internal/utils"
 
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 )
 
 // SubjectTreeNode tree struct of subject list
@@ -86,8 +87,8 @@ func GetSubjectInfo(subjectID uint64) (*SubjectDetail, error) {
 	var coverImageStatus string
 	var coverImageURL string
 	if s.CoverImage != 0 {
-		m, err := model.GetMediaByID(s.CoverImage)
-		if gorm.IsRecordNotFoundError(err) {
+		m, err := GetMediaByID(s.CoverImage)
+		if errors.Is(err, gorm.ErrRecordNotFound) {
 			coverImageStatus = "关联封面图不存在，可能已被删除。"
 		}
 		coverImageURL = m.GUID
@@ -235,7 +236,7 @@ func UpdateSubjectInfoByArticleChange(tx *gorm.DB, subjectIDGroup []uint64, coun
 			updateColumns["count"] = gorm.Expr("count + ?", countDiff)
 		}
 		if updateLastUpdated {
-			updateColumns["last_updated"] = mysql.NullTime{Time: time.Now(), Valid: true}
+			updateColumns["last_updated"] = sql.NullTime{Time: time.Now(), Valid: true}
 		}
 
 		// exec

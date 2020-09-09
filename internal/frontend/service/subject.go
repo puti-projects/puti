@@ -1,10 +1,10 @@
 package service
 
 import (
+	"database/sql"
 	"fmt"
 	"sync"
 
-	"github.com/go-sql-driver/mysql"
 	"github.com/puti-projects/puti/internal/model"
 	"github.com/puti-projects/puti/internal/pkg/db"
 	"github.com/puti-projects/puti/internal/utils"
@@ -36,7 +36,7 @@ type ChildrenSubejctsResult struct {
 	Description   string
 	CoverImageURL string
 	Count         uint64
-	LastUpdated   mysql.NullTime
+	LastUpdated   sql.NullTime
 }
 
 // GetChildrenSubejcts get subject's all children
@@ -75,7 +75,6 @@ func GetChildrenSubejcts(parentID uint64) (subjectResult []*model.ShowSubjectLis
 		IDMap: make(map[uint64]*model.ShowSubjectList, len(subjects)),
 	}
 
-	errChan := make(chan error, 1)
 	finished := make(chan bool, 1)
 
 	for _, s := range subjects {
@@ -104,11 +103,7 @@ func GetChildrenSubejcts(parentID uint64) (subjectResult []*model.ShowSubjectLis
 		close(finished)
 	}()
 
-	select {
-	case <-finished:
-	case err := <-errChan:
-		return nil, err
-	}
+	<-finished
 
 	for _, id := range ids {
 		subjectResult = append(subjectResult, subjectList.IDMap[id])
@@ -118,7 +113,7 @@ func GetChildrenSubejcts(parentID uint64) (subjectResult []*model.ShowSubjectLis
 }
 
 // getDifferDayBetweenLastUpdatedTimeAndNow calculate updated how many days ago
-func getDifferDayBetweenLastUpdatedTimeAndNow(lastUpdatedTime *mysql.NullTime) string {
+func getDifferDayBetweenLastUpdatedTimeAndNow(lastUpdatedTime *sql.NullTime) string {
 	if lastUpdatedTime.Valid {
 		day := utils.SubNullTimeUnitlNowAsDay(lastUpdatedTime.Time)
 		if day < 1 {

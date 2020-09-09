@@ -5,32 +5,17 @@ import (
 
 	Response "github.com/puti-projects/puti/internal/backend/handler"
 	"github.com/puti-projects/puti/internal/backend/service"
-	"github.com/puti-projects/puti/internal/model"
 	"github.com/puti-projects/puti/internal/pkg/errno"
-	"github.com/puti-projects/puti/internal/pkg/logger"
-	"github.com/puti-projects/puti/internal/utils"
 
 	"github.com/gin-gonic/gin"
-	"go.uber.org/zap"
 )
 
-// UpdateRequest is the update media request params struct
-type UpdateRequest struct {
-	ID          uint64 `json:"id"`
-	Title       string `json:"title"`
-	Slug        string `json:"slug"`
-	Description string `json:"description"`
-}
-
-// Update update media info
+// Update update media info handler
 func Update(c *gin.Context) {
-	logger.Info("update function called", zap.String("X-request-Id", utils.GetReqID(c)))
-
 	// Get user id
 	userID, _ := strconv.Atoi(c.Param("id"))
 
-	var r UpdateRequest
-
+	var r service.MediaUpdateRequest
 	if err := c.ShouldBind(&r); err != nil {
 		Response.SendResponse(c, errno.ErrBind, nil)
 		return
@@ -41,20 +26,8 @@ func Update(c *gin.Context) {
 		return
 	}
 
-	r.ID = uint64(userID)
-
-	media := &model.MediaModel{
-		Model: model.Model{ID: r.ID},
-
-		Title:       r.Title,
-		Slug:        r.Slug,
-		Description: r.Description,
-	}
-
-	// Update changed fields.
-	if err := service.UpdateMedia(media); err != nil {
-		Response.SendResponse(c, errno.ErrDatabase, nil)
-		return
+	if err := service.UpdateMedia(&r, userID); err != nil {
+		Response.SendResponse(c, err, nil)
 	}
 
 	Response.SendResponse(c, nil, nil)

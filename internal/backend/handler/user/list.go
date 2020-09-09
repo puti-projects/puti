@@ -8,24 +8,9 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// ListRequest is the user list request struct
-type ListRequest struct {
-	Username string `form:"username"`
-	Number   int    `form:"number"`
-	Page     int    `form:"page"`
-	Status   int    `form:"status"`
-	Role     string `form:"role"`
-}
-
-// ListResponse is the use list response struct
-type ListResponse struct {
-	TotalCount uint64              `json:"totalCount"`
-	UserList   []*service.UserInfo `json:"userList"`
-}
-
-// List list the users in the database.
+// List user list handler
 func List(c *gin.Context) {
-	var r ListRequest
+	var r service.UserListRequest
 	if err := c.Bind(&r); err != nil {
 		Response.SendResponse(c, errno.ErrBind, nil)
 		return
@@ -37,7 +22,7 @@ func List(c *gin.Context) {
 		return
 	}
 
-	Response.SendResponse(c, nil, ListResponse{
+	Response.SendResponse(c, nil, service.UserListResponse{
 		TotalCount: count,
 		UserList:   infos,
 	})

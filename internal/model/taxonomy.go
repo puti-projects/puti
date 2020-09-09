@@ -4,8 +4,8 @@ import "github.com/puti-projects/puti/internal/pkg/db"
 
 // TermTaxonomyModel `pt_term_taxonomy`'s struct using GORM Has-One model
 type TermTaxonomyModel struct {
-	ID           uint64    `gorm:"column:term_taxonomy_id;not null;primary_key"`
-	Term         TermModel `gorm:"foreignkey:TermID;association_foreignkey:ID"`
+	ID           uint64    `gorm:"column:term_taxonomy_id;not null;primaryKey"`
+	Term         TermModel `gorm:"foreignKey:TermID;references:ID"`
 	TermID       uint64    `gorm:"column:term_id;not null"`
 	ParentTermID uint64    `gorm:"column:parent_term_id;not null"`
 	Level        uint64    `gorm:"column:level;not null"`
@@ -72,13 +72,13 @@ func GetTermsInfo(termID uint64) (*TermTaxonomyModel, error) {
 		return nil, model.Error
 	}
 
-	result := db.DBEngine.Model(&termTaxonomy).Related(&termTaxonomy.Term, "TermID")
-	return termTaxonomy, result.Error
+	err := db.DBEngine.Model(&termTaxonomy).Association("Term").Find(&termTaxonomy.Term)
+	return termTaxonomy, err
 }
 
 // TaxonomyCheckNameExist check the taxonomy name if is already exist
 func TaxonomyCheckNameExist(name, taxonomy string) bool {
-	count := 0
+	var count int64 = 0
 	db.DBEngine.Table("pt_term t").
 		Select("t.term_id, t.name").
 		Joins("inner join pt_term_taxonomy tt on tt.term_id = t.term_id").
@@ -125,7 +125,7 @@ func GetTermTaxonomy(termID uint64, taxonomyType string) (*TermTaxonomyModel, er
 }
 
 // GetTermChildrenNumber calcuelate the total number of term's children
-func GetTermChildrenNumber(termID uint64, taxonomyType string) (count int) {
+func GetTermChildrenNumber(termID uint64, taxonomyType string) (count int64) {
 	if taxonomyType != "category" {
 		count = 0
 		return count

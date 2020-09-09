@@ -1,4 +1,4 @@
-package middleware
+package view
 
 import (
 	"html/template"
@@ -11,7 +11,7 @@ import (
 // RenderData renderer data
 type RenderData map[string]interface{}
 
-// Renderer set rederer data
+// Renderer  gin handlerfunc for set rederer data
 func Renderer(c *gin.Context) {
 	// init the data
 	renderData := &RenderData{}

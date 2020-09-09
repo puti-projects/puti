@@ -1,6 +1,7 @@
 package service
 
 import (
+	"database/sql"
 	"fmt"
 	"html/template"
 	"regexp"
@@ -8,7 +9,6 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/go-sql-driver/mysql"
 	"github.com/puti-projects/puti/internal/model"
 	"github.com/puti-projects/puti/internal/pkg/config"
 	"github.com/puti-projects/puti/internal/pkg/db"
@@ -28,7 +28,7 @@ func GetArticleListByTaxonomy(currentPage int, taxonomyType, taxonomySlug, keywo
 	// get articles data
 	pageSize, _ := strconv.Atoi(optionCache.Options.Get("posts_per_page"))
 	offset := (currentPage - 1) * pageSize
-	count := 0
+	var count int64 = 0
 
 	// get term id
 	var termTaxonomyID uint64
@@ -62,7 +62,7 @@ func GetArticleListByTaxonomy(currentPage int, taxonomyType, taxonomySlug, keywo
 	}
 
 	// get pagination
-	pagination = utils.GetPagination(count, currentPage, pageSize, 0)
+	pagination = utils.GetPagination(int(count), currentPage, pageSize, 0)
 
 	// handle articles data
 	articleResult = make([]*model.ShowArticle, 0)
@@ -107,7 +107,7 @@ func GetArticleListByTaxonomy(currentPage int, taxonomyType, taxonomySlug, keywo
 				CoverPicture: a.CoverPicture,
 				CommentCount: a.CommentCount,
 				ViewCount:    a.ViewCount,
-				PostedTime:   utils.GetFormatNullTime(&a.PostDate, "2006-01-02 15:04"),
+				PostedTime:   utils.GetFormatNullTime(a.PostDate, "2006-01-02 15:04"),
 				Tags:         articleTag,
 				Categories:   articleCategory,
 			}
@@ -137,7 +137,7 @@ func GetArticleList(currentPage int, keyword string) (articleResult []*model.Sho
 	// get articles data
 	pageSize, _ := strconv.Atoi(optionCache.Options.Get("posts_per_page"))
 	offset := (currentPage - 1) * pageSize
-	count := 0
+	var count int64 = 0
 
 	where := "`post_type` = ? AND `parent_id` = ? AND `status` = ?"
 	whereArgs := []interface{}{model.PostTypeArticle, 0, model.PostStatusPublish}
@@ -159,7 +159,7 @@ func GetArticleList(currentPage int, keyword string) (articleResult []*model.Sho
 	}
 
 	// get pagination
-	pagination = utils.GetPagination(count, currentPage, pageSize, 0)
+	pagination = utils.GetPagination(int(count), currentPage, pageSize, 0)
 
 	// handle articles data
 	articleResult = make([]*model.ShowArticle, 0)
@@ -204,7 +204,7 @@ func GetArticleList(currentPage int, keyword string) (articleResult []*model.Sho
 				CoverPicture: a.CoverPicture,
 				CommentCount: a.CommentCount,
 				ViewCount:    a.ViewCount,
-				PostedTime:   utils.GetFormatNullTime(&a.PostDate, "2006-01-02 15:04"),
+				PostedTime:   utils.GetFormatNullTime(a.PostDate, "2006-01-02 15:04"),
 				Tags:         articleTag,
 				Categories:   articleCategory,
 			}
@@ -318,7 +318,7 @@ func GetArticleDetailByID(articleID uint64) (*model.ShowArticleDetail, error) {
 		GUID:          siteURL + a.GUID,
 		CommentCount:  a.CommentCount,
 		ViewCount:     a.ViewCount,
-		PostedTime:    utils.GetFormatNullTime(&a.PostDate, "2006-01-02 15:04"),
+		PostedTime:    utils.GetFormatNullTime(a.PostDate, "2006-01-02 15:04"),
 		MetaData:      make(map[string]interface{}),
 		Categories:    articleCategory,
 		Tags:          articleTag,
@@ -392,7 +392,7 @@ func GetSubjectArticleList(subjectID uint64) ([]*map[string]interface{}, error) 
 	for rows.Next() {
 		var id, commentCount, viewCount uint64
 		var title, guid string
-		var postedTime *mysql.NullTime
+		var postedTime *sql.NullTime
 		rows.Scan(&id, &title, &guid, &commentCount, &viewCount, &postedTime)
 
 		item := &map[string]interface{}{

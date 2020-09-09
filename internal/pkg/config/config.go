@@ -6,6 +6,7 @@ import (
 
 	"github.com/fsnotify/fsnotify"
 	"github.com/spf13/viper"
+	"go.uber.org/zap"
 )
 
 // Config instance struct of config
@@ -106,10 +107,12 @@ func (c *Config) reloadAllSection() error {
 	for k, v := range sections {
 		err := c.readConfigSections(k, v)
 		if err != nil {
+			zap.L().Error(fmt.Sprintf("reload all config sections failed, err:%s", err))
 			return err
 		}
 	}
 
+	zap.L().Info("already reload all config sections")
 	return nil
 }
 
@@ -118,8 +121,8 @@ func (c *Config) watchConfigChange() {
 	go func() {
 		c.vp.WatchConfig()
 		c.vp.OnConfigChange(func(e fsnotify.Event) {
+			zap.L().Info("config file changed", zap.String("config-path", e.Name))
 			_ = c.reloadAllSection()
-			fmt.Printf("config file changed: %s\n", e.Name)
 		})
 	}()
 }

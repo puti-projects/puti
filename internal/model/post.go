@@ -1,34 +1,37 @@
 package model
 
 import (
-	"github.com/go-sql-driver/mysql"
+	"database/sql"
+	"errors"
+
 	"github.com/puti-projects/puti/internal/pkg/db"
+	"gorm.io/gorm"
 )
 
 // PostModel is the struct model for post
 type PostModel struct {
 	Model
 
-	UserID          uint64         `gorm:"column:user_id;not null"`
-	PostType        string         `gorm:"column:post_type;not null"`
-	Title           string         `gorm:"column:title;not null"`
-	ContentMarkdown string         `gorm:"column:content_markdown;not null"`
-	ContentHTML     string         `gorm:"column:content_html;not null"`
-	Slug            string         `gorm:"column:slug;not null"`
-	ParentID        uint64         `gorm:"column:parent_id;not null"` // set to 0 now, use for draft history feature in the future
-	Status          string         `gorm:"column:status;not null"`
-	CommentStatus   uint64         `gorm:"column:comment_status;not null"`
-	IfTop           uint64         `gorm:"column:if_top;not null"`
-	GUID            string         `gorm:"column:guid;not null"`
-	CoverPicture    string         `gorm:"column:cover_picture;not null"`
-	CommentCount    uint64         `gorm:"column:comment_count;not null"`
-	ViewCount       uint64         `gorm:"column:view_count;not null"`
-	PostDate        mysql.NullTime `gorm:"column:posted_time;not null"`
+	UserID          uint64        `gorm:"column:user_id;not null"`
+	PostType        string        `gorm:"column:post_type;not null"`
+	Title           string        `gorm:"column:title;not null"`
+	ContentMarkdown string        `gorm:"column:content_markdown;not null"`
+	ContentHTML     string        `gorm:"column:content_html;not null"`
+	Slug            string        `gorm:"column:slug;not null"`
+	ParentID        uint64        `gorm:"column:parent_id;not null"` // set to 0 now, use for draft history feature in the future
+	Status          string        `gorm:"column:status;not null"`
+	CommentStatus   uint64        `gorm:"column:comment_status;not null"`
+	IfTop           uint64        `gorm:"column:if_top;not null"`
+	GUID            string        `gorm:"column:guid;not null"`
+	CoverPicture    string        `gorm:"column:cover_picture;not null"`
+	CommentCount    uint64        `gorm:"column:comment_count;not null"`
+	ViewCount       uint64        `gorm:"column:view_count;not null"`
+	PostDate        *sql.NullTime `gorm:"column:posted_time;not null"`
 }
 
 // PostMetaModel meta data for post
 type PostMetaModel struct {
-	ID        uint64 `gorm:"primary_key;AUTO_INCREMENT;column:id"`
+	ID        uint64 `gorm:"primaryKey;autoIncrement;column:id"`
 	PostID    uint64 `gorm:"column:post_id;not null"`
 	MetaKey   string `gorm:"column:meta_key;not null"`
 	MetaValue string `gorm:"column:meta_value;not null"`
@@ -79,9 +82,9 @@ func GetOnePostMetaData(postID uint64, metaKey string) (*PostMetaModel, error) {
 }
 
 // ListPost returns the posts list in condition
-func ListPost(postType, title string, page, number int, sort, status string) ([]*PostModel, uint64, error) {
+func ListPost(postType, title string, page, number int, sort, status string) ([]*PostModel, int64, error) {
 	posts := make([]*PostModel, 0)
-	var count uint64
+	var count int64
 
 	where := "post_type = ? AND parent_id = ?"
 	whereArgs := []interface{}{postType, 0}
@@ -115,17 +118,19 @@ func ListPost(postType, title string, page, number int, sort, status string) ([]
 }
 
 // PageCheckSlugExist check the slug if already exist
+// ErrRecordNotFound => False
+// exist => True
 func PageCheckSlugExist(pageID uint64, Slug string) bool {
 	post := &PostModel{}
 
-	var ifNotFound bool
+	var err error
 	if pageID > 0 {
-		ifNotFound = db.DBEngine.Where("id != ? AND slug = ?", pageID, Slug).First(&post).RecordNotFound()
+		err = db.DBEngine.Where("id != ? AND slug = ?", pageID, Slug).First(&post).Error
 	} else {
-		ifNotFound = db.DBEngine.Where("slug = ?", Slug).First(&post).RecordNotFound()
+		err = db.DBEngine.Where("slug = ?", Slug).First(&post).Error
 	}
 
-	if ifNotFound {
+	if errors.Is(err, gorm.ErrRecordNotFound) {
 		return false
 	}
 

@@ -6,7 +6,7 @@ import (
 	"github.com/puti-projects/puti/internal/model"
 	"github.com/puti-projects/puti/internal/pkg/db"
 
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 )
 
 // TermInfo terms info
@@ -163,7 +163,7 @@ func UpdateTaxonomy(term *model.TermModel, termTaxonomy *model.TermTaxonomyModel
 }
 
 // updateTaxonomyChildLevel update category's children level
-func updateTaxonomyChildLevel(tx *gorm.DB, termID, parentLevel uint64, taxonomyType string) error {
+func updateTaxonomyChildLevel(tx *gorm.DB, termID uint64, parentLevel uint64, taxonomyType string) error {
 	TermTaxonomy := []model.TermTaxonomyModel{}
 	tt := tx.Where("parent_term_id = ? AND taxonomy = ?", termID, taxonomyType).Find(&TermTaxonomy)
 	if tt.Error != nil {

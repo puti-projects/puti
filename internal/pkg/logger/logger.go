@@ -16,48 +16,43 @@ import (
 	"os"
 
 	"github.com/puti-projects/puti/internal/pkg/config"
+
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
-	lumberjack "gopkg.in/natefinch/lumberjack.v2"
+	"gopkg.in/natefinch/lumberjack.v2"
 )
 
 var logger *zap.Logger
 
 // InitLogger init zap logger
 func InitLogger(runmode string) {
-	w := zapcore.AddSync(&lumberjack.Logger{
-		Filename:   config.Log.LoggerFile,
-		MaxSize:    config.Log.LoggerMaxSize, // megabytes
-		MaxBackups: config.Log.LoggerMaxBackups,
-		MaxAge:     config.Log.LoggerMaxAge, // days
-	})
-
 	if runmode == "release" {
-		InitProductionLogger(w)
+		logger = InitProductionLogger()
 	} else {
-		InitDevelopmentLogger(w)
+		logger = InitDevelopmentLogger()
 	}
+	defer logger.Sync()
+
+	zap.ReplaceGlobals(logger)
 }
 
 // InitProductionLogger init the logger for production environment
-func InitProductionLogger(w zapcore.WriteSyncer) {
+func InitProductionLogger() *zap.Logger {
 	highPriority := zap.LevelEnablerFunc(func(lvl zapcore.Level) bool {
 		return lvl >= zapcore.ErrorLevel
 	})
 
-	jsonEncoder := zapcore.NewJSONEncoder(newPutiEncoderConfig())
-
 	core := zapcore.NewCore(
-		jsonEncoder,
-		w,
+		zapcore.NewJSONEncoder(newPutiEncoderConfig()),
+		getWriteSyncer("error"),
 		highPriority,
 	)
-	logger = zap.New(core)
-	defer logger.Sync()
+
+	return zap.New(core, zap.AddCaller(), zap.AddCallerSkip(1))
 }
 
 // InitDevelopmentLogger init the logger for development environment
-func InitDevelopmentLogger(w zapcore.WriteSyncer) {
+func InitDevelopmentLogger() *zap.Logger {
 	highPriority := zap.LevelEnablerFunc(func(lvl zapcore.Level) bool {
 		return lvl >= zapcore.ErrorLevel
 	})
@@ -65,21 +60,49 @@ func InitDevelopmentLogger(w zapcore.WriteSyncer) {
 		return lvl < zapcore.ErrorLevel
 	})
 
-	consoleDebugging := zapcore.Lock(os.Stdout)
-	consoleErrors := zapcore.Lock(os.Stderr)
-
-	jsonEncoder := zapcore.NewJSONEncoder(newPutiEncoderConfig())
-	consoleEncoder := zapcore.NewConsoleEncoder(newPutiEncoderConfig())
-
 	core := zapcore.NewTee(
-		// lumberjack writer
-		zapcore.NewCore(jsonEncoder, w, zap.InfoLevel),
-		// console
-		zapcore.NewCore(consoleEncoder, consoleDebugging, lowPriority),
-		zapcore.NewCore(consoleEncoder, consoleErrors, highPriority),
+		// normal json encoder
+		zapcore.NewCore(
+			zapcore.NewJSONEncoder(newPutiEncoderConfig()),
+			getWriteSyncer("info"),
+			lowPriority,
+		),
+		// error json encoder
+		zapcore.NewCore(
+			zapcore.NewJSONEncoder(newPutiEncoderConfig()),
+			getWriteSyncer("error"),
+			highPriority,
+		),
+		// normal console
+		zapcore.NewCore(
+			zapcore.NewConsoleEncoder(newPutiEncoderConfig()),
+			zapcore.Lock(os.Stdout),
+			lowPriority,
+		),
+		// error console
+		zapcore.NewCore(
+			zapcore.NewConsoleEncoder(newPutiEncoderConfig()),
+			zapcore.Lock(os.Stderr),
+			highPriority,
+		),
 	)
-	logger = zap.New(core, zap.AddCaller(), zap.AddCallerSkip(1))
-	defer logger.Sync()
+	return zap.New(core, zap.AddCaller(), zap.AddCallerSkip(1))
+}
+
+func getWriteSyncer(writemode string) zapcore.WriteSyncer {
+	sl := &lumberjack.Logger{
+		MaxSize:    config.Log.LoggerMaxSize, // megabytes
+		MaxBackups: config.Log.LoggerMaxBackups,
+		MaxAge:     config.Log.LoggerMaxAge, // days
+	}
+
+	if writemode == "error" {
+		sl.Filename = config.Log.LoggerFileError
+		return zapcore.AddSync(sl)
+	}
+
+	sl.Filename = config.Log.LoggerFileInfo
+	return zapcore.AddSync(sl)
 }
 
 func newPutiEncoderConfig() zapcore.EncoderConfig {
@@ -89,11 +112,12 @@ func newPutiEncoderConfig() zapcore.EncoderConfig {
 		LevelKey:       "level",
 		NameKey:        "name",
 		CallerKey:      "caller",
+		FunctionKey:    zapcore.OmitKey,
 		MessageKey:     "message",
-		StacktraceKey:  "stack-trace",
+		StacktraceKey:  "stacktrace",
 		LineEnding:     zapcore.DefaultLineEnding,
-		EncodeLevel:    zapcore.CapitalLevelEncoder,
-		EncodeTime:     zapcore.ISO8601TimeEncoder, // TODO 时区
+		EncodeLevel:    zapcore.LowercaseLevelEncoder,
+		EncodeTime:     zapcore.TimeEncoderOfLayout("2006-01-02 15:04:05"),
 		EncodeDuration: zapcore.StringDurationEncoder,
 		EncodeCaller:   zapcore.ShortCallerEncoder,
 	}
@@ -130,6 +154,7 @@ func Errorf(template string, args ...interface{}) {
 }
 
 // DPanic logs a message at DPanicLevel. The message includes any fields passed at the log site.
+// DPanic means "development panic"
 func DPanic(msg string, args ...zapcore.Field) {
 	logger.DPanic(msg, args...)
 }

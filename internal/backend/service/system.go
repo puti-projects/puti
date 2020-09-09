@@ -2,14 +2,15 @@ package service
 
 import (
 	"fmt"
-	"github.com/puti-projects/puti/internal/pkg/constvar"
-	"github.com/puti-projects/puti/internal/pkg/logger"
-	"github.com/shirou/gopsutil/cpu"
-	"github.com/shirou/gopsutil/load"
 	"strconv"
 
+	"github.com/puti-projects/puti/internal/pkg/constvar"
+	"github.com/puti-projects/puti/internal/pkg/logger"
+
+	"github.com/shirou/gopsutil/cpu"
 	"github.com/shirou/gopsutil/disk"
 	"github.com/shirou/gopsutil/host"
+	"github.com/shirou/gopsutil/load"
 	"github.com/shirou/gopsutil/mem"
 )
 
@@ -25,10 +26,10 @@ const (
 )
 
 const (
-	statusERROR = "ERROR"
+	statusERROR    = "ERROR"
 	statusCRITICAL = "CRITICAL"
-	statusWARNING = "WARNING"
-	statusNORMAL = "NORMAL"
+	statusWARNING  = "WARNING"
+	statusNORMAL   = "NORMAL"
 )
 
 // SystemInfo system information
@@ -105,8 +106,8 @@ func (c *CPUHealth) GetHealthStatusByCores() string {
 		warningLevel = float64(c.CPUCores) - 0.5
 		break
 	default:
-		criticalLevel = float64(c.CPUCores-1)
-		warningLevel = float64(c.CPUCores-2)
+		criticalLevel = float64(c.CPUCores - 1)
+		warningLevel = float64(c.CPUCores - 2)
 		break
 	}
 
@@ -133,8 +134,8 @@ func DiskCheck() *DiskHealth {
 	}
 
 	diskHealth = &DiskHealth{
-		Used:  transSize(u.Used),
-		Total: transSize(u.Total),
+		Used:          transSize(u.Used),
+		Total:         transSize(u.Total),
 		HealthPercent: HealthPercent{UsedPercent: int(u.UsedPercent)},
 	}
 	diskHealth.HealthStatus = diskHealth.GetHealthStatusByPercent()
@@ -158,8 +159,8 @@ func RAMCheck() *RAMHealth {
 	}
 
 	ramHealth = &RAMHealth{
-		Used:  transSize(u.Used),
-		Total: transSize(u.Total),
+		Used:          transSize(u.Used),
+		Total:         transSize(u.Total),
 		HealthPercent: HealthPercent{UsedPercent: int(u.UsedPercent)},
 	}
 	ramHealth.HealthStatus = ramHealth.GetHealthStatusByPercent()
@@ -217,12 +218,12 @@ func SystemInfoCheck() *SystemInfo {
 // transSize tool function for change size
 func transSize(size uint64) string {
 	var transfer string
-	if size >= 1 * GB {
-		sizeFloat, _ := strconv.ParseFloat(fmt.Sprintf("%d.%.2d", size / GB, size % GB), 64)
-		sizeGB := strconv.FormatFloat(sizeFloat,'f',2,64)
+	if size >= 1*GB {
+		sizeFloat, _ := strconv.ParseFloat(fmt.Sprintf("%d.%.2d", size/GB, size%GB), 64)
+		sizeGB := strconv.FormatFloat(sizeFloat, 'f', 2, 64)
 		transfer = fmt.Sprintf("%s GB", sizeGB)
 	} else {
-		transfer = fmt.Sprintf("%d MB", size / MB)
+		transfer = fmt.Sprintf("%d MB", size/MB)
 	}
 
 	return transfer

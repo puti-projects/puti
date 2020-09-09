@@ -7,7 +7,7 @@ import (
 
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
-	"github.com/spf13/viper"
+	"github.com/puti-projects/puti/internal/pkg/config"
 )
 
 var (
@@ -62,7 +62,7 @@ func Parse(tokenString string, secret string) (*Context, error) {
 // ParseToken directly parse the token
 func ParseToken(t string) (*Context, error) {
 	// Load the jwt secret from config
-	secret := viper.GetString("jwt_secret")
+	secret := config.Safety.JwtSecret
 
 	if len(t) == 0 {
 		return &Context{}, ErrMissingToken
@@ -77,7 +77,7 @@ func ParseRequest(c *gin.Context) (*Context, error) {
 	header := c.Request.Header.Get("Authorization")
 
 	// Load the jwt secret from config
-	secret := viper.GetString("jwt_secret")
+	secret := config.Safety.JwtSecret
 
 	if len(header) == 0 {
 		return &Context{}, ErrMissingHeader
@@ -93,7 +93,7 @@ func ParseRequest(c *gin.Context) (*Context, error) {
 func Sign(ctx *gin.Context, c Context, secret string) (tokenString string, err error) {
 	// Load the jwt secret from the Gin config if the secret isn't specified.
 	if secret == "" {
-		secret = viper.GetString("jwt_secret")
+		secret = config.Safety.JwtSecret
 	}
 	// The token content.
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{

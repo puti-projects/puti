@@ -180,7 +180,7 @@ Thanks for these great open source libraries:
 | Dependency | About |
 | :----- | :----- |
 | [gin-gonic/gin](https://github.com/gin-gonic/gin) |  HTTP web framework written in Go |
-| [jinzhu/gorm](https://github.com/jinzhu/gorm) | The ORM library for Golang|
+| [go-gorm/gorm](https://github.com/go-gorm/gorm) | The ORM library for Golang|
 | [vuejs/vue](https://github.com/vuejs/vue) | JavaScript framework for building UI on the web |
 | [ElemeFE/element](https://github.com/ElemeFE/element) | A Vue.js 2.0 UI Toolkit for Web  |
 | [PanJiaChen/vue-element-admin](https://github.com/PanJiaChen/vue-element-admin) | A front-end management background integration solution |

@@ -22,7 +22,7 @@ type ListRequest struct {
 
 // ListResponse is the article list response struct
 type ListResponse struct {
-	TotalCount  uint64              `json:"totalCount"`
+	TotalCount  int64               `json:"totalCount"`
 	TotalPage   uint64              `json:"totalPage"`
 	ArticleList []*service.PostInfo `json:"articleList"`
 }
@@ -45,7 +45,7 @@ func List(c *gin.Context) {
 		return
 	}
 
-	number := uint64(r.Number)
+	number := int64(r.Number)
 	totalPage := math.Ceil(float64(count / number))
 
 	Response.SendResponse(c, nil, ListResponse{

@@ -7,11 +7,9 @@ import (
 	"github.com/puti-projects/puti/internal/backend/service"
 	"github.com/puti-projects/puti/internal/model"
 	"github.com/puti-projects/puti/internal/pkg/errno"
-	"github.com/puti-projects/puti/internal/pkg/logger"
 	"github.com/puti-projects/puti/internal/utils"
 
 	"github.com/gin-gonic/gin"
-	"go.uber.org/zap"
 )
 
 // UpdateRequest struct of page update params
@@ -33,8 +31,6 @@ type UpdateRequest struct {
 // Update update page info
 // Delete and restore info are also in this function and it depends on the 'status'
 func Update(c *gin.Context) {
-	logger.Info("Page update function called.", zap.String("X-request-Id", utils.GetReqID(c)))
-
 	// Get page id
 	ID, _ := strconv.Atoi(c.Param("id"))
 

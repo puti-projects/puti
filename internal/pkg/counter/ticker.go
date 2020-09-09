@@ -7,7 +7,7 @@ import (
 	"github.com/puti-projects/puti/internal/pkg/db"
 	"github.com/puti-projects/puti/internal/pkg/logger"
 
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 )
 
 const (

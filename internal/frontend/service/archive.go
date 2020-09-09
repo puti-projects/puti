@@ -37,8 +37,8 @@ func GetArchive() (map[string]map[string][]*model.ShowArchive, []string, map[str
 	sortYear := []string{}
 	sortMonth := map[string][]string{}
 	for _, v := range archives {
-		postedYear := utils.GetFormatNullTime(&v.PostDate, "2006")
-		postedMonth := utils.GetFormatNullTime(&v.PostDate, "01")
+		postedYear := utils.GetFormatNullTime(v.PostDate, "2006")
+		postedMonth := utils.GetFormatNullTime(v.PostDate, "01")
 
 		_, existYear := dataMap[postedYear]
 		if !existYear {
@@ -61,8 +61,8 @@ func GetArchive() (map[string]map[string][]*model.ShowArchive, []string, map[str
 			GUID:         v.GUID,
 			CommentCount: v.CommentCount,
 			ViewCount:    v.ViewCount,
-			PostedTime:   utils.GetFormatNullTime(&v.PostDate, "2006-01-02 15:04"),
-			PostedDay:    utils.GetFormatNullTime(&v.PostDate, "02"),
+			PostedTime:   utils.GetFormatNullTime(v.PostDate, "2006-01-02 15:04"),
+			PostedDay:    utils.GetFormatNullTime(v.PostDate, "02"),
 		}
 
 		dataMap[postedYear][postedMonth] = append(dataMap[postedYear][postedMonth], article)

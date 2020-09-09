@@ -8,6 +8,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/puti-projects/puti/internal/dao"
 	"github.com/puti-projects/puti/internal/pkg/config"
 	"github.com/puti-projects/puti/internal/pkg/counter"
 	"github.com/puti-projects/puti/internal/pkg/db"
@@ -54,34 +55,30 @@ func init() {
 	logger.InitLogger(config.Server.Runmode)
 	logger.Info("logger construction succeeded")
 
+	// init db
+	err = db.InitDB()
+	if err != nil {
+		logger.Panicf("database connection failed. error(%v)", err)
+	}
+	// if init db without problem, set up dao engine
+	dao.NewDaoEngine()
+
 	// load theme path
 	theme.LoadInstalled()
-
-	// Set gin mode.
-	if "debug" == config.Server.Runmode {
-		gin.SetMode(gin.DebugMode)
-	} else if "test" == config.Server.Runmode {
-		gin.SetMode(gin.TestMode)
-	} else {
-		gin.SetMode(gin.ReleaseMode)
-	}
 }
 
 func main() {
-	// init db
-	if err := db.InitDB(); err != nil {
-		logger.Errorf("sql.Open() error(%v)", err)
-		panic(fmt.Sprintf("database connection failed. err: %v", err))
+	// load default options (need db connection)
+	if err := option.LoadOptions(); err != nil {
+		logger.Errorf("load options failed, %s", err)
 	}
-	defer db.DBEngine.Close()
-
-	// load default options
-	option.LoadOptions()
+	logger.Info("options has been deployed successfully")
 
 	// routers
-	router := routers.NewRouter()
+	router := routers.NewRouter(config.Server.Runmode)
 
 	// Ping the server to make sure the router is working.
+	// should before http server set up
 	go func() {
 		if err := pingServer(); err != nil {
 			logger.Fatal("The router has no response, or it might took too long to start up. Error Detail:" + err.Error())
@@ -92,25 +89,29 @@ func main() {
 	// init ticker
 	counter.InitCountTicker()
 
-	// If open https, start listening https request
+	// listen and serve http
+	httpServe(router)
+}
+
+// httpServe set up http server
+// If https open, should only listen https port
+func httpServe(router *gin.Engine) {
+	// if open https
 	if true == config.Server.HttpsOpen {
-		cert := config.Server.TlsCert
-		key := config.Server.TlsKey
-		if cert != "" && key != "" {
-			go func() {
-				logger.Info("start to listening the incoming https requests", zap.String("port", config.Server.HttpsPort))
-				logger.Info(
-					http.ListenAndServeTLS(
-						"0.0.0.0:"+config.Server.HttpsPort,
-						cert,
-						key,
-						router,
-					).Error())
-			}()
-		} else {
-			logger.Errorf("cert and key can not be empty, failed to listen https port")
+		if config.Server.TlsCert == "" || config.Server.TlsKey == "" {
+			logger.Errorf("https opened but cert and key can not be empty, failed to listen https port")
 		}
+
+		logger.Info("start to listening the incoming https requests", zap.String("port", config.Server.HttpsPort))
+		logger.Info(
+			http.ListenAndServeTLS(
+				"0.0.0.0:"+config.Server.HttpsPort,
+				config.Server.TlsCert,
+				config.Server.TlsKey,
+				router,
+			).Error())
 	}
+
 	logger.Info("start to listening the incoming http requests", zap.String("port", config.Server.HttpPort))
 	logger.Info(http.ListenAndServe(
 		"0.0.0.0:"+config.Server.HttpPort,

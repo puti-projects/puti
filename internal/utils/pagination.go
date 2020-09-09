@@ -18,7 +18,7 @@ type Page struct {
 	PageNums        []int `json:"pageNums"`
 }
 
-// Pagination include pagination and page url
+// Pagination include page and page url
 type Pagination struct {
 	Page    *Page
 	PageURL string `json:"pageURL"`

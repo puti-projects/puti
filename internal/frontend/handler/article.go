@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"errors"
 	"net/http"
 	"strconv"
 	"strings"
@@ -9,7 +10,7 @@ import (
 	"github.com/puti-projects/puti/internal/pkg/counter"
 
 	"github.com/gin-gonic/gin"
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 )
 
 // ShowArticleList article list handle
@@ -103,7 +104,7 @@ func ShowArticleDetail(c *gin.Context) {
 
 	articleDetail, err := service.GetArticleDetailByID(aID)
 	if err != nil {
-		if gorm.IsRecordNotFoundError(err) {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
 			ShowNotFound(c)
 			return
 		}

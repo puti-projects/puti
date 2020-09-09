@@ -4,8 +4,7 @@ import (
 	"strconv"
 
 	Response "github.com/puti-projects/puti/internal/backend/handler"
-	"github.com/puti-projects/puti/internal/model"
-	"github.com/puti-projects/puti/internal/pkg/errno"
+	"github.com/puti-projects/puti/internal/backend/service"
 
 	"github.com/gin-gonic/gin"
 )
@@ -14,8 +13,8 @@ import (
 func Delete(c *gin.Context) {
 	mediaID, _ := strconv.Atoi(c.Param("id"))
 
-	if err := model.DeleteMedia(uint64(mediaID)); err != nil {
-		Response.SendResponse(c, errno.ErrDatabase, nil)
+	if err := service.DeleteMedia(uint64(mediaID)); err != nil {
+		Response.SendResponse(c, err, nil)
 		return
 	}
 

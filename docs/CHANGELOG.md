@@ -1,11 +1,13 @@
 # Changelog
 
-## v0.2.3
+## v0.3.0
 
 ### 功能和优化
 - 优化 Lin 主题 Latex 公式样式在移动端的展示
 - 移除 vendor 目录和依赖，使用 goproxy
 - 支持 Github Actions
+- 大量基础组件优化和重构
+- 升级 GROM 到 v2
 
 ### Bug 修复
 

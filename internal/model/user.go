@@ -2,12 +2,12 @@ package model
 
 import (
 	"github.com/puti-projects/puti/internal/pkg/auth"
-	"github.com/puti-projects/puti/internal/pkg/constvar"
-	"github.com/puti-projects/puti/internal/pkg/db"
+
+	"gorm.io/gorm"
 )
 
-// UserModel user model
-type UserModel struct {
+// User user model
+type User struct {
 	Model
 
 	Username string `gorm:"column:account;unique;not null"  validate:"min=1,max=60"`
@@ -16,86 +16,59 @@ type UserModel struct {
 	Email    string `gorm:"column:email;unique"`
 	Avatar   string `gorm:"column:avatar"`
 	PageURL  string `gorm:"column:page_url"`
-	Status   int    `gorm:"column:status" sql:"index"`
-	Roles    string `gorm:"column:role"`
+	Status   int    `gorm:"column:status;default:1" sql:"index"`
+	Roles    string `gorm:"column:role;default:subscriber"`
 }
 
 // TableName is the user table name in db
-func (c *UserModel) TableName() string {
+func (u *User) TableName() string {
 	return "pt_user"
 }
 
 // Create creates a new user account
-func (c *UserModel) Create() error {
-	return db.DBEngine.Create(&c).Error
+func (u *User) Create(db *gorm.DB) error {
+	return db.Create(u).Error
 }
 
 // Encrypt the user password.
-func (c *UserModel) Encrypt() (err error) {
-	c.Password, err = auth.Encrypt(c.Password)
-	return
+func (u *User) Encrypt() (err error) {
+	u.Password, err = auth.Encrypt(u.Password)
+	return err
 }
 
-// GetUser gets an user by the user identifier.
-func GetUser(username string) (*UserModel, error) {
-	u := &UserModel{}
-	d := db.DBEngine.Where("status = 1 AND deleted_time is null AND account = ?", username).First(&u)
-	return u, d.Error
+// Get get an user by the user identifier
+func (u *User) Get(db *gorm.DB) error {
+	if u.Username != "" {
+		db = db.Where("status = 1 AND deleted_time is null AND account = ?", u.Username)
+	}
+	return db.First(u).Error
 }
 
-// GetUserByID gets an user by ID
-func GetUserByID(id uint64) (*UserModel, error) {
-	u := &UserModel{}
-	d := db.DBEngine.Model(&UserModel{}).Where("`id` = ?", id).Find(&u)
-	return u, d.Error
+// GetByID get user by ID
+func (u *User) GetByID(db *gorm.DB) error {
+	return db.Where("`id` = ?", u.ID).First(u).Error
 }
 
-// DeleteUser deletes the user by id
-func DeleteUser(id uint64) error {
-	user := UserModel{}
-	user.ID = id
-	return db.DBEngine.Delete(&user).Error
+// Delete delete a user by id
+func (u *User) Delete(db *gorm.DB) error {
+	return db.Delete(u).Error
 }
 
-// Update updates an user account information.
-func (c *UserModel) Update() (err error) {
-	return db.DBEngine.Model(&UserModel{}).Save(c).Error
+// Update updates an user account information
+func (u *User) Update(db *gorm.DB) error {
+	return db.Save(u).Error
 }
 
-// ListUser List all users
-func ListUser(username, role string, number, page, status int) ([]*UserModel, uint64, error) {
-	if number == 0 {
-		number = constvar.DefaultLimit
-	}
+// Count count user
+func (u *User) Count(db *gorm.DB, where string, whereArgs []interface{}) (int64, error) {
+	var count int64
+	err := db.Model(u).Where(where, whereArgs...).Count(&count).Error
+	return count, err
+}
 
-	users := make([]*UserModel, 0)
-	var count uint64
-
-	where := "`deleted_time` is null"
-	whereArgs := []interface{}{}
-	if username != "" {
-		where += " AND `nickname` LIKE ?"
-		whereArgs = append(whereArgs, "%"+username+"%")
-	}
-
-	if role != "" {
-		where += " AND `role` = ?"
-		whereArgs = append(whereArgs, role)
-	}
-
-	if status != 0 {
-		where += " AND `status` = ?"
-		whereArgs = append(whereArgs, status)
-	}
-
-	if err := db.DBEngine.Model(&UserModel{}).Where(where, whereArgs...).Count(&count).Error; err != nil {
-		return users, count, err
-	}
-
-	offset := (page - 1) * number
-	if err := db.DBEngine.Where(where, whereArgs...).Offset(offset).Limit(number).Order("id desc").Find(&users).Error; err != nil {
-		return users, count, err
-	}
-
-	return users, count, nil
+// List get user list
+func (u *User) List(db *gorm.DB, where string, whereArgs []interface{}, offset, number int) ([]*User, error) {
+	users := make([]*User, 0)
+	err := db.Where(where, whereArgs...).Offset(offset).Limit(number).Order("id desc").Find(&users).Error
+	return users, err
 }

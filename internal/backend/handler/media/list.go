@@ -8,21 +8,9 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// ListRequest is the media list request struct
-type ListRequest struct {
-	Limit int `form:"limit"`
-	Page  int `form:"page"`
-}
-
-// ListResponse returns total number of media and current page of media
-type ListResponse struct {
-	TotalCount uint64               `json:"totalCount"`
-	MediaList  []*service.MediaInfo `json:"mediaList"`
-}
-
-// List returns current page media list and the total number of media
+// List media list handler
 func List(c *gin.Context) {
-	var r ListRequest
+	var r service.MediaListRequest
 	if err := c.ShouldBind(&r); err != nil {
 		Response.SendResponse(c, errno.ErrBind, nil)
 		return
@@ -34,7 +22,7 @@ func List(c *gin.Context) {
 		return
 	}
 
-	Response.SendResponse(c, nil, ListResponse{
+	Response.SendResponse(c, nil, service.MediaListResponse{
 		TotalCount: count,
 		MediaList:  infos,
 	})

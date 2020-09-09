@@ -1,14 +1,13 @@
 package model
 
 import (
-	"github.com/puti-projects/puti/internal/pkg/db"
 	"github.com/puti-projects/puti/internal/utils"
 
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 )
 
 // MediaModel the definition of media model
-type MediaModel struct {
+type Media struct {
 	Model
 
 	UserID      uint64 `gorm:"column:upload_user_id;not null"`
@@ -16,10 +15,10 @@ type MediaModel struct {
 	Slug        string `gorm:"column:slug;not null"`
 	Description string `gorm:"column:description;not null"`
 	GUID        string `gorm:"column:guid;not null"`
-	Type        string `gorm:"column:type;not null"`
+	Type        string `gorm:"column:type;not null;default:picture"`
 	MimeType    string `gorm:"column:mime_type;not null"`
 	Usage       string `gorm:"column:usage;not null"`
-	Status      uint64 `gorm:"column:status;default:1;not null"`
+	Status      uint64 `gorm:"column:status;not null;default:1"`
 }
 
 // ResourceTypePicture resource type of picture
@@ -35,58 +34,55 @@ const UsageDefault = "common"
 const UsageCover = "cover"
 
 // TableName is the resource table name in db
-func (c *MediaModel) TableName() string {
+func (m *Media) TableName() string {
 	return "pt_resource"
 }
 
 // BeforeCreate set values before create
 // Set file type by mime-type
-func (c *MediaModel) BeforeCreate(scope *gorm.Scope) error {
-	return scope.SetColumn("Type", utils.GetFileType(c.MimeType))
+func (m *Media) BeforeCreate(tx *gorm.DB) (err error) {
+	m.Type = utils.GetFileType(m.MimeType)
+	return
 }
 
 // Create save the new media file info
-func (c *MediaModel) Create() error {
-	return db.DBEngine.Create(&c).Error
+func (m *Media) Create(db *gorm.DB) error {
+	return db.Create(m).Error
 }
 
 // Update update media info
-func (c *MediaModel) Update() (err error) {
-	if err = db.DBEngine.Model(&MediaModel{}).Save(c).Error; err != nil {
-		return err
-	}
-
-	return nil
+func (m *Media) Update(db *gorm.DB) (err error) {
+	return db.Save(m).Error
 }
 
-// DeleteMedia deletes the media info by id (not file)
-func DeleteMedia(id uint64) error {
-	media := MediaModel{}
-	media.ID = id
-	return db.DBEngine.Delete(&media).Error
+// GetByID get media info by ID
+func (m *Media) GetByID(db *gorm.DB) error {
+	return db.Where("`status` = 1 AND `deleted_time` is null AND `id` = ?", m.ID).First(m).Error
 }
 
-// ListMedia returns the media list in condition
-func ListMedia(limit, page int) ([]*MediaModel, uint64, error) {
-	medias := make([]*MediaModel, 0)
-	var count uint64
-
-	where := "deleted_time is null"
-	if err := db.DBEngine.Model(&MediaModel{}).Where(where).Count(&count).Error; err != nil {
-		return medias, count, err
-	}
-
-	offset := (page - 1) * limit
-	if err := db.DBEngine.Where(where).Offset(offset).Limit(limit).Order("created_time DESC").Find(&medias).Error; err != nil {
-		return medias, count, err
-	}
-
-	return medias, count, nil
+// Delete delete the media info by id (not file right now)
+func (m *Media) Delete(db *gorm.DB) error {
+	return db.Delete(m).Error
 }
 
-// GetMediaByID get media info by id
-func GetMediaByID(id uint64) (*MediaModel, error) {
-	m := &MediaModel{}
-	d := db.DBEngine.Where("status = 1 AND deleted_time is null AND id = ?", id).First(&m)
-	return m, d.Error
+// Count count media in condition
+func (m *Media) Count(db *gorm.DB, where string, whereArgs []interface{}) (count int64, err error) {
+	if whereArgs != nil {
+		err = db.Model(m).Where(where, whereArgs...).Count(&count).Error
+		return
+	}
+	err = db.Model(m).Where(where).Count(&count).Error
+	return
+}
+
+// List get media list
+func (m *Media) List(db *gorm.DB, where string, whereArgs []interface{}, offset, limit int) (medias []*Media, err error) {
+	medias = make([]*Media, 0)
+	if whereArgs != nil {
+		err = db.Where(where, whereArgs...).Offset(offset).Limit(limit).Order("created_time DESC").Find(&medias).Error
+		return
+	}
+
+	err = db.Where(where).Offset(offset).Limit(limit).Order("created_time DESC").Find(&medias).Error
+	return medias, err
 }

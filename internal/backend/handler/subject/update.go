@@ -5,11 +5,8 @@ import (
 	"github.com/puti-projects/puti/internal/backend/service"
 	"github.com/puti-projects/puti/internal/model"
 	"github.com/puti-projects/puti/internal/pkg/errno"
-	"github.com/puti-projects/puti/internal/pkg/logger"
-	"github.com/puti-projects/puti/internal/utils"
 
 	"github.com/gin-gonic/gin"
-	"go.uber.org/zap"
 )
 
 // UpdateRequest struct bind to update subject
@@ -24,8 +21,6 @@ type UpdateRequest struct {
 
 // Update update the subject by ID
 func Update(c *gin.Context) {
-	logger.Info("Subject update function called.", zap.String("X-request-Id", utils.GetReqID(c)))
-
 	var r UpdateRequest
 	if err := c.Bind(&r); err != nil {
 		Response.SendResponse(c, errno.ErrBind, nil)

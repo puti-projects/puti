@@ -1,13 +1,14 @@
 package handler
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 
 	"github.com/puti-projects/puti/internal/frontend/service"
 
 	"github.com/gin-gonic/gin"
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 )
 
 // ShowTopSubjects subject list (parent id is 0)
@@ -39,7 +40,7 @@ func ShowSubjects(c *gin.Context) {
 	// get subject info
 	subjectInfo, err := service.GetSubjectInfoBySlug(subjectSlug)
 	if err != nil {
-		if gorm.IsRecordNotFoundError(err) {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
 			ShowNotFound(c)
 			return
 		}

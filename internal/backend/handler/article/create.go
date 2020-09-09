@@ -1,23 +1,21 @@
 package article
 
 import (
+	"database/sql"
 	"fmt"
 	"strconv"
 	"strings"
 	"time"
 
-	"github.com/go-sql-driver/mysql"
 	Response "github.com/puti-projects/puti/internal/backend/handler"
 	"github.com/puti-projects/puti/internal/backend/service"
 	"github.com/puti-projects/puti/internal/model"
 	"github.com/puti-projects/puti/internal/pkg/db"
 	"github.com/puti-projects/puti/internal/pkg/errno"
-	"github.com/puti-projects/puti/internal/pkg/logger"
 	"github.com/puti-projects/puti/internal/pkg/token"
 	"github.com/puti-projects/puti/internal/utils"
 
 	"github.com/gin-gonic/gin"
-	"go.uber.org/zap"
 )
 
 // CreateRequest struct of article create params
@@ -44,8 +42,6 @@ type CreateResponse struct {
 
 // Create create a new article (published or draft)
 func Create(c *gin.Context) {
-	logger.Info("article create function called", zap.String("X-request-Id", utils.GetReqID(c)))
-
 	// get token and parse
 	t := c.Query("token")
 	userContext, err := token.ParseToken(t)
@@ -99,7 +95,7 @@ func handleCreate(r *CreateRequest, userID uint64) (rsp *CreateResponse, err err
 		ViewCount:       0,
 	}
 	if r.PostedTime == "" && r.Status == model.PostStatusPublish {
-		article.PostDate = mysql.NullTime{Time: time.Now(), Valid: true}
+		article.PostDate = &sql.NullTime{Time: time.Now(), Valid: true}
 	} else {
 		article.PostDate = utils.StringToNullTime("2006-01-02 15:04:05", r.PostedTime)
 	}
@@ -108,7 +104,7 @@ func handleCreate(r *CreateRequest, userID uint64) (rsp *CreateResponse, err err
 	}
 
 	// set GUID
-	article.GUID = fmt.Sprintf("/article/%s.html", strconv.FormatUint(article.ID, 10))
+	article.GUID = fmt.Sprintf("/article/%s.html", strconv.FormatUint(uint64(article.ID), 10))
 	if err := tx.Model(&model.PostModel{}).Save(article).Error; err != nil {
 		tx.Rollback()
 		return rsp, err

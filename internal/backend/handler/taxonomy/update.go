@@ -7,11 +7,8 @@ import (
 	"github.com/puti-projects/puti/internal/backend/service"
 	"github.com/puti-projects/puti/internal/model"
 	"github.com/puti-projects/puti/internal/pkg/errno"
-	"github.com/puti-projects/puti/internal/utils"
 
 	"github.com/gin-gonic/gin"
-	"github.com/puti-projects/puti/internal/pkg/logger"
-	"go.uber.org/zap"
 )
 
 // UpdateRequest param struct to update taxonomy include category and tag
@@ -26,8 +23,6 @@ type UpdateRequest struct {
 
 // Update update taxonomy include category or tag
 func Update(c *gin.Context) {
-	logger.Info("Update function called.", zap.String("X-request-Id", utils.GetReqID(c)))
-
 	// Get term id
 	termID, _ := strconv.Atoi(c.Param("id"))
 

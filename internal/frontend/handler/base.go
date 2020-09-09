@@ -1,16 +1,16 @@
 package handler
 
 import (
-	"github.com/puti-projects/puti/internal/frontend/middleware"
+	"github.com/puti-projects/puti/internal/routers/middleware/view"
 
 	"github.com/gin-gonic/gin"
 )
 
 // getDataModel consume renderer data
-func getRenderData(c *gin.Context) middleware.RenderData {
+func getRenderData(c *gin.Context) view.RenderData {
 	renderData, _ := c.Get("renderData")
 
-	return *(renderData.(*middleware.RenderData))
+	return *(renderData.(*view.RenderData))
 }
 
 // getTheme return current theme name

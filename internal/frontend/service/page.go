@@ -40,7 +40,7 @@ func GetPageDetailByID(pageID uint64) (*model.ShowPageDetail, error) {
 		GUID:          siteURL + p.GUID,
 		CommentCount:  p.CommentCount,
 		ViewCount:     p.ViewCount,
-		PostedTime:    utils.GetFormatNullTime(&p.PostDate, "2006-01-02 15:04"),
+		PostedTime:    utils.GetFormatNullTime(p.PostDate, "2006-01-02 15:04"),
 		MetaData:      make(map[string]interface{}),
 	}
 

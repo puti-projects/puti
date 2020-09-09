@@ -1,18 +1,19 @@
 package service
 
 import (
+	"database/sql"
+	"errors"
 	"fmt"
 	"strconv"
 	"strings"
 	"sync"
 	"time"
 
-	"github.com/go-sql-driver/mysql"
 	"github.com/puti-projects/puti/internal/model"
 	"github.com/puti-projects/puti/internal/pkg/db"
 	"github.com/puti-projects/puti/internal/utils"
 
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 )
 
 // PostInfo is post info for post list
@@ -65,7 +66,7 @@ type PageDetail struct {
 }
 
 // ListPost post list
-func ListPost(postType, title string, page, number int, sort, status string) ([]*PostInfo, uint64, error) {
+func ListPost(postType, title string, page, number int, sort, status string) ([]*PostInfo, int64, error) {
 	infos := make([]*PostInfo, 0)
 	posts, count, err := model.ListPost(postType, title, page, number, sort, status)
 	if err != nil {
@@ -83,7 +84,6 @@ func ListPost(postType, title string, page, number int, sort, status string) ([]
 		IDMap: make(map[uint64]*PostInfo, len(posts)),
 	}
 
-	errChan := make(chan error, 1)
 	finished := make(chan bool, 1)
 
 	// Improve query efficiency in parallel
@@ -99,7 +99,7 @@ func ListPost(postType, title string, page, number int, sort, status string) ([]
 				UserID:       u.UserID,
 				Title:        u.Title,
 				Status:       u.Status,
-				PostDate:     utils.GetFormatNullTime(&u.PostDate, "2006-01-02 15:04"),
+				PostDate:     utils.GetFormatNullTime(u.PostDate, "2006-01-02 15:04"),
 				CommentCount: u.CommentCount,
 				ViewCount:    u.ViewCount,
 			}
@@ -111,11 +111,7 @@ func ListPost(postType, title string, page, number int, sort, status string) ([]
 		close(finished)
 	}()
 
-	select {
-	case <-finished:
-	case err := <-errChan:
-		return nil, count, err
-	}
+	<-finished
 
 	for _, id := range ids {
 		infos = append(infos, postList.IDMap[id])
@@ -150,7 +146,7 @@ func GetArticleDetail(articleID string) (*ArticleDetail, error) {
 		IfTop:           a.IfTop,
 		GUID:            a.GUID,
 		CoverPicture:    a.CoverPicture,
-		PostDate:        utils.GetFormatNullTime(&a.PostDate, "2006-01-02 15:04:05"),
+		PostDate:        utils.GetFormatNullTime(a.PostDate, "2006-01-02 15:04:05"),
 		MetaData:        make(map[string]interface{}),
 		Category:        make([]uint64, 0),
 		Tag:             make([]uint64, 0),
@@ -208,7 +204,7 @@ func GetPageDetail(pageID string) (*PageDetail, error) {
 		CommentStatus:   p.CommentStatus,
 		GUID:            p.GUID,
 		CoverPicture:    p.CoverPicture,
-		PostDate:        utils.GetFormatNullTime(&p.PostDate, "2006-01-02 15:04:05"),
+		PostDate:        utils.GetFormatNullTime(p.PostDate, "2006-01-02 15:04:05"),
 		MetaData:        make(map[string]interface{}),
 	}
 
@@ -247,7 +243,7 @@ func UpdateArticle(article *model.PostModel, description string, category []uint
 	oldArticle.CoverPicture = article.CoverPicture
 	oldArticle.PostDate = article.PostDate
 	if oldArticle.PostDate.Valid == false && article.Status == model.PostStatusPublish {
-		oldArticle.PostDate = mysql.NullTime{Time: time.Now(), Valid: true}
+		oldArticle.PostDate = &sql.NullTime{Time: time.Now(), Valid: true}
 	}
 	if err = tx.Model(&model.PostModel{}).Save(oldArticle).Error; err != nil {
 		tx.Rollback()
@@ -315,7 +311,7 @@ func UpdateArticle(article *model.PostModel, description string, category []uint
 
 	// get old subject
 	articleSubject, err := model.GetArticleSubject(article.ID)
-	if err != nil && !gorm.IsRecordNotFoundError(err) {
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		tx.Rollback()
 		return err
 	}

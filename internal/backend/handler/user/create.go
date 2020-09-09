@@ -2,85 +2,41 @@ package user
 
 import (
 	Response "github.com/puti-projects/puti/internal/backend/handler"
-	"github.com/puti-projects/puti/internal/model"
+	"github.com/puti-projects/puti/internal/backend/service"
 	"github.com/puti-projects/puti/internal/pkg/errno"
-	"github.com/puti-projects/puti/internal/utils"
 
 	"github.com/gin-gonic/gin"
-	"github.com/puti-projects/puti/internal/pkg/logger"
-	"go.uber.org/zap"
 )
 
-// CreateRequest is the create user request params struct
-type CreateRequest struct {
-	Account       string `form:"account"`
-	Nickname      string `form:"nickname"`
-	Email         string `form:"email"`
-	Role          string `form:"role"`
-	Password      string `form:"password"`
-	PasswordAgain string `form:"passwordAgain"`
-	Website       string `form:"website"`
-}
-
-// CreateResponse is the create user request's response struct
-type CreateResponse struct {
-	Account  string
-	Nickname string
-}
-
-// Create creates a user
+// Create user create handler
 func Create(c *gin.Context) {
-	logger.Info("User Create function called.", zap.String("X-request-Id", utils.GetReqID(c)))
-
-	var r CreateRequest
+	var r service.UserCreateRequest
 	if err := c.Bind(&r); err != nil {
 		Response.SendResponse(c, errno.ErrBind, nil)
 		return
 	}
 
 	// check params
-	if err := r.checkParam(); err != nil {
+	if err := checkParam(&r); err != nil {
 		Response.SendResponse(c, err, nil)
 		return
 	}
 
-	if "" == r.Nickname {
-		r.Nickname = r.Account
+	username, nickname, err := service.CreateUser(&r)
+	if err != nil {
+		Response.SendResponse(c, err, nil)
 	}
 
-	// TODO
-	u := model.UserModel{
-		Username: r.Account,
-		Password: r.Password,
-		Nickname: r.Nickname,
-		Email:    r.Email,
-		PageURL:  r.Website,
-		Status:   1,
-		Roles:    r.Role,
-	}
-
-	// encrypt password
-	if err := u.Encrypt(); err != nil {
-		Response.SendResponse(c, errno.ErrEncrypt, nil)
-		return
-	}
-
-	// Insert the user to the database. TODO 字段提示
-	if err := u.Create(); err != nil {
-		Response.SendResponse(c, errno.ErrDatabase, nil)
-		return
-	}
-
-	rsp := CreateResponse{
-		Account:  r.Account,
-		Nickname: r.Nickname,
+	rsp := &service.UserCreateResponse{
+		Account:  username,
+		Nickname: nickname,
 	}
 
 	// Show the user information.
 	Response.SendResponse(c, nil, rsp)
 }
 
-func (r *CreateRequest) checkParam() error {
+func checkParam(r *service.UserCreateRequest) error {
 	if r.Account == "" {
 		return errno.New(errno.ErrValidation, nil).Add("account is empty.")
 	}

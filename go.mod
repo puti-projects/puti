@@ -8,18 +8,17 @@ require (
 	github.com/fsnotify/fsnotify v1.4.9
 	github.com/gin-gonic/gin v1.6.3
 	github.com/go-ole/go-ole v1.2.1 // indirect
-	github.com/go-sql-driver/mysql v1.5.0
-	github.com/google/uuid v1.0.0
-	github.com/jinzhu/gorm v1.9.16
+	github.com/google/uuid v1.1.2
 	github.com/patrickmn/go-cache v2.1.0+incompatible
-	github.com/shirou/gopsutil v2.18.12+incompatible
-	github.com/shirou/w32 v0.0.0-20160930032740-bb4de0191aa4 // indirect
+	github.com/shirou/gopsutil v2.20.8+incompatible
 	github.com/spf13/afero v1.2.1 // indirect
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/spf13/pflag v1.0.5
 	github.com/spf13/viper v1.7.1
-	github.com/teris-io/shortid v0.0.0-20171029131806-771a37caa5cf
-	go.uber.org/zap v1.15.0
-	golang.org/x/crypto v0.0.0-20191205180655-e7c4368fe9dd
+	go.uber.org/zap v1.16.0
+	golang.org/x/crypto v0.0.0-20200820211705-5c72a883971a
+	golang.org/x/sys v0.0.0-20200905004654-be1d3432aa8f // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0
+	gorm.io/driver/mysql v1.0.1
+	gorm.io/gorm v1.20.0
 )

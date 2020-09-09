@@ -7,12 +7,10 @@ import (
 	"github.com/puti-projects/puti/internal/model"
 	"github.com/puti-projects/puti/internal/pkg/db"
 	"github.com/puti-projects/puti/internal/pkg/errno"
-	"github.com/puti-projects/puti/internal/pkg/logger"
 	"github.com/puti-projects/puti/internal/pkg/token"
 	"github.com/puti-projects/puti/internal/utils"
 
 	"github.com/gin-gonic/gin"
-	"go.uber.org/zap"
 )
 
 // CreateRequest struct of page create params
@@ -38,8 +36,6 @@ type CreateResponse struct {
 
 // Create add new page
 func Create(c *gin.Context) {
-	logger.Info("Page create function called.", zap.String("X-request-Id", utils.GetReqID(c)))
-
 	// get token and parse
 	t := c.Query("token")
 	userContext, err := token.ParseToken(t)

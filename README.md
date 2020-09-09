@@ -182,7 +182,7 @@ Detailed changes for each release are documented in the [changelog file]((https:
 | 依赖 | 关于 |
 | :----- | :----- |
 | [gin-gonic/gin](https://github.com/gin-gonic/gin) |  HTTP web framework written in Go |
-| [jinzhu/gorm](https://github.com/jinzhu/gorm) | The ORM library for Golang|
+| [go-gorm/gorm](https://github.com/go-gorm/gorm)  | The ORM library for Golang|
 | [patrickmn/go-cache](https://github.com/patrickmn/go-cache) | An in-memory key:value store/cache|
 | [spf13/viper](https://github.com/spf13/viper) |  Complete configuration solution|
 | [go.uber.org/zap](https://go.uber.org/zap) |  Fast, structured, leveled logging|

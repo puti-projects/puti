@@ -4,8 +4,8 @@ import "github.com/puti-projects/puti/internal/pkg/db"
 
 // SubjectRelationshipsModel `pt_subject_relationships` 's struct
 type SubjectRelationshipsModel struct {
-	ObjectID  uint64 `gorm:"column:object_id;not null;primary_key"`
-	SubjectID uint64 `gorm:"column:subject_id;not null;primary_key"`
+	ObjectID  uint64 `gorm:"column:object_id;not null;primaryKey"`
+	SubjectID uint64 `gorm:"column:subject_id;not null;primaryKey"`
 	OrderNum  string `gorm:"column:order_num;not null"`
 }
 

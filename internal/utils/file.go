@@ -66,3 +66,20 @@ func PathExists(path string) (bool, error) {
 	}
 	return false, err
 }
+
+// CheckPathAndCreate check path if exist, fi not exist, make the path dir
+func CheckPathAndCreate(path string) error {
+	coverPathExist, err := PathExists(path)
+	if err != nil {
+		return err
+	}
+
+	if !coverPathExist {
+		err := os.Mkdir(path, os.ModePerm)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}

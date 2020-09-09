@@ -17,7 +17,8 @@ type SafetyConfig struct {
 }
 
 type LogConfig struct {
-	LoggerFile       string `mapstructure:"logger_file"`
+	LoggerFileInfo   string `mapstructure:"logger_file_info"`
+	LoggerFileError  string `mapstructure:"logger_file_error"`
 	LoggerMaxSize    int    `mapstructure:"logger_max_size"`
 	LoggerMaxBackups int    `mapstructure:"logger_max_backups"`
 	LoggerMaxAge     int    `mapstructure:"logger_max_age"`

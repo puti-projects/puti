@@ -2,29 +2,31 @@ package db
 
 import (
 	"fmt"
+	"time"
 
-	"github.com/jinzhu/gorm"
 	"github.com/puti-projects/puti/internal/pkg/config"
+
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
 )
 
 var (
 	DBEngine *gorm.DB
 )
 
+// InitDB init db connection pool
 func InitDB() error {
 	var err error
-	DBEngine, err = openDB(
-		config.Db.Username,
-		config.Db.Password,
-		config.Db.Addr,
-		config.Db.Name,
-	)
+	DBEngine, err = openDB(config.Db.Username, config.Db.Password, config.Db.Addr, config.Db.Name)
 	if err != nil {
 		return err
 	}
 
-	// set for db connection
-	setupDB(DBEngine)
+	// set up config of db connection pool
+	err = setupDB(DBEngine)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
@@ -32,14 +34,16 @@ func InitDB() error {
 // openDB creates the DB connection
 // It sets the location to UTC time
 func openDB(username, password, addr, name string) (*gorm.DB, error) {
-	config := fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=utf8mb4,utf8&parseTime=%t&loc=%s",
+	dsn := fmt.Sprintf(
+		"%s:%s@tcp(%s)/%s?charset=utf8mb4&parseTime=%t&loc=%s",
 		username,
 		password,
 		addr,
 		name,
 		true,
-		"UTC")
-	db, err := gorm.Open("mysql", config)
+		"UTC",
+	)
+	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
 		return nil, err
 	}
@@ -48,15 +52,18 @@ func openDB(username, password, addr, name string) (*gorm.DB, error) {
 }
 
 // setupDB sets the DB settings
-func setupDB(db *gorm.DB) {
-	// gorm log mode
-	if config.Server.Runmode == "debug" {
-		db.LogMode(true)
-	} else {
-		db.LogMode(false)
+func setupDB(db *gorm.DB) error {
+	sqlDB, err := db.DB()
+	if err != nil {
+		return err
 	}
 
-	// connection pool setting
-	db.DB().SetMaxOpenConns(config.Db.MaxOpenConns) // 用于设置最大打开的连接数，默认值为0表示不限制.设置最大的连接数，可以避免并发太高导致连接mysql出现too many connections的错误。
-	db.DB().SetMaxIdleConns(config.Db.MaxIdleConns) // 用于设置闲置的连接数.设置闲置的连接数则当开启的一个连接使用完成后可以放在池里等候下一次使用。
+	// 设置空闲连接池中连接的最大数量
+	sqlDB.SetMaxIdleConns(config.Db.MaxIdleConns)
+	// 设置打开数据库连接的最大数量
+	sqlDB.SetMaxOpenConns(config.Db.MaxOpenConns)
+	// 设置连接可复用的最大时间
+	sqlDB.SetConnMaxLifetime(time.Hour)
+
+	return nil
 }

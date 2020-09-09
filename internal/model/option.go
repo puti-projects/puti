@@ -4,7 +4,7 @@ import "github.com/puti-projects/puti/internal/pkg/db"
 
 // OptionModel site options
 type OptionModel struct {
-	ID          uint64 `gorm:"primary_key;AUTO_INCREMENT;column:id"`
+	ID          uint64 `gorm:"primaryKey;autoIncrement;column:id"`
 	OptionName  string `gorm:"column:option_name;not null"`
 	OptionValue string `gorm:"column:option_value;not null"`
 	Autoload    uint64 `gorm:"column:autoload;not null"`

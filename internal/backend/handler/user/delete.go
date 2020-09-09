@@ -4,18 +4,17 @@ import (
 	"strconv"
 
 	Response "github.com/puti-projects/puti/internal/backend/handler"
-	"github.com/puti-projects/puti/internal/model"
-	"github.com/puti-projects/puti/internal/pkg/errno"
+	"github.com/puti-projects/puti/internal/backend/service"
 
 	"github.com/gin-gonic/gin"
 )
 
-// Delete deletes the user by id
+// Delete user delete handler
 func Delete(c *gin.Context) {
 	userID, _ := strconv.Atoi(c.Param("id"))
 
-	if err := model.DeleteUser(uint64(userID)); err != nil {
-		Response.SendResponse(c, errno.ErrDatabase, nil)
+	if err := service.DeleteUser(userID); err != nil {
+		Response.SendResponse(c, err, nil)
 		return
 	}
 

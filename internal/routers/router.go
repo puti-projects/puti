@@ -1,6 +1,7 @@
 package routers
 
 import (
+	"database/sql"
 	"html/template"
 	"net/http"
 	"path/filepath"
@@ -15,32 +16,40 @@ import (
 	"github.com/puti-projects/puti/internal/backend/handler/subject"
 	"github.com/puti-projects/puti/internal/backend/handler/taxonomy"
 	"github.com/puti-projects/puti/internal/backend/handler/user"
-	apiMiddleware "github.com/puti-projects/puti/internal/backend/middleware"
 	webHandler "github.com/puti-projects/puti/internal/frontend/handler"
-	webMiddleware "github.com/puti-projects/puti/internal/frontend/middleware"
+	"github.com/puti-projects/puti/internal/pkg/config"
 	"github.com/puti-projects/puti/internal/pkg/logger"
 	optionCache "github.com/puti-projects/puti/internal/pkg/option"
 	"github.com/puti-projects/puti/internal/pkg/theme"
-	"github.com/spf13/viper"
+	"github.com/puti-projects/puti/internal/routers/middleware"
+	apiMiddleware "github.com/puti-projects/puti/internal/routers/middleware/api"
+	webMiddleware "github.com/puti-projects/puti/internal/routers/middleware/view"
+	"github.com/puti-projects/puti/internal/utils"
 
 	"github.com/gin-gonic/gin"
-	"github.com/go-sql-driver/mysql"
-	"github.com/puti-projects/puti/internal/pkg/config"
-	"github.com/puti-projects/puti/internal/utils"
 )
 
-func NewRouter() *gin.Engine {
+func NewRouter(runmode string) *gin.Engine {
+	// Set gin mode before initialize the gin router
+	if "debug" == runmode {
+		gin.SetMode(gin.DebugMode)
+	} else if "test" == runmode {
+		gin.SetMode(gin.TestMode)
+	} else {
+		gin.SetMode(gin.ReleaseMode)
+	}
+
 	// create the gin engine
 	g := gin.New()
 
 	g = setFuncMap(g)
 
-	// r.Use(gin.Logger())   // default logger middleware
-	g.Use(gin.Recovery()) // default recovery middleware
+	g.Use(middleware.AccessLogger())
+	g.Use(middleware.Recovery())
 
 	currentTheme := optionCache.Options.Get("current_theme")
 
-	if viper.GetString("runmode") == gin.DebugMode {
+	if runmode == gin.DebugMode {
 		g.Use(apiMiddleware.Options)
 	}
 
@@ -57,7 +66,7 @@ func setFuncMap(g *gin.Engine) *gin.Engine {
 		"minus": func(a, b int) int {
 			return a - b
 		},
-		"formatNullTime": func(time *mysql.NullTime, format string) string {
+		"formatNullTime": func(time *sql.NullTime, format string) string {
 			return utils.GetFormatNullTime(time, format)
 		},
 	})

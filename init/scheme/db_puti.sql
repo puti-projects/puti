@@ -347,7 +347,7 @@ CREATE TABLE `pt_user`  (
   `email` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '邮箱',
   `avatar` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '头像',
   `page_url` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '主页链接',
-  `status` int(11) NOT NULL DEFAULT 0 COMMENT '状态.1激活2冻结',
+  `status` int(11) NOT NULL DEFAULT 1 COMMENT '状态.1激活2冻结',
   `role` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'subscriber' COMMENT '用户角色',
   `created_time` datetime(0) NOT NULL COMMENT '注册时间(UTC)',
   `updated_time` datetime(0) NOT NULL COMMENT '更新时间(UTC)',

@@ -14,22 +14,22 @@ var DefaultExpiration = 2 * time.Hour
 // DefaultPurgesExpiration default purges expired items of 3 hours for puti
 var DefaultPurgesExpiration = 3 * time.Hour
 
+type optionCache struct {
+	gocacheBody *gocache.Cache
+}
+
 // Options cache
 var Options = &optionCache{
 	gocacheBody: gocache.New(DefaultExpiration, DefaultPurgesExpiration),
 }
 
-type optionCache struct {
-	gocacheBody *gocache.Cache
-}
-
 // LoadOptions load default options
-func LoadOptions() {
+func LoadOptions() error {
 	if err := getAutoLoadOptions(); err != nil {
-		logger.Errorf("load options failed, %s", err)
+		return err
 	}
 
-	logger.Info("options has been deployed successfully")
+	return nil
 }
 
 // getAutoLoadOptions get options need to load

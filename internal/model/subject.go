@@ -1,7 +1,8 @@
 package model
 
 import (
-	"github.com/go-sql-driver/mysql"
+	"database/sql"
+
 	"github.com/puti-projects/puti/internal/pkg/db"
 )
 
@@ -9,14 +10,14 @@ import (
 type SubjectModel struct {
 	Model
 
-	ParentID    uint64         `gorm:"column:parent_id;not null"`
-	Name        string         `gorm:"column:name;not null"`
-	Slug        string         `gorm:"column:slug;not null"`
-	Description string         `gorm:"column:description;not null"`
-	CoverImage  uint64         `gorm:"column:cover_image;not null"`
-	IsEnd       uint64         `gorm:"column:is_end;not null"`
-	Count       uint64         `gorm:"column:count;not null"`
-	LastUpdated mysql.NullTime `gorm:"column:last_updated"`
+	ParentID    uint64       `gorm:"column:parent_id;not null"`
+	Name        string       `gorm:"column:name;not null"`
+	Slug        string       `gorm:"column:slug;not null"`
+	Description string       `gorm:"column:description;not null"`
+	CoverImage  uint64       `gorm:"column:cover_image;not null"`
+	IsEnd       uint64       `gorm:"column:is_end;not null"`
+	Count       uint64       `gorm:"column:count;not null"`
+	LastUpdated sql.NullTime `gorm:"column:last_updated"`
 }
 
 // TableName is the resource table name in db
@@ -55,7 +56,7 @@ func GetAllSubjects() ([]*SubjectModel, error) {
 
 // SubjectCheckNameExistWhileCreate check the subject name if is already exist
 func SubjectCheckNameExistWhileCreate(name string) bool {
-	count := 0
+	var count int64 = 0
 	subjectModel := &SubjectModel{}
 	db.DBEngine.Table(subjectModel.TableName()).
 		Where("`name` = ?", name).
@@ -70,7 +71,7 @@ func SubjectCheckNameExistWhileCreate(name string) bool {
 
 // SubjectCheckNameExistWhileUpdate check the subject name if is already exist without itself
 func SubjectCheckNameExistWhileUpdate(subjectID uint64, name string) bool {
-	count := 0
+	var count int64 = 0
 	subjectModel := &SubjectModel{}
 	db.DBEngine.Table(subjectModel.TableName()).
 		Where("`id` != ? AND `name` = ?", subjectID, name).
@@ -84,7 +85,7 @@ func SubjectCheckNameExistWhileUpdate(subjectID uint64, name string) bool {
 }
 
 // GetSubjectChildrenNumber calcuelate the total number of subject's children
-func GetSubjectChildrenNumber(subjectID uint64) (count int) {
+func GetSubjectChildrenNumber(subjectID uint64) (count int64) {
 	db.DBEngine.Model(&SubjectModel{}).Where("`parent_id` = ?", subjectID).Count(&count)
 	return count
 }
