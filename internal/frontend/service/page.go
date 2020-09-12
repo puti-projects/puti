@@ -23,8 +23,8 @@ func GetPageIDBySlug(slug string) uint64 {
 }
 
 // GetPageDetailByID get page detail info by page id
-func GetPageDetailByID(pageID uint64) (*model.ShowPageDetail, error) {
-	p := &model.PostModel{}
+func GetPageDetailByID(pageID uint64) (*ShowPageDetail, error) {
+	p := &model.Post{}
 	err := db.DBEngine.Where("id = ? AND post_type = ? AND parent_id = ? AND status =?", pageID, model.PostTypePage, 0, model.PostStatusPublish).First(&p).Error
 	if err != nil {
 		return nil, err
@@ -32,7 +32,7 @@ func GetPageDetailByID(pageID uint64) (*model.ShowPageDetail, error) {
 
 	siteURL := optionCache.Options.Get("site_url")
 
-	pageDetail := &model.ShowPageDetail{
+	pageDetail := &ShowPageDetail{
 		ID:            p.ID,
 		Title:         p.Title,
 		ContentHTML:   template.HTML(p.ContentHTML),
@@ -44,8 +44,9 @@ func GetPageDetailByID(pageID uint64) (*model.ShowPageDetail, error) {
 		MetaData:      make(map[string]interface{}),
 	}
 
-	// get extra data of article
-	pm, err := model.GetPostMetaData(pageID)
+	// get extra data of page
+	meta := &model.PostMeta{PostID: pageID}
+	pm, err := meta.GetAllByPostID(db.DBEngine)
 	if err != nil {
 		return nil, err
 	}

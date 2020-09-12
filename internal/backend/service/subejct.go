@@ -1,17 +1,34 @@
 package service
 
 import (
-	"database/sql"
 	"errors"
-	"strings"
-	"time"
 
+	"github.com/puti-projects/puti/internal/backend/dao"
 	"github.com/puti-projects/puti/internal/model"
-	"github.com/puti-projects/puti/internal/pkg/db"
+	"github.com/puti-projects/puti/internal/pkg/errno"
 	"github.com/puti-projects/puti/internal/utils"
 
 	"gorm.io/gorm"
 )
+
+// SubjectCreateRequest struct bind to create subject
+type SubjectCreateRequest struct {
+	Name        string `json:"name"`
+	Slug        string `json:"slug"`
+	ParentID    uint64 `json:"parent_id"`
+	CoverImage  uint64 `json:"cover_image"`
+	Description string `json:"description"`
+}
+
+// SubjectUpdateRequest struct bind to update subject
+type SubjectUpdateRequest struct {
+	ID          uint64 `json:"ID"`
+	Name        string `json:"name"`
+	Slug        string `json:"slug"`
+	ParentID    uint64 `json:"parent_id"`
+	CoverImage  uint64 `json:"cover_image"`
+	Description string `json:"description"`
+}
 
 // SubjectTreeNode tree struct of subject list
 type SubjectTreeNode struct {
@@ -37,20 +54,42 @@ type SubjectDetail struct {
 	CoverURL         string `json:"cover_url"`
 }
 
-// GetSubjectList get subject list by tree struct
-func GetSubjectList() ([]*SubjectTreeNode, error) {
-	subjects, err := model.GetAllSubjects()
-	if err != nil {
-		return nil, err
+// CreateSubject create a subject
+func CreateSubject(r *SubjectCreateRequest) error {
+	s := &model.Subject{
+		ParentID:    r.ParentID,
+		Name:        r.Name,
+		Slug:        r.Slug,
+		Description: r.Description,
+		CoverImage:  r.CoverImage,
 	}
 
-	list := GetSubjectTree(subjects, 0)
+	if err := dao.Engine.CreateSubject(s); err != nil {
+		return errno.New(errno.ErrDatabase, err)
+	}
+
+	return nil
+}
+
+// CheckSubjectNameExist check the subject name
+func CheckSubjectNameExist(subjectID uint64, name string) bool {
+	return dao.Engine.CheckSubjectNameExist(subjectID, name)
+}
+
+// GetSubjectList get subject list by tree struct
+func GetSubjectList() ([]*SubjectTreeNode, error) {
+	subjects, err := dao.Engine.GetAllSubjects()
+	if err != nil {
+		return nil, errno.New(errno.ErrDatabase, err)
+	}
+
+	list := getSubjectTree(subjects, 0)
 
 	return list, nil
 }
 
 // GetSubjectTree return a subject tree
-func GetSubjectTree(subjects []*model.SubjectModel, pid uint64) []*SubjectTreeNode {
+func getSubjectTree(subjects []*model.Subject, pid uint64) []*SubjectTreeNode {
 	var tree []*SubjectTreeNode
 
 	for _, v := range subjects {
@@ -69,7 +108,7 @@ func GetSubjectTree(subjects []*model.SubjectModel, pid uint64) []*SubjectTreeNo
 			} else {
 				subjectTreeNode.LastUpdated = lastUpdatedTime
 			}
-			subjectTreeNode.Children = GetSubjectTree(subjects, v.ID)
+			subjectTreeNode.Children = getSubjectTree(subjects, v.ID)
 			tree = append(tree, &subjectTreeNode)
 		}
 	}
@@ -79,7 +118,7 @@ func GetSubjectTree(subjects []*model.SubjectModel, pid uint64) []*SubjectTreeNo
 
 // GetSubjectInfo get subject detail by id
 func GetSubjectInfo(subjectID uint64) (*SubjectDetail, error) {
-	s, err := model.GetSubjectByID(subjectID)
+	s, err := dao.Engine.GetSubjectByID(subjectID)
 	if err != nil {
 		return nil, err
 	}
@@ -109,216 +148,58 @@ func GetSubjectInfo(subjectID uint64) (*SubjectDetail, error) {
 }
 
 // UpdateSubject udpate subject info
-func UpdateSubject(subject *model.SubjectModel) error {
-	// begin transcation
-	tx := db.DBEngine.Begin()
-	defer func() {
-		if r := recover(); r != nil {
-			tx.Rollback()
-		}
-	}()
+func UpdateSubject(r *SubjectUpdateRequest) error {
+	subject := &model.Subject{
+		Model: model.Model{ID: r.ID},
 
-	if err := tx.Error; err != nil {
-		return err
+		ParentID:    r.ParentID,
+		Name:        r.Name,
+		Slug:        r.Slug,
+		Description: r.Description,
+		CoverImage:  r.CoverImage,
 	}
 
-	oldSubject, err := model.GetSubjectByID(subject.ID)
-	if err != nil {
-		return err
-	}
-
-	// if change parent ID
-	if oldSubject.ParentID != subject.ParentID {
-		if err := updateParentSubjectCount(tx, oldSubject.ParentID, subject.ParentID, oldSubject.Count); err != nil {
-			tx.Rollback()
-			return err
-		}
-	}
-
-	oldSubject.ParentID = subject.ParentID
-	oldSubject.Name = strings.TrimSpace(subject.Name)
-	oldSubject.Slug = strings.TrimSpace(subject.Slug)
-	oldSubject.Description = strings.TrimSpace(subject.Description)
-	oldSubject.CoverImage = subject.CoverImage
-
-	if err = tx.Model(&model.SubjectModel{}).Save(oldSubject).Error; err != nil {
-		tx.Rollback()
-		return err
-	}
-
-	// commit
-	return tx.Commit().Error
-}
-
-// updateParentSubjectCount update old parent's and new parent's count
-func updateParentSubjectCount(tx *gorm.DB, oldParentID, newParentID, countNum uint64) error {
-	// update old parents count
-	if oldParentID != 0 {
-		if err := updateSubjectCount(tx, oldParentID, -countNum); err != nil {
-			return err
-		}
-	}
-
-	// update new parents count
-	if newParentID != 0 {
-		if err := updateSubjectCount(tx, newParentID, countNum); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-// updateSubjectCount update subject's count by subject ID and diff count number
-func updateSubjectCount(tx *gorm.DB, subjectID uint64, countDiff uint64) error {
-	subject := &model.SubjectModel{}
-	t := tx.Where("`id` = ?", subjectID).First(&subject)
-	if t.Error != nil {
-		return t.Error
-	}
-	subject.Count = subject.Count + countDiff
-	if err := tx.Model(&model.SubjectModel{}).Save(subject).Error; err != nil {
-		return err
-	}
-
-	if subject.ParentID != 0 {
-		return updateSubjectCount(tx, subject.ParentID, countDiff)
+	if err := dao.Engine.UpdateSubject(subject); err != nil {
+		return errno.New(errno.ErrDatabase, err)
 	}
 
 	return nil
 }
 
 // GetArticleSubejct get article's subject by article id
-func GetArticleSubejct(articleID uint64) ([]uint64, error) {
-	subject, err := model.GetArticleSubject(articleID)
+func GetArticleSubejctID(articleID uint64) ([]uint64, error) {
+	subjectRelation, err := dao.Engine.GetArticleSubjectByArticleID(articleID)
 	if err != nil {
 		return nil, err
 	}
 
 	articleSubject := make([]uint64, 0)
-	for _, item := range subject {
+	for _, item := range subjectRelation {
 		articleSubject = append(articleSubject, item.SubjectID)
 	}
 
 	return articleSubject, nil
 }
 
-// UpdateSubjectInfoByArticleChange update subject's info (count, last updated time) when creating or updaing the article
-// checkout taxonomy's parent and compare it with the subjectIDGroup is in need
-func UpdateSubjectInfoByArticleChange(tx *gorm.DB, subjectIDGroup []uint64, countDiff int64, updateLastUpdated bool) (err error) {
-	var parentIDs []uint64
-	for _, subjectID := range subjectIDGroup {
-		parentIDs, err = getSubjectParentID(tx, subjectID, parentIDs)
-		if err != nil {
-			return err
-		}
-	}
-
-	if len(parentIDs) != 0 {
-		for _, v := range parentIDs {
-			inGroup := false
-			for _, vv := range subjectIDGroup {
-				if vv == v {
-					inGroup = true
-				}
-			}
-
-			if inGroup == false {
-				subjectIDGroup = append(subjectIDGroup, v)
-			}
-		}
-	}
-
-	if len(subjectIDGroup) != 0 {
-		subjectModel := &model.SubjectModel{}
-		updateColumns := map[string]interface{}{}
-		if countDiff != 0 {
-			updateColumns["count"] = gorm.Expr("count + ?", countDiff)
-		}
-		if updateLastUpdated {
-			updateColumns["last_updated"] = sql.NullTime{Time: time.Now(), Valid: true}
-		}
-
-		// exec
-		if len(updateColumns) != 0 {
-			err = tx.Table(subjectModel.TableName()).Where("`id` IN (?)", subjectIDGroup).Updates(updateColumns).Error
-			if err != nil {
-				return err
-			}
-		}
+// checkIfSubjecCanDelete check the subject has children or not
+func checkIfSubjecCanDelete(subjectID uint64) error {
+	if ifHasChild := dao.Engine.IfSubjectHasChild(subjectID); ifHasChild == true {
+		return errno.New(errno.ErrValidation, nil).Add("subject has children and can not be deleted")
 	}
 
 	return nil
 }
 
-// getSubjectParentID get all level parents
-func getSubjectParentID(tx *gorm.DB, subjectID uint64, parentIDs []uint64) (parentIDGroup []uint64, err error) {
-	subject := &model.SubjectModel{}
-	err = tx.Where("`id` = ?", subjectID).First(&subject).Error
-	if err != nil {
-		return nil, err
-	}
-
-	if subject.ParentID != 0 {
-		parentIDGroup = append(parentIDGroup, subject.ParentID)
-		parentIDGroup, err = getSubjectParentID(tx, subject.ParentID, parentIDGroup)
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	return parentIDGroup, nil
-}
-
-// IfSubjectHasChild check the subject has children or not
-func IfSubjectHasChild(subjectID uint64) bool {
-	count := model.GetSubjectChildrenNumber(subjectID)
-	if count > 0 {
-		return true
-	}
-
-	return false
-}
-
 // DeleteSubject delete subject directly
 func DeleteSubject(subjectID uint64) error {
-	// begin transcation
-	tx := db.DBEngine.Begin()
-	defer func() {
-		if r := recover(); r != nil {
-			tx.Rollback()
-		}
-	}()
-
-	// get subject info
-	subject := &model.SubjectModel{}
-	t := tx.Where("`id` = ?", subjectID).First(&subject)
-	if t.Error != nil {
-		return t.Error
-	}
-
-	// delete subject
-	dSubject := tx.Where("`id` = ?", subjectID).Delete(model.SubjectModel{})
-	if err := dSubject.Error; err != nil {
-		tx.Rollback()
+	// check
+	if err := checkIfSubjecCanDelete(subjectID); err != nil {
 		return err
 	}
 
-	// delete relationship
-	dRelation := tx.Where("`subject_id` = ?", subjectID).Delete(model.SubjectRelationshipsModel{})
-	if err := dRelation.Error; err != nil {
-		tx.Rollback()
-		return err
+	if err := dao.Engine.DeleteSubject(subjectID); err != nil {
+		return errno.New(errno.ErrDatabase, err)
 	}
 
-	// update parent count number(if has parent)
-	if subject.ParentID > 0 {
-		if err := updateSubjectCount(tx, subject.ParentID, -subject.Count); err != nil {
-			tx.Rollback()
-			return err
-		}
-	}
-
-	// commit
-	return tx.Commit().Error
+	return nil
 }

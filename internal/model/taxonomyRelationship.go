@@ -1,44 +1,27 @@
 package model
 
-import "github.com/puti-projects/puti/internal/pkg/db"
+import (
+	"gorm.io/gorm"
+)
 
-// TermRelationshipsModel `pt_term_relationships` 's struct taxomony raltionships with object
-type TermRelationshipsModel struct {
+// TermRelationships `pt_term_relationships` 's struct taxomony raltionships with object
+type TermRelationships struct {
 	ObjectID       uint64 `gorm:"column:object_id;not null;primaryKey"`
 	TermTaxonomyID uint64 `gorm:"column:term_taxonomy_id;not null;primaryKey"`
 	TermOrder      string `gorm:"column:term_order;not null"`
 }
 
-// ArticleTaxonomy use for article taxonomy
-type ArticleTaxonomy struct {
-	TermID   uint64
-	Taxonomy string
-}
-
 // TableName TermRelationshipsModel's binding db name
-func (c *TermRelationshipsModel) TableName() string {
+func (c *TermRelationships) TableName() string {
 	return "pt_term_relationships"
 }
 
-// GetArticleTaxonomy get article taxonomy include all type
-func GetArticleTaxonomy(articleID uint64) ([]*ArticleTaxonomy, error) {
-	sql := "SELECT t.term_id, tt.taxonomy FROM pt_term t LEFT JOIN pt_term_taxonomy tt ON tt.term_id = t.term_id LEFT JOIN pt_term_relationships tr ON tr.term_taxonomy_id = tt.term_taxonomy_id WHERE tr.object_id = ?"
-	rows, err := db.DBEngine.Raw(sql, articleID).Rows()
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
+// Delete delete a record
+func (t *TermRelationships) Delete(db *gorm.DB) error {
+	return db.Delete(t).Error
+}
 
-	result := make([]*ArticleTaxonomy, 0)
-	for rows.Next() {
-		articleTaxonomy := &ArticleTaxonomy{}
-
-		if err := db.DBEngine.ScanRows(rows, &articleTaxonomy); err != nil {
-			return nil, err
-		}
-
-		result = append(result, articleTaxonomy)
-	}
-
-	return result, nil
+// DeleteByCondition delete records by condition
+func (t *TermRelationships) DeleteByCondition(db *gorm.DB, where string, whereArgs []interface{}) error {
+	return db.Where(where, whereArgs...).Delete(t).Error
 }

@@ -3,11 +3,11 @@ package model
 import (
 	"database/sql"
 
-	"github.com/puti-projects/puti/internal/pkg/db"
+	"gorm.io/gorm"
 )
 
 // SubjectModel the definition of subject model
-type SubjectModel struct {
+type Subject struct {
 	Model
 
 	ParentID    uint64       `gorm:"column:parent_id;not null"`
@@ -21,46 +21,50 @@ type SubjectModel struct {
 }
 
 // TableName is the resource table name in db
-func (c *SubjectModel) TableName() string {
+func (s *Subject) TableName() string {
 	return "pt_subject"
 }
 
 // Create creates a new subject
-func (c *SubjectModel) Create() error {
-	return db.DBEngine.Create(&c).Error
+func (s *Subject) Create(db *gorm.DB) error {
+	return db.Create(s).Error
 }
 
 // Update update subject
-func (c *SubjectModel) Update() (err error) {
-	if err = db.DBEngine.Model(&SubjectModel{}).Save(c).Error; err != nil {
-		return err
-	}
-
-	return nil
+func (s *Subject) Update(db *gorm.DB) error {
+	return db.Save(s).Error
 }
 
-// GetSubjectByID get subject info by ID
-func GetSubjectByID(id uint64) (*SubjectModel, error) {
-	s := &SubjectModel{}
-	result := db.DBEngine.Where("id = ?", id).First(&s)
-	return s, result.Error
+// Save update subject
+func (s *Subject) Save(db *gorm.DB) error {
+	return db.Save(s).Error
 }
 
-// GetAllSubjects get all subjects
-func GetAllSubjects() ([]*SubjectModel, error) {
-	var subjects []*SubjectModel
-	result := db.DBEngine.Find(&subjects)
-
-	return subjects, result.Error
+// Delete delete subject
+func (s *Subject) Delete(db *gorm.DB) error {
+	return db.Delete(s).Error
 }
 
-// SubjectCheckNameExistWhileCreate check the subject name if is already exist
-func SubjectCheckNameExistWhileCreate(name string) bool {
+// GetByID get subject by ID
+func (s *Subject) GetByID(db *gorm.DB) error {
+	return db.First(s, s.ID).Error
+}
+
+// GetAll get all subjects
+func (s *Subject) GetAll(db *gorm.DB) ([]*Subject, error) {
+	var subjects []*Subject
+	err := db.Find(&subjects).Error
+	return subjects, err
+}
+
+// CheckSubjectNameExist check the subject name if is already exist
+func (s *Subject) CheckSubjectNameExist(db *gorm.DB) bool {
 	var count int64 = 0
-	subjectModel := &SubjectModel{}
-	db.DBEngine.Table(subjectModel.TableName()).
-		Where("`name` = ?", name).
-		Count(&count)
+	if s.ID > 0 {
+		db.Model(s).Where("`id` != ? AND `name` = ?", s.ID, s.Name).Count(&count)
+	} else {
+		db.Model(s).Where("`name` = ?", s.Name).Count(&count)
+	}
 
 	if count > 0 {
 		return true
@@ -69,23 +73,14 @@ func SubjectCheckNameExistWhileCreate(name string) bool {
 	return false
 }
 
-// SubjectCheckNameExistWhileUpdate check the subject name if is already exist without itself
-func SubjectCheckNameExistWhileUpdate(subjectID uint64, name string) bool {
-	var count int64 = 0
-	subjectModel := &SubjectModel{}
-	db.DBEngine.Table(subjectModel.TableName()).
-		Where("`id` != ? AND `name` = ?", subjectID, name).
-		Count(&count)
+// IfSubjectHasChild check if subject has children
+func (s *Subject) IfSubjectHasChild(db *gorm.DB, subjectID uint64) bool {
+	var count int64
+	db.Model(&s).Where("`parent_id` = ?", subjectID).Count(&count)
 
 	if count > 0 {
 		return true
 	}
 
 	return false
-}
-
-// GetSubjectChildrenNumber calcuelate the total number of subject's children
-func GetSubjectChildrenNumber(subjectID uint64) (count int64) {
-	db.DBEngine.Model(&SubjectModel{}).Where("`parent_id` = ?", subjectID).Count(&count)
-	return count
 }

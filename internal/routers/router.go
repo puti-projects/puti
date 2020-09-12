@@ -6,24 +6,24 @@ import (
 	"net/http"
 	"path/filepath"
 
-	apiHandler "github.com/puti-projects/puti/internal/backend/handler"
-	"github.com/puti-projects/puti/internal/backend/handler/article"
-	"github.com/puti-projects/puti/internal/backend/handler/auth"
-	"github.com/puti-projects/puti/internal/backend/handler/media"
-	"github.com/puti-projects/puti/internal/backend/handler/option"
-	"github.com/puti-projects/puti/internal/backend/handler/page"
-	"github.com/puti-projects/puti/internal/backend/handler/statistics"
-	"github.com/puti-projects/puti/internal/backend/handler/subject"
-	"github.com/puti-projects/puti/internal/backend/handler/taxonomy"
-	"github.com/puti-projects/puti/internal/backend/handler/user"
-	webHandler "github.com/puti-projects/puti/internal/frontend/handler"
+	"github.com/puti-projects/puti/internal/backend/api"
+	"github.com/puti-projects/puti/internal/backend/api/article"
+	"github.com/puti-projects/puti/internal/backend/api/auth"
+	"github.com/puti-projects/puti/internal/backend/api/media"
+	"github.com/puti-projects/puti/internal/backend/api/option"
+	"github.com/puti-projects/puti/internal/backend/api/page"
+	"github.com/puti-projects/puti/internal/backend/api/statistics"
+	"github.com/puti-projects/puti/internal/backend/api/subject"
+	"github.com/puti-projects/puti/internal/backend/api/taxonomy"
+	"github.com/puti-projects/puti/internal/backend/api/user"
+	"github.com/puti-projects/puti/internal/frontend/web"
 	"github.com/puti-projects/puti/internal/pkg/config"
 	"github.com/puti-projects/puti/internal/pkg/logger"
 	optionCache "github.com/puti-projects/puti/internal/pkg/option"
 	"github.com/puti-projects/puti/internal/pkg/theme"
 	"github.com/puti-projects/puti/internal/routers/middleware"
 	apiMiddleware "github.com/puti-projects/puti/internal/routers/middleware/api"
-	webMiddleware "github.com/puti-projects/puti/internal/routers/middleware/view"
+	webMiddleware "github.com/puti-projects/puti/internal/routers/middleware/web"
 	"github.com/puti-projects/puti/internal/utils"
 
 	"github.com/gin-gonic/gin"
@@ -84,22 +84,22 @@ func loadWeb(g *gin.Engine, currentTheme string) {
 
 	// Group for frontend
 	// notice: page route is handle in NoRoute(), since the wildcard problem in root from httprouter
-	web := g.Group("")
-	web.Use(webMiddleware.Renderer)
+	webGroup := g.Group("")
+	webGroup.Use(webMiddleware.Renderer)
 	{
-		web.GET("", webHandler.ShowIndex)
-		web.GET("/article", webHandler.ShowArticleList)
-		web.GET("/category/:slug", webHandler.ShowCategoryArticleList)
-		web.GET("/tag/:slug", webHandler.ShowTagArticleList)
-		web.GET("/article/:id", webHandler.ShowArticleDetail)
-		web.GET("/archive", webHandler.ShowArchive)
-		web.GET("/subject", webHandler.ShowTopSubjects)
-		web.GET("/subject/:slug", webHandler.ShowSubjects)
+		webGroup.GET("", web.ShowIndex)
+		webGroup.GET("/article", web.ShowArticleList)
+		webGroup.GET("/category/:slug", web.ShowCategoryArticleList)
+		webGroup.GET("/tag/:slug", web.ShowTagArticleList)
+		webGroup.GET("/article/:id", web.ShowArticleDetail)
+		webGroup.GET("/archive", web.ShowArchive)
+		webGroup.GET("/subject", web.ShowTopSubjects)
+		webGroup.GET("/subject/:slug", web.ShowSubjects)
 
 	}
 
 	// no route handle
-	g.NoRoute(webMiddleware.Renderer, webHandler.ShowNotFound)
+	g.NoRoute(webMiddleware.Renderer, web.ShowNotFound)
 }
 
 // loadStatic load static resource
@@ -141,52 +141,52 @@ func loadStatic(g *gin.Engine, currentTheme string) {
 // loadAPI load api part
 func loadAPI(g *gin.Engine) {
 	// Group for api
-	api := g.Group("/api")
+	apiGroup := g.Group("/api")
 
-	api.Use(apiMiddleware.NoCache)
-	api.Use(apiMiddleware.Secure)
-	api.Use(apiMiddleware.RequestID())
+	apiGroup.Use(apiMiddleware.NoCache)
+	apiGroup.Use(apiMiddleware.Secure)
+	apiGroup.Use(apiMiddleware.RequestID())
 
-	api.POST("/login", auth.Login)
-	api.GET("/token", auth.Info)
+	apiGroup.POST("/login", auth.Login)
+	apiGroup.GET("/token", auth.Info)
 
-	api.Use(apiMiddleware.AuthMiddleware())
+	apiGroup.Use(apiMiddleware.AuthMiddleware())
 	{
-		api.GET("/statistics/dashboard", statistics.Dashboard)
-		api.GET("/statistics/system", statistics.System)
-		api.POST("/user/:username", user.Create)
-		api.GET("/user/:username", user.Get)
-		api.DELETE("/user/:id", user.Delete)
-		api.PUT("/user/:id", user.Update)
-		api.GET("/user", user.List)
-		api.POST("/avatar", user.Avatar)
-		api.GET("/article", article.List)
-		api.GET("/article/:id", article.Get)
-		api.POST("/article", article.Create)
-		api.PUT("/article/:id", article.Update)
-		api.DELETE("/article/:id", article.Delete)
-		api.GET("/page", page.List)
-		api.GET("/page/:id", page.Get)
-		api.POST("/page", page.Create)
-		api.PUT("/page/:id", page.Update)
-		api.DELETE("/page/:id", page.Delete)
-		api.POST("/taxonomy/:name", taxonomy.Create)
-		api.GET("/taxonomy/:id", taxonomy.Get)
-		api.DELETE("/taxonomy/:id", taxonomy.Delete)
-		api.PUT("/taxonomy/:id", taxonomy.Update)
-		api.GET("/taxonomy", taxonomy.List)
-		api.GET("/media/:id", media.Detail)
-		api.GET("/media", media.List)
-		api.POST("/media", media.Upload)
-		api.DELETE("/media/:id", media.Delete)
-		api.PUT("/media/:id", media.Update)
-		api.GET("/option", option.List)
-		api.PUT("/option", option.Update)
-		api.GET("/subject", subject.List)
-		api.GET("/subject/:id", subject.Detail)
-		api.POST("/subject/:name", subject.Create)
-		api.PUT("/subject/:id", subject.Update)
-		api.DELETE("/subject/:id", subject.Delete)
+		apiGroup.GET("/statistics/dashboard", statistics.Dashboard)
+		apiGroup.GET("/statistics/system", statistics.System)
+		apiGroup.POST("/user/:username", user.Create)
+		apiGroup.GET("/user/:username", user.Get)
+		apiGroup.DELETE("/user/:id", user.Delete)
+		apiGroup.PUT("/user/:id", user.Update)
+		apiGroup.GET("/user", user.List)
+		apiGroup.POST("/avatar", user.Avatar)
+		apiGroup.GET("/article", article.List)
+		apiGroup.GET("/article/:id", article.Get)
+		apiGroup.POST("/article", article.Create)
+		apiGroup.PUT("/article/:id", article.Update)
+		apiGroup.DELETE("/article/:id", article.Delete)
+		apiGroup.GET("/page", page.List)
+		apiGroup.GET("/page/:id", page.Get)
+		apiGroup.POST("/page", page.Create)
+		apiGroup.PUT("/page/:id", page.Update)
+		apiGroup.DELETE("/page/:id", page.Delete)
+		apiGroup.POST("/taxonomy/:name", taxonomy.Create)
+		apiGroup.GET("/taxonomy/:id", taxonomy.Get)
+		apiGroup.DELETE("/taxonomy/:id", taxonomy.Delete)
+		apiGroup.PUT("/taxonomy/:id", taxonomy.Update)
+		apiGroup.GET("/taxonomy", taxonomy.List)
+		apiGroup.GET("/media/:id", media.Detail)
+		apiGroup.GET("/media", media.List)
+		apiGroup.POST("/media", media.Upload)
+		apiGroup.DELETE("/media/:id", media.Delete)
+		apiGroup.PUT("/media/:id", media.Update)
+		apiGroup.GET("/option", option.List)
+		apiGroup.PUT("/option", option.Update)
+		apiGroup.GET("/subject", subject.List)
+		apiGroup.GET("/subject/:id", subject.Detail)
+		apiGroup.POST("/subject/:name", subject.Create)
+		apiGroup.PUT("/subject/:id", subject.Update)
+		apiGroup.DELETE("/subject/:id", subject.Delete)
 	}
 }
 
@@ -195,6 +195,6 @@ func loadHealthTest(g *gin.Engine) {
 	// Group for health check
 	svcd := g.Group("/check")
 	{
-		svcd.GET("/health", apiHandler.HealthCheck)
+		svcd.GET("/health", api.HealthCheck)
 	}
 }

@@ -86,3 +86,11 @@ func (m *Media) List(db *gorm.DB, where string, whereArgs []interface{}, offset,
 	err = db.Where(where).Offset(offset).Limit(limit).Order("created_time DESC").Find(&medias).Error
 	return medias, err
 }
+
+// TotalNumber get total number of media
+func (m *Media) TotalNumber(db *gorm.DB) (totalMedia int64, err error) {
+	err = db.Model(m).
+		Where("`deleted_time` is null").
+		Count(&totalMedia).Error
+	return
+}

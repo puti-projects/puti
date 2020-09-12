@@ -1,20 +1,132 @@
 package service
 
+// article and page handle are all in this post module
+
 import (
 	"database/sql"
-	"errors"
 	"fmt"
-	"strconv"
-	"strings"
 	"sync"
 	"time"
 
+	"github.com/puti-projects/puti/internal/backend/dao"
 	"github.com/puti-projects/puti/internal/model"
-	"github.com/puti-projects/puti/internal/pkg/db"
+	"github.com/puti-projects/puti/internal/pkg/errno"
 	"github.com/puti-projects/puti/internal/utils"
-
-	"gorm.io/gorm"
 )
+
+// ArticleCreateRequest struct of article create params
+type ArticleCreateRequest struct {
+	Status        string   `json:"status"`
+	Title         string   `json:"title"`
+	Content       string   `json:"content"`
+	ContentHTML   string   `json:"content_html"`
+	Description   string   `json:"description"`
+	CommentStatus uint64   `json:"comment_status"`
+	CoverPicture  string   `json:"cover_picture"`
+	PostedTime    string   `json:"posted_time"`
+	IfTop         uint64   `json:"if_top"`
+	Category      []uint64 `json:"category"`
+	Tag           []uint64 `json:"tag"`
+	Subject       []uint64 `json:"subject"`
+}
+
+// ArticleCreateResponse return the new article id and url
+type ArticleCreateResponse struct {
+	ID   uint64 `json:"id"`
+	GUID string `json:"guid"`
+}
+
+// PageCreateRequest struct of page create params
+type PageCreateRequest struct {
+	Status        string `json:"status"`
+	Title         string `json:"title"`
+	Content       string `json:"content"`
+	ContentHTML   string `json:"content_html"`
+	Description   string `json:"description"`
+	CommentStatus uint64 `json:"comment_status"`
+	CoverPicture  string `json:"cover_picture"`
+	PostedTime    string `json:"posted_time"`
+	Slug          string `json:"slug"`
+	PageTemplate  string `json:"page_template"`
+	ParentID      uint64 `json:"parent_id"`
+}
+
+// PageCreateResponse return the new page id and url
+type PageCreateResponse struct {
+	ID   uint64 `json:"id"`
+	GUID string `json:"guid"`
+}
+
+// ArticleUpdateRequest struct for update article
+type ArticleUpdateRequest struct {
+	ID            uint64   `json:"id"`
+	Status        string   `json:"status"`
+	Title         string   `json:"title"`
+	Content       string   `json:"content"`
+	ContentHTML   string   `json:"content_html"`
+	Description   string   `json:"description"`
+	CommentStatus uint64   `json:"comment_status"`
+	CoverPicture  string   `json:"cover_picture"`
+	PostedTime    string   `json:"posted_time"`
+	IfTop         uint64   `json:"if_top"`
+	Category      []uint64 `json:"category"`
+	Tag           []uint64 `json:"tag"`
+	Subject       []uint64 `json:"subject"`
+}
+
+// PageUpdateRequest struct of page update params
+type PageUpdateRequest struct {
+	ID            uint64 `json:"id"`
+	Status        string `json:"status"`
+	Title         string `json:"title"`
+	Content       string `json:"content"`
+	ContentHTML   string `json:"content_html"`
+	Description   string `json:"description"`
+	CommentStatus uint64 `json:"comment_status"`
+	CoverPicture  string `json:"cover_picture"`
+	PostedTime    string `json:"posted_time"`
+	Slug          string `json:"slug"`
+	PageTemplate  string `json:"page_template"`
+	ParentID      uint64 `json:"parent_id"`
+}
+
+// ArticleListRequest is the article list request struct
+type ArticleListRequest struct {
+	Title  string `form:"title"`
+	Page   int    `form:"page"`
+	Number int    `form:"number"`
+	Sort   string `form:"sort"`
+	Status string `form:"status"`
+}
+
+// ArticleListResponse is the article list response struct
+type ArticleListResponse struct {
+	TotalCount  int64       `json:"totalCount"`
+	TotalPage   uint64      `json:"totalPage"`
+	ArticleList []*PostInfo `json:"articleList"`
+}
+
+// PageListRequest is the page list request struct
+type PageListRequest struct {
+	Title  string `form:"title"`
+	Page   int    `form:"page"`
+	Number int    `form:"number"`
+	Sort   string `form:"sort"`
+	Status string `form:"status"`
+}
+
+// PageListResponse is the page list response struct
+type PageListResponse struct {
+	TotalCount int64       `json:"totalCount"`
+	TotalPage  uint64      `json:"totalPage"`
+	PageList   []*PostInfo `json:"pageList"`
+}
+
+// PostList post list
+type PostList struct {
+	Lock  *sync.Mutex
+	IDMap map[uint64]*PostInfo
+}
 
 // PostInfo is post info for post list
 type PostInfo struct {
@@ -25,12 +137,6 @@ type PostInfo struct {
 	PostDate     string `json:"post_date"`
 	CommentCount uint64 `json:"comment_count"`
 	ViewCount    uint64 `json:"view_count"`
-}
-
-// PostList post list
-type PostList struct {
-	Lock  *sync.Mutex
-	IDMap map[uint64]*PostInfo
 }
 
 // ArticleDetail struct for article info detail
@@ -65,10 +171,114 @@ type PageDetail struct {
 	MetaData        map[string]interface{} `json:"meta_date"`
 }
 
+// CreateArticle create article
+func CreateArticle(r *ArticleCreateRequest, userID uint64) (*ArticleCreateResponse, error) {
+	// post data
+	article := &model.Post{
+		UserID:          userID,
+		PostType:        model.PostTypeArticle,
+		Title:           r.Title,
+		ContentMarkdown: r.Content,
+		ContentHTML:     r.ContentHTML,
+		ParentID:        0,
+		Status:          r.Status,
+		CommentStatus:   r.CommentStatus,
+		IfTop:           r.IfTop,
+		CoverPicture:    r.CoverPicture,
+		CommentCount:    0,
+		ViewCount:       0,
+	}
+	if r.PostedTime == "" && r.Status == model.PostStatusPublish {
+		article.PostDate = &sql.NullTime{Time: time.Now(), Valid: true}
+	} else {
+		article.PostDate = utils.StringToNullTime("2006-01-02 15:04:05", r.PostedTime)
+	}
+
+	// post meta data
+	descriptionMeta := []*model.PostMeta{
+		{
+			MetaKey:   "description",
+			MetaValue: r.Description,
+		},
+	}
+
+	article, err := dao.Engine.CreateArticle(article, descriptionMeta, r.Category, r.Tag, r.Subject)
+	if err != nil {
+		return nil, errno.New(errno.ErrDatabase, err)
+	}
+
+	rsp := &ArticleCreateResponse{
+		ID:   article.ID,
+		GUID: article.GUID,
+	}
+	return rsp, nil
+}
+
+// CreatePage create page
+func CreatePage(r *PageCreateRequest, userID uint64) (*PageCreateResponse, error) {
+	// page data
+	page := &model.Post{
+		UserID:          userID,
+		PostType:        model.PostTypePage,
+		Title:           r.Title,
+		ContentMarkdown: r.Content,
+		ContentHTML:     r.ContentHTML,
+		Slug:            r.Slug,
+		ParentID:        r.ParentID,
+		Status:          r.Status,
+		CommentStatus:   r.CommentStatus,
+		IfTop:           0,
+		GUID:            fmt.Sprintf("/%s", r.Slug),
+		CoverPicture:    r.CoverPicture,
+		CommentCount:    0,
+		ViewCount:       0,
+	}
+	if r.PostedTime == "" && r.Status == model.PostStatusPublish {
+		page.PostDate = &sql.NullTime{Time: time.Now(), Valid: true}
+	} else {
+		page.PostDate = utils.StringToNullTime("2006-01-02 15:04:05", r.PostedTime)
+	}
+
+	// set metadata description
+	meta := []*model.PostMeta{
+		{
+			PostID:    page.ID,
+			MetaKey:   "description",
+			MetaValue: r.Description,
+		},
+		{
+			PostID:    page.ID,
+			MetaKey:   "page_template",
+			MetaValue: r.PageTemplate,
+		},
+	}
+
+	page, err := dao.Engine.CreatePage(page, meta)
+	if err != nil {
+		return nil, errno.New(errno.ErrDatabase, err)
+	}
+
+	rsp := &PageCreateResponse{
+		ID:   page.ID,
+		GUID: page.GUID,
+	}
+	return rsp, nil
+}
+
+// ListArticle article list
+func ListArticle(postType string, r *ArticleListRequest) ([]*PostInfo, int64, error) {
+	return ListPost(postType, r.Title, r.Page, r.Number, r.Sort, r.Status)
+}
+
+// ListPage page list
+func ListPage(postType string, r *PageListRequest) ([]*PostInfo, int64, error) {
+	return ListPost(postType, r.Title, r.Page, r.Number, r.Sort, r.Status)
+}
+
 // ListPost post list
 func ListPost(postType, title string, page, number int, sort, status string) ([]*PostInfo, int64, error) {
 	infos := make([]*PostInfo, 0)
-	posts, count, err := model.ListPost(postType, title, page, number, sort, status)
+	posts, count, err := dao.Engine.ListPost(postType, title, page, number, sort, status)
 	if err != nil {
 		return nil, count, err
 	}
@@ -89,7 +299,7 @@ func ListPost(postType, title string, page, number int, sort, status string) ([]
 	// Improve query efficiency in parallel
 	for _, u := range posts {
 		wg.Add(1)
-		go func(u *model.PostModel) {
+		go func(u *model.Post) {
 			defer wg.Done()
 
 			postList.Lock.Lock()
@@ -120,394 +330,168 @@ func ListPost(postType, title string, page, number int, sort, status string) ([]
 	return infos, count, nil
 }
 
-// GetArticleDetail get article detail by id
-func GetArticleDetail(articleID string) (*ArticleDetail, error) {
-	ID, _ := strconv.Atoi(articleID)
-	uID := uint64(ID)
+// CheckPageSlugExist check if page slug name exist
+func CheckPageSlugExist(pageID uint64, slug string) bool {
+	return dao.Engine.CheckPageSlugExist(pageID, slug)
+}
 
-	// get article info
-	a, err := model.GetPost(uID)
+// GetArticleDetail get article detail by id
+func GetArticleDetail(articleID uint64) (*ArticleDetail, error) {
+	// get article
+	article, err := dao.Engine.GetPostByID(articleID)
 	if err != nil {
 		return nil, err
 	}
 
 	// get extra data of article
-	am, err := model.GetPostMetaData(uID)
+	articleMeta, err := dao.Engine.GetPostMetaByPostID(articleID)
 	if err != nil {
 		return nil, err
 	}
 
+	// main data
 	ArticleDetail := &ArticleDetail{
-		ID:              a.ID,
-		Title:           a.Title,
-		ContentMarkdown: a.ContentMarkdown,
-		Status:          a.Status,
-		CommentStatus:   a.CommentStatus,
-		IfTop:           a.IfTop,
-		GUID:            a.GUID,
-		CoverPicture:    a.CoverPicture,
-		PostDate:        utils.GetFormatNullTime(a.PostDate, "2006-01-02 15:04:05"),
+		ID:              article.ID,
+		Title:           article.Title,
+		ContentMarkdown: article.ContentMarkdown,
+		Status:          article.Status,
+		CommentStatus:   article.CommentStatus,
+		IfTop:           article.IfTop,
+		GUID:            article.GUID,
+		CoverPicture:    article.CoverPicture,
+		PostDate:        utils.GetFormatNullTime(article.PostDate, "2006-01-02 15:04:05"),
 		MetaData:        make(map[string]interface{}),
 		Category:        make([]uint64, 0),
 		Tag:             make([]uint64, 0),
 		Subject:         make([]uint64, 0),
 	}
-
-	for _, meta := range am {
+	// meta data
+	for _, meta := range articleMeta {
 		ArticleDetail.MetaData[meta.MetaKey] = meta.MetaValue
 	}
-
-	articleTaxonomy, err := GetArticleTaxonomy(uID)
+	// taxonomy data
+	articleTaxonomy, err := dao.Engine.GetArticleTaxonomy(nil, articleID)
+	if err != nil {
+		return nil, err
+	}
 	category, categoryOk := articleTaxonomy["category"]
 	if categoryOk {
 		ArticleDetail.Category = category
 	}
-
 	tag, tagOk := articleTaxonomy["tag"]
 	if tagOk {
 		ArticleDetail.Tag = tag
 	}
-
-	subjectTaxonomy, err := GetArticleSubejct(uID)
+	// subject
+	articleSubjectGroup, err := GetArticleSubejctID(articleID)
 	if err != nil {
 		return nil, err
 	}
-	ArticleDetail.Subject = subjectTaxonomy
+	ArticleDetail.Subject = articleSubjectGroup
 
 	return ArticleDetail, nil
 }
 
 // GetPageDetail get page detail by id
-func GetPageDetail(pageID string) (*PageDetail, error) {
-	ID, _ := strconv.Atoi(pageID)
-	uID := uint64(ID)
-
-	// get page info
-	p, err := model.GetPost(uID)
+func GetPageDetail(pageID uint64) (*PageDetail, error) {
+	// get page
+	page, err := dao.Engine.GetPostByID(pageID)
 	if err != nil {
 		return nil, err
 	}
 
 	// get extra data of page
-	pm, err := model.GetPostMetaData(uID)
+	pageMeta, err := dao.Engine.GetPostMetaByPostID(pageID)
 	if err != nil {
 		return nil, err
 	}
 
 	pageDetail := &PageDetail{
-		ID:              p.ID,
-		Title:           p.Title,
-		ContentMarkdown: p.ContentMarkdown,
-		Slug:            p.Slug,
-		ParentID:        p.ParentID,
-		Status:          p.Status,
-		CommentStatus:   p.CommentStatus,
-		GUID:            p.GUID,
-		CoverPicture:    p.CoverPicture,
-		PostDate:        utils.GetFormatNullTime(p.PostDate, "2006-01-02 15:04:05"),
+		ID:              page.ID,
+		Title:           page.Title,
+		ContentMarkdown: page.ContentMarkdown,
+		Slug:            page.Slug,
+		ParentID:        page.ParentID,
+		Status:          page.Status,
+		CommentStatus:   page.CommentStatus,
+		GUID:            page.GUID,
+		CoverPicture:    page.CoverPicture,
+		PostDate:        utils.GetFormatNullTime(page.PostDate, "2006-01-02 15:04:05"),
 		MetaData:        make(map[string]interface{}),
 	}
 
-	for _, meta := range pm {
+	for _, meta := range pageMeta {
 		pageDetail.MetaData[meta.MetaKey] = meta.MetaValue
 	}
 
 	return pageDetail, nil
 }
 
-// UpdateArticle update article info
-// In this version, article meta data just update description, it should be more than one choise.TODO
-func UpdateArticle(article *model.PostModel, description string, category []uint64, tag []uint64, subject []uint64) (err error) {
-	tx := db.DBEngine.Begin()
-	defer func() {
-		if r := recover(); r != nil {
-			tx.Rollback()
-		}
-	}()
-
-	if tx.Error != nil {
-		return err
-	}
-
-	// udapte article
-	oldArticle, err := model.GetPost(article.ID)
+// UpdateArticle update article
+// TODO: In this version, article meta data just update description, it should be more than one choise.
+func UpdateArticle(a *ArticleUpdateRequest) error {
+	// get old article data
+	article, err := dao.Engine.GetPostByID(a.ID)
 	if err != nil {
 		return err
 	}
-	oldArticle.Title = article.Title
-	oldArticle.ContentMarkdown = article.ContentMarkdown
-	oldArticle.ContentHTML = article.ContentHTML
-	oldArticle.Status = article.Status
-	oldArticle.CommentStatus = article.CommentStatus
-	oldArticle.IfTop = article.IfTop
-	oldArticle.CoverPicture = article.CoverPicture
-	oldArticle.PostDate = article.PostDate
-	if oldArticle.PostDate.Valid == false && article.Status == model.PostStatusPublish {
-		oldArticle.PostDate = &sql.NullTime{Time: time.Now(), Valid: true}
-	}
-	if err = tx.Model(&model.PostModel{}).Save(oldArticle).Error; err != nil {
-		tx.Rollback()
-		return err
+
+	// reset article data
+	article.Title = a.Title
+	article.ContentMarkdown = a.Content
+	article.ContentHTML = a.ContentHTML
+	article.Status = a.Status
+	article.CommentStatus = a.CommentStatus
+	article.IfTop = a.IfTop
+	article.CoverPicture = a.CoverPicture
+	article.PostDate = utils.StringToNullTime("2006-01-02 15:04:05", a.PostedTime)
+	if article.PostDate.Valid == false && article.Status == model.PostStatusPublish {
+		// first publish; save as draft and  publish now in this situation
+		article.PostDate = &sql.NullTime{Time: time.Now(), Valid: true}
 	}
 
-	// update article meta data
-	oldArticleMeta, err := model.GetOnePostMetaData(article.ID, "description")
-	if oldArticleMeta.MetaValue != description {
-		oldArticleMeta.MetaValue = description
-		if err = tx.Model(&model.PostMetaModel{}).Save(oldArticleMeta).Error; err != nil {
-			tx.Rollback()
-			return err
-		}
-	}
-
-	// get old and new taxonomy
-	articleTaxonomy, err := model.GetArticleTaxonomy(article.ID)
+	err = dao.Engine.UpdateArticle(article, a.Description, a.Category, a.Tag, a.Subject)
 	if err != nil {
-		tx.Rollback()
-		return err
-	}
-	var oldTaxonomy []uint64
-	for _, item := range articleTaxonomy {
-		oldTaxonomy = append(oldTaxonomy, item.TermID)
-	}
-	newTaxonomy := append(category, tag...)
-
-	// delete all old taxonomy relationship
-	dRelation := tx.Where("object_id = ?", article.ID).Delete(model.TermRelationshipsModel{})
-	if err := dRelation.Error; err != nil {
-		tx.Rollback()
-		return err
+		return errno.New(errno.ErrDatabase, err)
 	}
 
-	// insert all new relationship
-	valueStrings := make([]string, 0, len(newTaxonomy))
-	valueArgs := make([]interface{}, 0, len(newTaxonomy)*3)
-	for _, item := range newTaxonomy {
-		termTaxonomy, _ := model.GetTermTaxonomy(item, "")
-		valueStrings = append(valueStrings, "(?, ?, ?)")
-		valueArgs = append(valueArgs, article.ID)      // object_id
-		valueArgs = append(valueArgs, termTaxonomy.ID) // term_taxonomy_id
-		valueArgs = append(valueArgs, 0)               // term_order
-	}
-	tb := &model.TermRelationshipsModel{}
-	stmt := fmt.Sprintf("INSERT INTO %s (object_id, term_taxonomy_id, term_order) VALUES %s", tb.TableName(), strings.Join(valueStrings, ","))
-	if err := tx.Exec(stmt, valueArgs...).Error; err != nil {
-		tx.Rollback()
-		return err
-	}
-
-	// calculate taxonomy diff
-	deleteTaxonomy := calSliceDiff(oldTaxonomy, newTaxonomy)
-	insertTaxonomy := calSliceDiff(newTaxonomy, oldTaxonomy)
-	// update count
-	if err := UpdateTaxonomyCountByArticleChange(tx, insertTaxonomy, 1); err != nil {
-		tx.Rollback()
-		return err
-	}
-	if err := UpdateTaxonomyCountByArticleChange(tx, deleteTaxonomy, -1); err != nil {
-		tx.Rollback()
-		return err
-	}
-
-	// get old subject
-	articleSubject, err := model.GetArticleSubject(article.ID)
-	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
-		tx.Rollback()
-		return err
-	}
-	var oldSubject []uint64
-	for _, item := range articleSubject {
-		oldSubject = append(oldSubject, item.SubjectID)
-	}
-
-	// delete all old subject relationship
-	deleteSubjectRelation := tx.Where("`object_id` = ?", article.ID).Delete(model.SubjectRelationshipsModel{})
-	if err := deleteSubjectRelation.Error; err != nil {
-		tx.Rollback()
-		return err
-	}
-
-	// insert all new relationship
-	if subjectLen := len(subject); subjectLen != 0 {
-		subjectValueStrings := make([]string, 0, subjectLen)
-		subjectValueArgs := make([]interface{}, 0, subjectLen*3)
-		for _, subject := range subject {
-			subjectValueStrings = append(subjectValueStrings, "(?, ?, ?)")
-			subjectValueArgs = append(subjectValueArgs, article.ID) // object_id
-			subjectValueArgs = append(subjectValueArgs, subject)    // subject_id
-			subjectValueArgs = append(subjectValueArgs, 0)          // order_num
-		}
-		sr := &model.SubjectRelationshipsModel{}
-		sqlr := fmt.Sprintf("INSERT INTO %s (object_id, subject_id, order_num) VALUES %s", sr.TableName(), strings.Join(subjectValueStrings, ","))
-		if err := tx.Exec(sqlr, subjectValueArgs...).Error; err != nil {
-			tx.Rollback()
-			return err
-		}
-	}
-
-	// calculate subject diff
-	deleteSubject := calSliceDiff(oldSubject, subject)
-	insertSubject := calSliceDiff(subject, oldSubject)
-
-	// update subject's info
-	if err := UpdateSubjectInfoByArticleChange(tx, insertSubject, 1, true); err != nil {
-		tx.Rollback()
-		return err
-	}
-	if err := UpdateSubjectInfoByArticleChange(tx, deleteSubject, -1, true); err != nil {
-		tx.Rollback()
-		return err
-	}
-
-	return tx.Commit().Error
+	return nil
 }
 
-func calSliceDiff(slice1, slice2 []uint64) (diffslice []uint64) {
-	for _, v := range slice1 {
-		inSlice2 := false
-		for _, vv := range slice2 {
-			if vv == v {
-				inSlice2 = true
-			}
-		}
-
-		if inSlice2 == false {
-			diffslice = append(diffslice, v)
-		}
-	}
-	return
-}
-
-// UpdatePage udpate page info
-func UpdatePage(page *model.PostModel, description, pageTemplate string) (err error) {
-	tx := db.DBEngine.Begin()
-	defer func() {
-		if r := recover(); r != nil {
-			tx.Rollback()
-		}
-	}()
-
-	if tx.Error != nil {
-		return err
-	}
-
-	// udapte page
-	oldPage, err := model.GetPost(page.ID)
+// UpdatePage update page
+func UpdatePage(p *PageUpdateRequest) (err error) {
+	// get old page data
+	page, err := dao.Engine.GetPostByID(p.ID)
 	if err != nil {
 		return err
 	}
-	oldPage.Title = page.Title
-	oldPage.ContentMarkdown = page.ContentMarkdown
-	oldPage.ContentHTML = page.ContentHTML
-	oldPage.Status = page.Status
-	oldPage.CommentStatus = page.CommentStatus
-	oldPage.CoverPicture = page.CoverPicture
-	oldPage.PostDate = page.PostDate
-	if oldPage.Slug != page.Slug {
-		oldPage.Slug = page.Slug
-		oldPage.GUID = fmt.Sprintf("/%s", page.Slug)
+
+	page.Title = p.Title
+	page.ContentMarkdown = p.Content
+	page.ContentHTML = p.ContentHTML
+	page.Status = p.Status
+	page.CommentStatus = p.CommentStatus
+	page.CoverPicture = p.CoverPicture
+	page.PostDate = utils.StringToNullTime("2006-01-02 15:04:05", p.PostedTime)
+	if page.Slug != p.Slug {
+		page.Slug = p.Slug
+		page.GUID = fmt.Sprintf("/%s", p.Slug)
 	}
-	oldPage.ParentID = page.ParentID
-	if err = tx.Model(&model.PostModel{}).Save(oldPage).Error; err != nil {
-		tx.Rollback()
-		return err
+	page.ParentID = p.ParentID
+
+	err = dao.Engine.UpdatePage(page, p.Description, p.PageTemplate)
+	if err != nil {
+		return errno.New(errno.ErrDatabase, err)
 	}
 
-	// update article meta data
-	// update description
-	metaDescription, err := model.GetOnePostMetaData(page.ID, "description")
-	if metaDescription.MetaValue != description {
-		metaDescription.MetaValue = description
-		if err = tx.Model(&model.PostMetaModel{}).Save(metaDescription).Error; err != nil {
-			tx.Rollback()
-			return err
-		}
-	}
-	// update page_template
-	metaPageTemplate, err := model.GetOnePostMetaData(page.ID, "page_template")
-	if metaPageTemplate.MetaValue != pageTemplate {
-		metaPageTemplate.MetaValue = pageTemplate
-		if err = tx.Model(&model.PostMetaModel{}).Save(metaPageTemplate).Error; err != nil {
-			tx.Rollback()
-			return err
-		}
-	}
-
-	return tx.Commit().Error
+	return nil
 }
 
 // DeletePost delete post by soft delete
-// meta data was reserved
+// Note: meta data was reserved
 func DeletePost(postType string, articleID uint64) error {
-	tx := db.DBEngine.Begin()
-	defer func() {
-		if r := recover(); r != nil {
-			tx.Rollback()
-		}
-	}()
-
-	if postType == "article" {
-		if err := deleteArticleElse(tx, articleID); err != nil {
-			tx.Rollback()
-			return err
-		}
-	}
-
-	// delete post
-	if err := tx.Where("id = ?", articleID).Delete(model.PostModel{}).Error; err != nil {
-		tx.Rollback()
-		return err
-	}
-
-	return tx.Commit().Error
-}
-
-// deleteArticleElse delete extra data which only article have
-func deleteArticleElse(tx *gorm.DB, articleID uint64) error {
-	// get article taxonomy by id
-	articleTaxonomy, err := GetArticleTaxonomy(articleID)
-	if err != nil {
-		return err
-	}
-
-	// delete article relationship
-	dRelation := tx.Where("`object_id` = ?", articleID).Delete(model.TermRelationshipsModel{})
-	if err := dRelation.Error; err != nil {
-		return err
-	}
-
-	// recount and update taxonomy count
-	taxonomy := append(articleTaxonomy["category"], articleTaxonomy["tag"]...)
-	if len(taxonomy) != 0 {
-		// update category count
-		err := UpdateTaxonomyCountByArticleChange(tx, taxonomy, -1)
-		if err != nil {
-			return err
-		}
-	}
-
-	// get article subject by id
-	articleSubject, err := model.GetArticleSubject(articleID)
-	if err != nil {
-		return err
-	}
-
-	// delete article subject
-	dsRelation := tx.Where("`object_id` = ?", articleID).Delete(model.SubjectRelationshipsModel{})
-	if err := dsRelation.Error; err != nil {
-		return err
-	}
-
-	// recount and update subject count
-	subjectIDs := make([]uint64, 0)
-	for _, subject := range articleSubject {
-		subjectIDs = append(subjectIDs, subject.SubjectID)
-	}
-	if len(subjectIDs) != 0 {
-		// update subject count
-		if err := UpdateSubjectInfoByArticleChange(tx, subjectIDs, -1, false); err != nil {
-			return err
-		}
+	if err := dao.Engine.DeletePost(postType, articleID); err != nil {
+		return errno.New(errno.ErrDatabase, err)
 	}
 
 	return nil
@@ -516,15 +500,8 @@ func deleteArticleElse(tx *gorm.DB, articleID uint64) error {
 // TrashPost put the post into the trash by "delete" button
 // The different between DeleteArticle and TrashPost is that TrashPost just set the status to deleted
 func TrashPost(postID uint64) error {
-	oldPost, err := model.GetPost(postID)
-	if err != nil {
-		return err
-	}
-
-	oldPost.Status = "deleted"
-
-	if err = db.DBEngine.Model(&model.PostModel{}).Save(oldPost).Error; err != nil {
-		return err
+	if err := dao.Engine.TrashPost(postID); err != nil {
+		return errno.New(errno.ErrDatabase, err)
 	}
 
 	return nil
@@ -532,16 +509,9 @@ func TrashPost(postID uint64) error {
 
 // RestorePost restore the post which had been put to the trash
 // this restore action will set the post as a draft status
-func RestorePost(articleID uint64) error {
-	oldArticle, err := model.GetPost(articleID)
-	if err != nil {
-		return err
-	}
-
-	oldArticle.Status = "draft"
-
-	if err = db.DBEngine.Model(&model.PostModel{}).Save(oldArticle).Error; err != nil {
-		return err
+func RestorePost(postID uint64) error {
+	if err := dao.Engine.RestorePost(postID); err != nil {
+		return errno.New(errno.ErrDatabase, err)
 	}
 
 	return nil

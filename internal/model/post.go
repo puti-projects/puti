@@ -4,23 +4,22 @@ import (
 	"database/sql"
 	"errors"
 
-	"github.com/puti-projects/puti/internal/pkg/db"
 	"gorm.io/gorm"
 )
 
 // PostModel is the struct model for post
-type PostModel struct {
+type Post struct {
 	Model
 
 	UserID          uint64        `gorm:"column:user_id;not null"`
-	PostType        string        `gorm:"column:post_type;not null"`
+	PostType        string        `gorm:"column:post_type;not null;default:article"`
 	Title           string        `gorm:"column:title;not null"`
 	ContentMarkdown string        `gorm:"column:content_markdown;not null"`
 	ContentHTML     string        `gorm:"column:content_html;not null"`
 	Slug            string        `gorm:"column:slug;not null"`
 	ParentID        uint64        `gorm:"column:parent_id;not null"` // set to 0 now, use for draft history feature in the future
-	Status          string        `gorm:"column:status;not null"`
-	CommentStatus   uint64        `gorm:"column:comment_status;not null"`
+	Status          string        `gorm:"column:status;not null;default:publish"`
+	CommentStatus   uint64        `gorm:"column:comment_status;not null;default:1"`
 	IfTop           uint64        `gorm:"column:if_top;not null"`
 	GUID            string        `gorm:"column:guid;not null"`
 	CoverPicture    string        `gorm:"column:cover_picture;not null"`
@@ -30,7 +29,7 @@ type PostModel struct {
 }
 
 // PostMetaModel meta data for post
-type PostMetaModel struct {
+type PostMeta struct {
 	ID        uint64 `gorm:"primaryKey;autoIncrement;column:id"`
 	PostID    uint64 `gorm:"column:post_id;not null"`
 	MetaKey   string `gorm:"column:meta_key;not null"`
@@ -51,83 +50,83 @@ const (
 )
 
 // TableName is the article table name in db
-func (c *PostModel) TableName() string {
+func (p *Post) TableName() string {
 	return "pt_post"
 }
 
 // TableName is the article meta data table name in db
-func (c *PostMetaModel) TableName() string {
+func (p *PostMeta) TableName() string {
 	return "pt_post_meta"
 }
 
-// GetPost gets the post by post id
-func GetPost(postID uint64) (*PostModel, error) {
-	a := &PostModel{}
-	d := db.DBEngine.Where("id = ? AND deleted_time is null", postID).First(&a)
-	return a, d.Error
+// Create creates a post
+func (p *Post) Create(db *gorm.DB) error {
+	return db.Create(p).Error
 }
 
-// GetPostMetaData gets the extral data of post
-func GetPostMetaData(postID uint64) ([]*PostMetaModel, error) {
-	am := []*PostMetaModel{}
-	d := db.DBEngine.Where("post_id = ?", postID).Find(&am)
-	return am, d.Error
+// Create
+func (p *PostMeta) Create(db *gorm.DB) error {
+	return db.Create(p).Error
 }
 
-// GetOnePostMetaData get one specific meta by metakey and post id
-func GetOnePostMetaData(postID uint64, metaKey string) (*PostMetaModel, error) {
-	am := &PostMetaModel{}
-	d := db.DBEngine.Where("post_id = ? AND meta_key = ?", postID, metaKey).First(&am)
-	return am, d.Error
+// Save update a post
+func (p *Post) Save(db *gorm.DB) error {
+	return db.Save(p).Error
 }
 
-// ListPost returns the posts list in condition
-func ListPost(postType, title string, page, number int, sort, status string) ([]*PostModel, int64, error) {
-	posts := make([]*PostModel, 0)
+// Save update a post meata
+func (p *PostMeta) Save(db *gorm.DB) error {
+	return db.Save(p).Error
+}
+
+// Delete delete a post by ID
+func (p *Post) Delete(db *gorm.DB) error {
+	return db.Delete(p).Error
+}
+
+// GetByID get post by ID
+func (p *Post) GetByID(db *gorm.DB) error {
+	return db.Where("`deleted_time` is null").First(p, p.ID).Error
+}
+
+// GetAllByPostID get all meta data by post id
+func (p *PostMeta) GetAllByPostID(db *gorm.DB) ([]*PostMeta, error) {
+	pm := []*PostMeta{}
+	err := db.Where("`post_id` = ?", p.PostID).Find(&pm).Error
+	return pm, err
+}
+
+// GetOneByPostID get one specific meta by metakey and post id
+func (p *PostMeta) GetOneByPostID(db *gorm.DB) error {
+	if "" != p.MetaKey {
+		return db.Where("`post_id` = ? AND `meta_key` = ?", p.PostID, p.MetaKey).First(&p).Error
+	}
+	return nil
+}
+
+// Count count user
+func (p *Post) Count(db *gorm.DB, where string, whereArgs []interface{}) (int64, error) {
 	var count int64
+	err := db.Model(p).Where(where, whereArgs...).Count(&count).Error
+	return count, err
+}
 
-	where := "post_type = ? AND parent_id = ?"
-	whereArgs := []interface{}{postType, 0}
-	if "" != title {
-		where += " AND title LIKE ?"
-		whereArgs = append(whereArgs, "%"+title+"%")
-	}
-
-	if status != "" {
-		where += " AND status= ?"
-		whereArgs = append(whereArgs, status)
-	}
-
-	if err := db.DBEngine.Model(&PostModel{}).Where(where, whereArgs...).Count(&count).Error; err != nil {
-		return posts, count, err
-	}
-
-	offset := (page - 1) * number
-	var order string
-	if sort != "" {
-		order = "id " + sort
-	} else {
-		order = "id DESC"
-	}
-
-	if err := db.DBEngine.Where(where, whereArgs...).Offset(offset).Limit(number).Order(order).Find(&posts).Error; err != nil {
-		return posts, count, err
-	}
-
-	return posts, count, nil
+// List get user list
+func (p *Post) List(db *gorm.DB, where string, whereArgs []interface{}, offset, number int, order string) ([]*Post, error) {
+	post := make([]*Post, 0)
+	err := db.Where(where, whereArgs...).Offset(offset).Limit(number).Order(order).Find(&post).Error
+	return post, err
 }
 
 // PageCheckSlugExist check the slug if already exist
 // ErrRecordNotFound => False
 // exist => True
-func PageCheckSlugExist(pageID uint64, Slug string) bool {
-	post := &PostModel{}
-
+func (p *Post) CheckSlug(db *gorm.DB) bool {
 	var err error
-	if pageID > 0 {
-		err = db.DBEngine.Where("id != ? AND slug = ?", pageID, Slug).First(&post).Error
+	if p.ID > 0 {
+		err = db.Where("`id` != ? AND `slug` = ?", p.ID, p.Slug).First(&p).Error
 	} else {
-		err = db.DBEngine.Where("slug = ?", Slug).First(&post).Error
+		err = db.Where("`slug` = ?", p.Slug).First(&p).Error
 	}
 
 	if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -135,4 +134,22 @@ func PageCheckSlugExist(pageID uint64, Slug string) bool {
 	}
 
 	return true
+}
+
+// TotalView gte total view of all post
+func (p *Post) TotalView(db *gorm.DB) (totalViews int64, err error) {
+	row := db.Model(p).
+		Where("`status` != ? AND `deleted_time` is null", "deleted").
+		Select("sum(`view_count`) as total_views").
+		Row()
+	err = row.Scan(&totalViews)
+	return
+}
+
+// TotalNumber count total number of post by post type
+func (p *Post) TotalNumber(db *gorm.DB, postType string) (totalPost int64, err error) {
+	err = db.Model(p).
+		Where("`post_type` = ? AND `status` != ? AND `deleted_time` is null", postType, "deleted").
+		Count(&totalPost).Error
+	return
 }

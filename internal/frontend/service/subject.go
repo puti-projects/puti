@@ -13,7 +13,7 @@ import (
 // SubjectList subject list
 type SubjectList struct {
 	Lock  *sync.Mutex
-	IDMap map[uint64]*model.ShowSubjectList
+	IDMap map[uint64]*ShowSubjectList
 }
 
 // SubejctInfoResult use for scan subject info
@@ -41,9 +41,9 @@ type ChildrenSubejctsResult struct {
 
 // GetChildrenSubejcts get subject's all children
 // If the parentID is 0, get all top subjects
-func GetChildrenSubejcts(parentID uint64) (subjectResult []*model.ShowSubjectList, err error) {
+func GetChildrenSubejcts(parentID uint64) (subjectResult []*ShowSubjectList, err error) {
 	subjects := make([]*ChildrenSubejctsResult, 0)
-	subjectModel := &model.SubjectModel{}
+	subjectModel := &model.Subject{}
 	rows, err := db.DBEngine.Table(subjectModel.TableName()+" s").
 		Select("s.`id`, s.`parent_id`, s.`name`, s.`slug`, s.`description`, r.`guid` as cover_image_url, s.`count`, s.`last_updated`").
 		Joins("LEFT JOIN pt_resource r ON r.id = s.`cover_image`").
@@ -63,7 +63,7 @@ func GetChildrenSubejcts(parentID uint64) (subjectResult []*model.ShowSubjectLis
 		subjects = append(subjects, subject)
 	}
 
-	subjectResult = make([]*model.ShowSubjectList, 0)
+	subjectResult = make([]*ShowSubjectList, 0)
 	ids := []uint64{}
 	for _, subject := range subjects {
 		ids = append(ids, subject.ID)
@@ -72,7 +72,7 @@ func GetChildrenSubejcts(parentID uint64) (subjectResult []*model.ShowSubjectLis
 	wg := sync.WaitGroup{}
 	subjectList := SubjectList{
 		Lock:  new(sync.Mutex),
-		IDMap: make(map[uint64]*model.ShowSubjectList, len(subjects)),
+		IDMap: make(map[uint64]*ShowSubjectList, len(subjects)),
 	}
 
 	finished := make(chan bool, 1)
@@ -84,7 +84,7 @@ func GetChildrenSubejcts(parentID uint64) (subjectResult []*model.ShowSubjectLis
 
 			subjectList.Lock.Lock()
 			defer subjectList.Lock.Unlock()
-			subjectList.IDMap[s.ID] = &model.ShowSubjectList{
+			subjectList.IDMap[s.ID] = &ShowSubjectList{
 				ID:                s.ID,
 				URL:               "/subject/" + s.Slug,
 				Name:              s.Name,
@@ -128,9 +128,9 @@ func getDifferDayBetweenLastUpdatedTimeAndNow(lastUpdatedTime *sql.NullTime) str
 }
 
 // GetSubjectInfoBySlug get subject info by the unique slug
-func GetSubjectInfoBySlug(subjectSlug string) (*model.ShowSubjectInfo, error) {
+func GetSubjectInfoBySlug(subjectSlug string) (*ShowSubjectInfo, error) {
 	subjectResult := &SubejctInfoResult{}
-	subjectModel := &model.SubjectModel{}
+	subjectModel := &model.Subject{}
 	result := db.DBEngine.Table(subjectModel.TableName()+" s").
 		Select("s.`id`, s.`parent_id`, s.`name`, s.`slug`, s.`description`, r.`guid` as cover_image_url, s.`count`").
 		Joins("LEFT JOIN pt_resource r ON r.id = s.`cover_image`").
@@ -141,7 +141,7 @@ func GetSubjectInfoBySlug(subjectSlug string) (*model.ShowSubjectInfo, error) {
 	}
 
 	// siteURL := optionCache.Options.Get("site_url")
-	subjectInfo := &model.ShowSubjectInfo{
+	subjectInfo := &ShowSubjectInfo{
 		ID:            subjectResult.ID,
 		ParentURL:     "/subject",
 		Name:          subjectResult.Name,
@@ -153,8 +153,8 @@ func GetSubjectInfoBySlug(subjectSlug string) (*model.ShowSubjectInfo, error) {
 
 	// get parent url
 	if subjectResult.ParentID > 0 {
-		parent, err := model.GetSubjectByID(subjectResult.ParentID)
-		if err != nil {
+		parent := model.Subject{Model: model.Model{ID: subjectResult.ParentID}}
+		if err := parent.GetByID(db.DBEngine); err != nil {
 			return nil, err
 		}
 		subjectInfo.ParentURL = "/subject/" + parent.Slug

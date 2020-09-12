@@ -4,7 +4,7 @@ import (
 	"time"
 
 	gocache "github.com/patrickmn/go-cache"
-	"github.com/puti-projects/puti/internal/model"
+	"github.com/puti-projects/puti/internal/backend/dao"
 	"github.com/puti-projects/puti/internal/pkg/logger"
 )
 
@@ -34,7 +34,7 @@ func LoadOptions() error {
 
 // getAutoLoadOptions get options need to load
 func getAutoLoadOptions() error {
-	options, err := model.GetAutoLoadOptions()
+	options, err := dao.Engine.GetAutoLoadOptions()
 	if err != nil {
 		return err
 	}
@@ -59,7 +59,7 @@ func (cache *optionCache) Get(optionName string) string {
 	}
 
 	// If can not find the option by name in cache, get from db
-	option, err := model.GetOption(optionName)
+	option, err := dao.Engine.GetOptionByName(optionName)
 	if err != nil {
 		logger.Errorf("getting option failed. Option name: %s. %s", optionName, err)
 		return ""

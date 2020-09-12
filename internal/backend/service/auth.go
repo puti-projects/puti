@@ -1,11 +1,12 @@
 package service
 
 import (
-	"github.com/gin-gonic/gin"
-	"github.com/puti-projects/puti/internal/dao"
+	"github.com/puti-projects/puti/internal/backend/dao"
 	"github.com/puti-projects/puti/internal/pkg/auth"
 	"github.com/puti-projects/puti/internal/pkg/errno"
 	"github.com/puti-projects/puti/internal/pkg/token"
+
+	"github.com/gin-gonic/gin"
 )
 
 // LoginRequest is the login request params struct

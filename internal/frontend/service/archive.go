@@ -10,12 +10,12 @@ import (
 )
 
 // GetArchive get archive list and list sort
-func GetArchive() (map[string]map[string][]*model.ShowArchive, []string, map[string][]string, error) {
-	archives := []model.PostModel{}
+func GetArchive() (map[string]map[string][]*ShowArchive, []string, map[string][]string, error) {
+	archives := []model.Post{}
 
 	where := "`post_type` = ? AND `parent_id` = ? AND `status` = ?"
 	whereArgs := []interface{}{model.PostTypeArticle, 0, model.PostStatusPublish}
-	postModel := &model.PostModel{}
+	postModel := &model.Post{}
 	rows, err := db.DBEngine.Table(postModel.TableName()).
 		Select("`id`, `title`, `guid`, `comment_count`, `view_count`, `posted_time`").
 		Where(where, whereArgs...).
@@ -27,13 +27,13 @@ func GetArchive() (map[string]map[string][]*model.ShowArchive, []string, map[str
 	}
 	defer rows.Close()
 	for rows.Next() {
-		var archive model.PostModel
+		var archive model.Post
 		// ScanRows scan a row into archive
 		db.DBEngine.ScanRows(rows, &archive)
 		archives = append(archives, archive)
 	}
 
-	dataMap := map[string]map[string][]*model.ShowArchive{}
+	dataMap := map[string]map[string][]*ShowArchive{}
 	sortYear := []string{}
 	sortMonth := map[string][]string{}
 	for _, v := range archives {
@@ -42,20 +42,20 @@ func GetArchive() (map[string]map[string][]*model.ShowArchive, []string, map[str
 
 		_, existYear := dataMap[postedYear]
 		if !existYear {
-			dataMap[postedYear] = make(map[string][]*model.ShowArchive)
+			dataMap[postedYear] = make(map[string][]*ShowArchive)
 			sortYear = append(sortYear, postedYear)
 		}
 
 		_, existMonth := dataMap[postedYear][postedMonth]
 		if !existMonth {
-			dataMap[postedYear][postedMonth] = make([]*model.ShowArchive, 0)
+			dataMap[postedYear][postedMonth] = make([]*ShowArchive, 0)
 			if _, existSortYear := sortMonth[postedYear]; !existSortYear {
 				sortMonth[postedYear] = []string{}
 			}
 			sortMonth[postedYear] = append(sortMonth[postedYear], postedMonth)
 		}
 
-		article := &model.ShowArchive{
+		article := &ShowArchive{
 			ID:           v.ID,
 			Title:        v.Title,
 			GUID:         v.GUID,

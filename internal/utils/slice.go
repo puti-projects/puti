@@ -12,6 +12,24 @@ func SliceHas(v interface{}, sl []interface{}) bool {
 	return false
 }
 
+// SliceDiffUint64 returns diff slice of slice1 - slice2.
+// for uint64
+func SliceDiffUint64(slice1, slice2 []uint64) (diffslice []uint64) {
+	for _, v := range slice1 {
+		inSlice2 := false
+		for _, vv := range slice2 {
+			if vv == v {
+				inSlice2 = true
+			}
+		}
+
+		if inSlice2 == false {
+			diffslice = append(diffslice, v)
+		}
+	}
+	return
+}
+
 // SliceDiff returns diff slice of slice1 - slice2.
 func SliceDiff(slice1, slice2 []interface{}) (diffslice []interface{}) {
 	for _, v := range slice1 {

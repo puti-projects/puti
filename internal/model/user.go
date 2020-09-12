@@ -46,7 +46,7 @@ func (u *User) Get(db *gorm.DB) error {
 
 // GetByID get user by ID
 func (u *User) GetByID(db *gorm.DB) error {
-	return db.Where("`id` = ?", u.ID).First(u).Error
+	return db.First(u, u.ID).Error
 }
 
 // Delete delete a user by id

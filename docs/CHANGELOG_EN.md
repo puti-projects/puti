@@ -1,5 +1,20 @@
 # Changelog
 
+## v0.3.0 Optimization [2020-09-12]
+
+### Feature and Enhancement
+- Optimize the display of the Lin theme Latex formula style on the mobile terminal
+- Remove vendor directory and dependencies, use goproxy
+- Support Github Actions
+- A large number of basic component optimization and reconstruction
+- Back-end api structure reconstruction
+- Upgrade GROM to v2
+
+### Bug Fixed
+- Fix the problem of incorrect label modification
+
+---
+
 ## v0.2.2 Article Cover Picture [2019-08-14]
 
 ### Feature and Enhancement

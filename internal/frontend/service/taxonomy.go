@@ -6,8 +6,8 @@ import (
 )
 
 // GetcategoryList get category tree for widget
-func GetcategoryList() (taxonomyTree []*model.ShowWidgetCategoryTreeNode, err error) {
-	var termTaxonomy []*model.TermTaxonomyModel
+func GetcategoryList() (taxonomyTree []*ShowWidgetCategoryTreeNode, err error) {
+	var termTaxonomy []*model.TermTaxonomy
 	err = db.DBEngine.Where("taxonomy = ? AND term_id != ?", "category", model.DefaultUnCategorizedID).Preload("Term").Find(&termTaxonomy).Error
 	if err != nil {
 		return nil, err
@@ -19,12 +19,12 @@ func GetcategoryList() (taxonomyTree []*model.ShowWidgetCategoryTreeNode, err er
 }
 
 // getTaxonomyTree return a taxonomy tree
-func getTaxonomyTree(termTaxonomy []*model.TermTaxonomyModel, pid uint64) []*model.ShowWidgetCategoryTreeNode {
-	var tree []*model.ShowWidgetCategoryTreeNode
+func getTaxonomyTree(termTaxonomy []*model.TermTaxonomy, pid uint64) []*ShowWidgetCategoryTreeNode {
+	var tree []*ShowWidgetCategoryTreeNode
 
 	for _, v := range termTaxonomy {
 		if pid == v.ParentTermID {
-			treeNode := model.ShowWidgetCategoryTreeNode{
+			treeNode := ShowWidgetCategoryTreeNode{
 				TermID: v.TermID,
 				Name:   v.Term.Name,
 				Slug:   v.Term.Slug,

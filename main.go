@@ -1,14 +1,17 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
 	"os"
+	"os/signal"
+	"syscall"
 	"time"
 
-	"github.com/puti-projects/puti/internal/dao"
+	"github.com/puti-projects/puti/internal/backend/dao"
 	"github.com/puti-projects/puti/internal/pkg/config"
 	"github.com/puti-projects/puti/internal/pkg/counter"
 	"github.com/puti-projects/puti/internal/pkg/db"
@@ -70,7 +73,7 @@ func init() {
 func main() {
 	// load default options (need db connection)
 	if err := option.LoadOptions(); err != nil {
-		logger.Errorf("load options failed, %s", err)
+		logger.Errorf("load options failed, %v", err)
 	}
 	logger.Info("options has been deployed successfully")
 
@@ -96,27 +99,68 @@ func main() {
 // httpServe set up http server
 // If https open, should only listen https port
 func httpServe(router *gin.Engine) {
+	var srv *http.Server
 	// if open https
 	if true == config.Server.HttpsOpen {
-		if config.Server.TlsCert == "" || config.Server.TlsKey == "" {
-			logger.Errorf("https opened but cert and key can not be empty, failed to listen https port")
-		}
-
-		logger.Info("start to listening the incoming https requests", zap.String("port", config.Server.HttpsPort))
-		logger.Info(
-			http.ListenAndServeTLS(
-				"0.0.0.0:"+config.Server.HttpsPort,
-				config.Server.TlsCert,
-				config.Server.TlsKey,
-				router,
-			).Error())
+		srv = httpsHandle(router)
+	} else {
+		srv = httpHandle(router)
 	}
 
-	logger.Info("start to listening the incoming http requests", zap.String("port", config.Server.HttpPort))
-	logger.Info(http.ListenAndServe(
-		"0.0.0.0:"+config.Server.HttpPort,
-		router,
-	).Error())
+	signalHandle(srv)
+}
+
+func httpHandle(router *gin.Engine) *http.Server {
+	srv := &http.Server{
+		Addr:    ":" + config.Server.HttpPort,
+		Handler: router,
+	}
+
+	go func() {
+		logger.Info("start to listening the incoming http requests", zap.String("port", config.Server.HttpPort))
+		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			logger.Fatalf("server.ListenAndServe err: %v", err)
+		}
+	}()
+
+	return srv
+}
+
+func httpsHandle(router *gin.Engine) *http.Server {
+	if config.Server.TlsCert == "" || config.Server.TlsKey == "" {
+		logger.Errorf("https opened but cert and key can not be empty, failed to listen https port")
+	}
+
+	srv := &http.Server{
+		Addr:    ":" + config.Server.HttpsPort,
+		Handler: router,
+	}
+
+	go func() {
+		logger.Info("start to listening the incoming https requests", zap.String("port", config.Server.HttpsPort))
+		if err := srv.ListenAndServeTLS(config.Server.TlsCert, config.Server.TlsKey); err != nil && err != http.ErrServerClosed {
+			logger.Fatalf("server.ListenAndServeTLS err: %v", err)
+		}
+	}()
+
+	return srv
+}
+
+func signalHandle(srv *http.Server) {
+	quit := make(chan os.Signal)
+	// receive syscall.SIGINT and syscall.SIGTERM signal
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+
+	// if signal received
+	<-quit
+	logger.Warn("shuting down server")
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	if err := srv.Shutdown(ctx); err != nil {
+		logger.Fatalf("server shutdown failed: %v; the service will be forced to quit", err)
+	}
+	logger.Warn("server shutdown")
 }
 
 // pingServer pings the http server to make sure the service is working.

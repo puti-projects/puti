@@ -1,16 +1,17 @@
 # Changelog
 
-## v0.3.0
+## v0.3.0 Optimization [2020-09-12]
 
 ### 功能和优化
 - 优化 Lin 主题 Latex 公式样式在移动端的展示
 - 移除 vendor 目录和依赖，使用 goproxy
 - 支持 Github Actions
 - 大量基础组件优化和重构
+- 后台 api 结构重构
 - 升级 GROM 到 v2
 
 ### Bug 修复
-
+- 修复标签修改出错的问题
 
 ---
 

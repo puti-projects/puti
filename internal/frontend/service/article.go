@@ -20,11 +20,11 @@ import (
 // List post list
 type List struct {
 	Lock  *sync.Mutex
-	IDMap map[uint64]*model.ShowArticle
+	IDMap map[uint64]*ShowArticle
 }
 
 // GetArticleListByTaxonomy get articles list
-func GetArticleListByTaxonomy(currentPage int, taxonomyType, taxonomySlug, keyword string) (termName string, articleResult []*model.ShowArticle, pagination *utils.Pagination, err error) {
+func GetArticleListByTaxonomy(currentPage int, taxonomyType, taxonomySlug, keyword string) (termName string, articleResult []*ShowArticle, pagination *utils.Pagination, err error) {
 	// get articles data
 	pageSize, _ := strconv.Atoi(optionCache.Options.Get("posts_per_page"))
 	offset := (currentPage - 1) * pageSize
@@ -47,7 +47,7 @@ func GetArticleListByTaxonomy(currentPage int, taxonomyType, taxonomySlug, keywo
 		whereArgs = append(whereArgs, "%"+keyword+"%")
 	}
 
-	articles := []*model.PostModel{}
+	articles := []*model.Post{}
 	result := db.DBEngine.Table("pt_post p").
 		Select("p.`id`, p.`title`, p.`if_top`, p.`content_html`, p.`guid`, p.`cover_picture`, p.`comment_count`, p.`view_count`, p.`posted_time`").
 		Joins("INNER JOIN pt_term_relationships tr ON tr.object_id = p.id").
@@ -65,7 +65,7 @@ func GetArticleListByTaxonomy(currentPage int, taxonomyType, taxonomySlug, keywo
 	pagination = utils.GetPagination(int(count), currentPage, pageSize, 0)
 
 	// handle articles data
-	articleResult = make([]*model.ShowArticle, 0)
+	articleResult = make([]*ShowArticle, 0)
 	ids := []uint64{}
 	for _, article := range articles {
 		ids = append(ids, article.ID)
@@ -74,7 +74,7 @@ func GetArticleListByTaxonomy(currentPage int, taxonomyType, taxonomySlug, keywo
 	wg := sync.WaitGroup{}
 	articleList := List{
 		Lock:  new(sync.Mutex),
-		IDMap: make(map[uint64]*model.ShowArticle, len(articles)),
+		IDMap: make(map[uint64]*ShowArticle, len(articles)),
 	}
 
 	errChan := make(chan error, 1)
@@ -83,7 +83,7 @@ func GetArticleListByTaxonomy(currentPage int, taxonomyType, taxonomySlug, keywo
 	siteURL := optionCache.Options.Get("site_url")
 	for _, a := range articles {
 		wg.Add(1)
-		go func(a *model.PostModel) {
+		go func(a *model.Post) {
 			defer wg.Done()
 
 			var ifTop = false
@@ -98,7 +98,7 @@ func GetArticleListByTaxonomy(currentPage int, taxonomyType, taxonomySlug, keywo
 
 			articleList.Lock.Lock()
 			defer articleList.Lock.Unlock()
-			articleList.IDMap[a.ID] = &model.ShowArticle{
+			articleList.IDMap[a.ID] = &ShowArticle{
 				ID:           a.ID,
 				Title:        a.Title,
 				IfTop:        ifTop,
@@ -133,7 +133,7 @@ func GetArticleListByTaxonomy(currentPage int, taxonomyType, taxonomySlug, keywo
 }
 
 // GetArticleList get articles list
-func GetArticleList(currentPage int, keyword string) (articleResult []*model.ShowArticle, pagination *utils.Pagination, err error) {
+func GetArticleList(currentPage int, keyword string) (articleResult []*ShowArticle, pagination *utils.Pagination, err error) {
 	// get articles data
 	pageSize, _ := strconv.Atoi(optionCache.Options.Get("posts_per_page"))
 	offset := (currentPage - 1) * pageSize
@@ -146,8 +146,8 @@ func GetArticleList(currentPage int, keyword string) (articleResult []*model.Sho
 		whereArgs = append(whereArgs, "%"+keyword+"%")
 	}
 
-	articles := []*model.PostModel{}
-	result := db.DBEngine.Model(&model.PostModel{}).
+	articles := []*model.Post{}
+	result := db.DBEngine.Model(&model.Post{}).
 		Select("`id`, `title`, `if_top`, `content_html`, `guid`, `cover_picture`, `comment_count`, `view_count`, `posted_time`").
 		Where(where, whereArgs...).Count(&count).
 		Order("`if_top` DESC, `posted_time` DESC").
@@ -162,7 +162,7 @@ func GetArticleList(currentPage int, keyword string) (articleResult []*model.Sho
 	pagination = utils.GetPagination(int(count), currentPage, pageSize, 0)
 
 	// handle articles data
-	articleResult = make([]*model.ShowArticle, 0)
+	articleResult = make([]*ShowArticle, 0)
 	ids := []uint64{}
 	for _, article := range articles {
 		ids = append(ids, article.ID)
@@ -171,7 +171,7 @@ func GetArticleList(currentPage int, keyword string) (articleResult []*model.Sho
 	wg := sync.WaitGroup{}
 	articleList := List{
 		Lock:  new(sync.Mutex),
-		IDMap: make(map[uint64]*model.ShowArticle, len(articles)),
+		IDMap: make(map[uint64]*ShowArticle, len(articles)),
 	}
 
 	errChan := make(chan error, 1)
@@ -180,7 +180,7 @@ func GetArticleList(currentPage int, keyword string) (articleResult []*model.Sho
 	siteURL := optionCache.Options.Get("site_url")
 	for _, a := range articles {
 		wg.Add(1)
-		go func(a *model.PostModel) {
+		go func(a *model.Post) {
 			defer wg.Done()
 
 			var ifTop = false
@@ -195,7 +195,7 @@ func GetArticleList(currentPage int, keyword string) (articleResult []*model.Sho
 
 			articleList.Lock.Lock()
 			defer articleList.Lock.Unlock()
-			articleList.IDMap[a.ID] = &model.ShowArticle{
+			articleList.IDMap[a.ID] = &ShowArticle{
 				ID:           a.ID,
 				Title:        a.Title,
 				IfTop:        ifTop,
@@ -229,7 +229,7 @@ func GetArticleList(currentPage int, keyword string) (articleResult []*model.Sho
 	return
 }
 
-func getArticleTaxonomyInfo(articleID uint64, siteURL string) ([]*model.ShowCategory, []*model.ShowTag, error) {
+func getArticleTaxonomyInfo(articleID uint64, siteURL string) ([]*ShowCategory, []*ShowTag, error) {
 	sql := "SELECT t.`name`, t.`slug`, tt.`taxonomy` FROM pt_term t LEFT JOIN pt_term_taxonomy tt ON tt.`term_id` = t.`term_id` LEFT JOIN pt_term_relationships tr ON tr.`term_taxonomy_id` = tt.`term_taxonomy_id` WHERE tr.`object_id` = ?"
 	rows, err := db.DBEngine.Raw(sql, articleID).Rows()
 	if err != nil {
@@ -237,19 +237,19 @@ func getArticleTaxonomyInfo(articleID uint64, siteURL string) ([]*model.ShowCate
 	}
 	defer rows.Close()
 
-	articleCategory := make([]*model.ShowCategory, 0)
-	articleTag := make([]*model.ShowTag, 0)
+	articleCategory := make([]*ShowCategory, 0)
+	articleTag := make([]*ShowTag, 0)
 	var name string
 	var slug string
 	var taxonomy string
 	for rows.Next() {
 		rows.Scan(&name, &slug, &taxonomy)
 		if taxonomy == "category" {
-			articleCategory = append(articleCategory, &model.ShowCategory{Title: name, URL: siteURL + config.PathCategory + "/" + slug})
+			articleCategory = append(articleCategory, &ShowCategory{Title: name, URL: siteURL + config.PathCategory + "/" + slug})
 		}
 
 		if taxonomy == "tag" {
-			articleTag = append(articleTag, &model.ShowTag{Title: name, URL: siteURL + config.PathTag + "/" + slug})
+			articleTag = append(articleTag, &ShowTag{Title: name, URL: siteURL + config.PathTag + "/" + slug})
 		}
 	}
 
@@ -276,12 +276,12 @@ func getArticleAbstract(content string) string {
 }
 
 // GetLatestArticlesList get latest article list for widget
-func GetLatestArticlesList(getNums int) ([]*model.ShowWidgetLatestArticles, error) {
+func GetLatestArticlesList(getNums int) ([]*ShowWidgetLatestArticles, error) {
 	where := "`post_type` = ? AND `parent_id` = ? AND `status` = ?"
 	whereArgs := []interface{}{model.PostTypeArticle, 0, model.PostStatusPublish}
 
-	articles := []*model.ShowWidgetLatestArticles{}
-	postModel := &model.PostModel{}
+	articles := []*ShowWidgetLatestArticles{}
+	postModel := &model.Post{}
 	result := db.DBEngine.Table(postModel.TableName()).
 		Select("`id`, `title`, `guid`, `comment_count`, `view_count`, `posted_time`").
 		Where(where, whereArgs...).
@@ -297,8 +297,8 @@ func GetLatestArticlesList(getNums int) ([]*model.ShowWidgetLatestArticles, erro
 }
 
 // GetArticleDetailByID get article detail by article id
-func GetArticleDetailByID(articleID uint64) (*model.ShowArticleDetail, error) {
-	a := &model.PostModel{}
+func GetArticleDetailByID(articleID uint64) (*ShowArticleDetail, error) {
+	a := &model.Post{}
 	err := db.DBEngine.Where("id = ? AND post_type = ? AND parent_id = ? AND status =?", articleID, model.PostTypeArticle, 0, model.PostStatusPublish).First(&a).Error
 	if err != nil {
 		return nil, err
@@ -310,7 +310,7 @@ func GetArticleDetailByID(articleID uint64) (*model.ShowArticleDetail, error) {
 		return nil, err
 	}
 
-	articleDetail := &model.ShowArticleDetail{
+	articleDetail := &ShowArticleDetail{
 		ID:            a.ID,
 		Title:         a.Title,
 		ContentHTML:   template.HTML(a.ContentHTML),
@@ -325,7 +325,8 @@ func GetArticleDetailByID(articleID uint64) (*model.ShowArticleDetail, error) {
 	}
 
 	// get extra data of article
-	am, err := model.GetPostMetaData(articleID)
+	pm := &model.PostMeta{PostID: articleID}
+	am, err := pm.GetAllByPostID(db.DBEngine)
 	if err != nil {
 		return nil, err
 	}
@@ -337,16 +338,16 @@ func GetArticleDetailByID(articleID uint64) (*model.ShowArticleDetail, error) {
 }
 
 // GetLastArticle get last article title and url
-func GetLastArticle(currentArticleID uint64) *model.ShowLastOrNextArticle {
+func GetLastArticle(currentArticleID uint64) *ShowLastOrNextArticle {
 	var title string
 	var url string
-	postModel := &model.PostModel{}
+	postModel := &model.Post{}
 	row := db.DBEngine.Table(postModel.TableName()).
 		Where("`id` < ? AND `post_type` = ? AND `parent_id` = ? AND `status` = ? AND `deleted_time` IS NULL", currentArticleID, model.PostTypeArticle, 0, model.PostStatusPublish).
 		Select("`title`, `guid`").Order("`id` DESC").Row()
 	row.Scan(&title, &url)
 
-	article := &model.ShowLastOrNextArticle{
+	article := &ShowLastOrNextArticle{
 		Title: title,
 		URL:   url,
 	}
@@ -355,16 +356,16 @@ func GetLastArticle(currentArticleID uint64) *model.ShowLastOrNextArticle {
 }
 
 // GetNextArticle get next article title and url
-func GetNextArticle(currentArticleID uint64) *model.ShowLastOrNextArticle {
+func GetNextArticle(currentArticleID uint64) *ShowLastOrNextArticle {
 	var title string
 	var url string
-	postModel := &model.PostModel{}
+	postModel := &model.Post{}
 	row := db.DBEngine.Table(postModel.TableName()).
 		Where("`id` > ? AND `post_type` = ? AND `parent_id` = ? AND `status` = ? AND `deleted_time` IS NULL", currentArticleID, model.PostTypeArticle, 0, model.PostStatusPublish).
 		Select("`title`, `guid`").Order("`id` ASC").Row()
 	row.Scan(&title, &url)
 
-	article := &model.ShowLastOrNextArticle{
+	article := &ShowLastOrNextArticle{
 		Title: title,
 		URL:   url,
 	}
@@ -376,8 +377,8 @@ func GetNextArticle(currentArticleID uint64) *model.ShowLastOrNextArticle {
 func GetSubjectArticleList(subjectID uint64) ([]*map[string]interface{}, error) {
 	var articleList []*map[string]interface{}
 
-	postModel := &model.PostModel{}
-	srModel := &model.SubjectRelationshipsModel{}
+	postModel := &model.Post{}
+	srModel := &model.SubjectRelationships{}
 	rows, err := db.DBEngine.Table(postModel.TableName()+" p").
 		Select("p.`id`, p.`title`, p.`guid`, p.`comment_count`, p.`view_count`, p.`posted_time`").
 		Joins("INNER JOIN "+srModel.TableName()+" sr ON sr.`object_id` = p.`id`").
