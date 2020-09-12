@@ -35,12 +35,12 @@ type ShowCategory struct {
 // ShowWidgetLatestArticles latest article list for widget
 // Use {{ formatNullTime .PostedTime "2006-01-02 15:04" }} to decode the time
 type ShowWidgetLatestArticles struct {
-	ID           string        `json:"id"`
-	Title        string        `json:"title"`
-	GUID         string        `json:"GUID"`
-	CommentCount string        `json:"comment_count"`
-	ViewCount    string        `json:"view_count"`
-	PostedTime   *sql.NullTime `json:"posted_time"`
+	ID           string       `json:"id"`
+	Title        string       `json:"title"`
+	GUID         string       `json:"GUID"`
+	CommentCount string       `json:"comment_count"`
+	ViewCount    string       `json:"view_count"`
+	PostedTime   sql.NullTime `json:"posted_time"`
 }
 
 // ShowWidgetCategoryTreeNode category tree node for widget

@@ -32,9 +32,9 @@ func GetArticleListByTaxonomy(currentPage int, taxonomyType, taxonomySlug, keywo
 
 	// get term id
 	var termTaxonomyID uint64
-	getTermTaxonomyID := db.DBEngine.Table("pt_term t").
+	getTermTaxonomyID := db.DBEngine.Table("pt_term as t").
 		Select("t.`name`, tt.`term_taxonomy_id`").
-		Joins("INNER JOIN pt_term_taxonomy tt ON tt.term_id = t.term_id").
+		Joins("INNER JOIN pt_term_taxonomy as tt ON tt.term_id = t.term_id").
 		Where("t.`slug` = ? AND tt.`taxonomy` = ?", taxonomySlug, taxonomyType).
 		Row()
 	getTermTaxonomyID.Scan(&termName, &termTaxonomyID)
@@ -48,9 +48,9 @@ func GetArticleListByTaxonomy(currentPage int, taxonomyType, taxonomySlug, keywo
 	}
 
 	articles := []*model.Post{}
-	result := db.DBEngine.Table("pt_post p").
+	result := db.DBEngine.Table("pt_post AS p").
 		Select("p.`id`, p.`title`, p.`if_top`, p.`content_html`, p.`guid`, p.`cover_picture`, p.`comment_count`, p.`view_count`, p.`posted_time`").
-		Joins("INNER JOIN pt_term_relationships tr ON tr.object_id = p.id").
+		Joins("INNER JOIN pt_term_relationships AS tr ON tr.object_id = p.id").
 		Unscoped().
 		Where(where, whereArgs...).Count(&count).
 		Order("p.`if_top` DESC, p.`posted_time` DESC").
@@ -107,7 +107,7 @@ func GetArticleListByTaxonomy(currentPage int, taxonomyType, taxonomySlug, keywo
 				CoverPicture: a.CoverPicture,
 				CommentCount: a.CommentCount,
 				ViewCount:    a.ViewCount,
-				PostedTime:   utils.GetFormatNullTime(a.PostDate, "2006-01-02 15:04"),
+				PostedTime:   utils.GetFormatNullTime(&a.PostDate, "2006-01-02 15:04"),
 				Tags:         articleTag,
 				Categories:   articleCategory,
 			}
@@ -204,7 +204,7 @@ func GetArticleList(currentPage int, keyword string) (articleResult []*ShowArtic
 				CoverPicture: a.CoverPicture,
 				CommentCount: a.CommentCount,
 				ViewCount:    a.ViewCount,
-				PostedTime:   utils.GetFormatNullTime(a.PostDate, "2006-01-02 15:04"),
+				PostedTime:   utils.GetFormatNullTime(&a.PostDate, "2006-01-02 15:04"),
 				Tags:         articleTag,
 				Categories:   articleCategory,
 			}
@@ -318,7 +318,7 @@ func GetArticleDetailByID(articleID uint64) (*ShowArticleDetail, error) {
 		GUID:          siteURL + a.GUID,
 		CommentCount:  a.CommentCount,
 		ViewCount:     a.ViewCount,
-		PostedTime:    utils.GetFormatNullTime(a.PostDate, "2006-01-02 15:04"),
+		PostedTime:    utils.GetFormatNullTime(&a.PostDate, "2006-01-02 15:04"),
 		MetaData:      make(map[string]interface{}),
 		Categories:    articleCategory,
 		Tags:          articleTag,
@@ -393,7 +393,7 @@ func GetSubjectArticleList(subjectID uint64) ([]*map[string]interface{}, error) 
 	for rows.Next() {
 		var id, commentCount, viewCount uint64
 		var title, guid string
-		var postedTime *sql.NullTime
+		var postedTime sql.NullTime
 		rows.Scan(&id, &title, &guid, &commentCount, &viewCount, &postedTime)
 
 		item := &map[string]interface{}{

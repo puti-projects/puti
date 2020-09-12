@@ -119,9 +119,9 @@ func (t *TermTaxonomy) GetAllByType(db *gorm.DB, taxomonyType string) ([]*TermTa
 // TaxonomyCheckNameExist check the taxonomy name if is already exist
 func CheckTaxonomyNameExist(db *gorm.DB, name, taxonomy string) bool {
 	var count int64 = 0
-	db.Table("pt_term t").
+	db.Table("pt_term AS t").
 		Select("t.term_id, t.name").
-		Joins("inner join pt_term_taxonomy tt on tt.term_id = t.term_id").
+		Joins("INNER JOIN pt_term_taxonomy AS tt ON tt.term_id = t.term_id").
 		Where("t.name = ? AND tt.taxonomy = ?", name, taxonomy).
 		Count(&count)
 

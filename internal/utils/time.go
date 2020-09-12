@@ -48,7 +48,7 @@ func StringToTime(layout string, timeString string) time.Time {
 }
 
 // StringToNullTime changesfer a time string to mysql.NullTime
-func StringToNullTime(layout string, timeString string) *sql.NullTime {
+func StringToNullTime(layout string, timeString string) sql.NullTime {
 	var nullTime sql.NullTime
 	if timeString == "" {
 		nullTime.Valid = false
@@ -57,7 +57,7 @@ func StringToNullTime(layout string, timeString string) *sql.NullTime {
 	}
 
 	nullTime.Time = StringToTime(layout, timeString)
-	return &nullTime
+	return nullTime
 }
 
 // SubNullTimeUnitlNowAsDay calculate the diff day until now

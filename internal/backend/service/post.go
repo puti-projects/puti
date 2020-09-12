@@ -189,7 +189,7 @@ func CreateArticle(r *ArticleCreateRequest, userID uint64) (*ArticleCreateRespon
 		ViewCount:       0,
 	}
 	if r.PostedTime == "" && r.Status == model.PostStatusPublish {
-		article.PostDate = &sql.NullTime{Time: time.Now(), Valid: true}
+		article.PostDate = sql.NullTime{Time: time.Now(), Valid: true}
 	} else {
 		article.PostDate = utils.StringToNullTime("2006-01-02 15:04:05", r.PostedTime)
 	}
@@ -234,7 +234,7 @@ func CreatePage(r *PageCreateRequest, userID uint64) (*PageCreateResponse, error
 		ViewCount:       0,
 	}
 	if r.PostedTime == "" && r.Status == model.PostStatusPublish {
-		page.PostDate = &sql.NullTime{Time: time.Now(), Valid: true}
+		page.PostDate = sql.NullTime{Time: time.Now(), Valid: true}
 	} else {
 		page.PostDate = utils.StringToNullTime("2006-01-02 15:04:05", r.PostedTime)
 	}
@@ -298,6 +298,9 @@ func ListPost(postType, title string, page, number int, sort, status string) ([]
 
 	// Improve query efficiency in parallel
 	for _, u := range posts {
+		fmt.Println(u.CreatedAt)
+		fmt.Println(u.DeletedAt)
+		fmt.Println(u.PostDate)
 		wg.Add(1)
 		go func(u *model.Post) {
 			defer wg.Done()
@@ -309,7 +312,7 @@ func ListPost(postType, title string, page, number int, sort, status string) ([]
 				UserID:       u.UserID,
 				Title:        u.Title,
 				Status:       u.Status,
-				PostDate:     utils.GetFormatNullTime(u.PostDate, "2006-01-02 15:04"),
+				PostDate:     utils.GetFormatNullTime(&u.PostDate, "2006-01-02 15:04"),
 				CommentCount: u.CommentCount,
 				ViewCount:    u.ViewCount,
 			}
@@ -359,7 +362,7 @@ func GetArticleDetail(articleID uint64) (*ArticleDetail, error) {
 		IfTop:           article.IfTop,
 		GUID:            article.GUID,
 		CoverPicture:    article.CoverPicture,
-		PostDate:        utils.GetFormatNullTime(article.PostDate, "2006-01-02 15:04:05"),
+		PostDate:        utils.GetFormatNullTime(&article.PostDate, "2006-01-02 15:04:05"),
 		MetaData:        make(map[string]interface{}),
 		Category:        make([]uint64, 0),
 		Tag:             make([]uint64, 0),
@@ -416,7 +419,7 @@ func GetPageDetail(pageID uint64) (*PageDetail, error) {
 		CommentStatus:   page.CommentStatus,
 		GUID:            page.GUID,
 		CoverPicture:    page.CoverPicture,
-		PostDate:        utils.GetFormatNullTime(page.PostDate, "2006-01-02 15:04:05"),
+		PostDate:        utils.GetFormatNullTime(&page.PostDate, "2006-01-02 15:04:05"),
 		MetaData:        make(map[string]interface{}),
 	}
 
@@ -447,7 +450,7 @@ func UpdateArticle(a *ArticleUpdateRequest) error {
 	article.PostDate = utils.StringToNullTime("2006-01-02 15:04:05", a.PostedTime)
 	if article.PostDate.Valid == false && article.Status == model.PostStatusPublish {
 		// first publish; save as draft and  publish now in this situation
-		article.PostDate = &sql.NullTime{Time: time.Now(), Valid: true}
+		article.PostDate = sql.NullTime{Time: time.Now(), Valid: true}
 	}
 
 	err = dao.Engine.UpdateArticle(article, a.Description, a.Category, a.Tag, a.Subject)
