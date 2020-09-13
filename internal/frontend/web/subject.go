@@ -2,7 +2,6 @@ package web
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
 
 	"github.com/puti-projects/puti/internal/frontend/service"
@@ -19,7 +18,6 @@ func ShowTopSubjects(c *gin.Context) {
 	// get content
 	subjectsList, err := service.GetChildrenSubejcts(0)
 	if err != nil {
-		fmt.Println(err)
 		ShowInternalServerError(c)
 		return
 	}

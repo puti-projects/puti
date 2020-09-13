@@ -45,7 +45,7 @@ func NewRouter(runmode string) *gin.Engine {
 	g = setFuncMap(g)
 
 	g.Use(middleware.AccessLogger())
-	g.Use(middleware.Recovery())
+	// g.Use(middleware.Recovery())
 
 	currentTheme := optionCache.Options.Get("current_theme")
 
@@ -66,8 +66,9 @@ func setFuncMap(g *gin.Engine) *gin.Engine {
 		"minus": func(a, b int) int {
 			return a - b
 		},
-		"formatNullTime": func(time *sql.NullTime, format string) string {
-			return utils.GetFormatNullTime(time, format)
+		// TODO this function should remove after output of widget standardization
+		"formatNullTime": func(time sql.NullTime, format string) string {
+			return utils.GetFormatNullTime(&time, format)
 		},
 	})
 

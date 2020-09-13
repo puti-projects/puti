@@ -298,9 +298,6 @@ func ListPost(postType, title string, page, number int, sort, status string) ([]
 
 	// Improve query efficiency in parallel
 	for _, u := range posts {
-		fmt.Println(u.CreatedAt)
-		fmt.Println(u.DeletedAt)
-		fmt.Println(u.PostDate)
 		wg.Add(1)
 		go func(u *model.Post) {
 			defer wg.Done()

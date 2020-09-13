@@ -402,7 +402,7 @@ func GetSubjectArticleList(subjectID uint64) ([]*map[string]interface{}, error) 
 			"GUID":         guid,
 			"CommentCount": commentCount,
 			"ViewCount":    viewCount,
-			"PostedTime":   postedTime,
+			"PostedTime":   utils.GetFormatNullTime(&postedTime, "2006-01-02 15:04"),
 		}
 		articleList = append(articleList, item)
 	}
