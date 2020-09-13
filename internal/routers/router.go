@@ -45,7 +45,7 @@ func NewRouter(runmode string) *gin.Engine {
 	g = setFuncMap(g)
 
 	g.Use(middleware.AccessLogger())
-	// g.Use(middleware.Recovery())
+	g.Use(middleware.Recovery())
 
 	currentTheme := optionCache.Options.Get("current_theme")
 
