@@ -230,8 +230,8 @@ func GetArticleList(currentPage int, keyword string) (articleResult []*ShowArtic
 }
 
 func getArticleTaxonomyInfo(articleID uint64, siteURL string) ([]*ShowCategory, []*ShowTag, error) {
-	sql := "SELECT t.`name`, t.`slug`, tt.`taxonomy` FROM pt_term t LEFT JOIN pt_term_taxonomy tt ON tt.`term_id` = t.`term_id` LEFT JOIN pt_term_relationships tr ON tr.`term_taxonomy_id` = tt.`term_taxonomy_id` WHERE tr.`object_id` = ?"
-	rows, err := db.DBEngine.Raw(sql, articleID).Rows()
+	rawSQL := "SELECT t.`name`, t.`slug`, tt.`taxonomy` FROM pt_term t LEFT JOIN pt_term_taxonomy tt ON tt.`term_id` = t.`term_id` LEFT JOIN pt_term_relationships tr ON tr.`term_taxonomy_id` = tt.`term_taxonomy_id` WHERE tr.`object_id` = ?"
+	rows, err := db.DBEngine.Raw(rawSQL, articleID).Rows()
 	if err != nil {
 		return nil, nil, err
 	}

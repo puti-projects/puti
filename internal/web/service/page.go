@@ -17,7 +17,7 @@ func GetPageIDBySlug(slug string) uint64 {
 		Select("`id`").
 		Where("`slug` = ? AND `post_type` = ? AND `parent_id` = ? AND `status` = ? AND `deleted_time` IS NULL", slug, model.PostTypePage, 0, model.PostStatusPublish).
 		Row()
-	getpageID.Scan(&pageID)
+	_ = getpageID.Scan(&pageID)
 
 	return pageID
 }

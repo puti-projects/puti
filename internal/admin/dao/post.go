@@ -29,7 +29,9 @@ func (d *Dao) GetPostByID(postID uint64) (*model.Post, error) {
 }
 
 func (d *Dao) GetPostMetaByPostID(postID uint64) ([]*model.PostMeta, error) {
-	pm := model.PostMeta{}
+	pm := model.PostMeta{
+		PostID: postID,
+	}
 	postMeta, err := pm.GetAllByPostID(d.db)
 	if err != nil {
 		return nil, err
