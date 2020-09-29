@@ -4,7 +4,7 @@ import (
 	"time"
 
 	gocache "github.com/patrickmn/go-cache"
-	"github.com/puti-projects/puti/internal/backend/dao"
+	"github.com/puti-projects/puti/internal/admin/dao"
 	"github.com/puti-projects/puti/internal/pkg/logger"
 )
 

@@ -6,25 +6,24 @@ import (
 	"net/http"
 	"path/filepath"
 
-	"github.com/puti-projects/puti/internal/backend/api"
-	"github.com/puti-projects/puti/internal/backend/api/article"
-	"github.com/puti-projects/puti/internal/backend/api/auth"
-	"github.com/puti-projects/puti/internal/backend/api/media"
-	"github.com/puti-projects/puti/internal/backend/api/option"
-	"github.com/puti-projects/puti/internal/backend/api/page"
-	"github.com/puti-projects/puti/internal/backend/api/statistics"
-	"github.com/puti-projects/puti/internal/backend/api/subject"
-	"github.com/puti-projects/puti/internal/backend/api/taxonomy"
-	"github.com/puti-projects/puti/internal/backend/api/user"
-	"github.com/puti-projects/puti/internal/frontend/web"
+	"github.com/puti-projects/puti/internal/admin/api"
+	"github.com/puti-projects/puti/internal/admin/api/article"
+	"github.com/puti-projects/puti/internal/admin/api/auth"
+	"github.com/puti-projects/puti/internal/admin/api/media"
+	"github.com/puti-projects/puti/internal/admin/api/option"
+	"github.com/puti-projects/puti/internal/admin/api/page"
+	"github.com/puti-projects/puti/internal/admin/api/statistics"
+	"github.com/puti-projects/puti/internal/admin/api/subject"
+	"github.com/puti-projects/puti/internal/admin/api/taxonomy"
+	"github.com/puti-projects/puti/internal/admin/api/user"
 	"github.com/puti-projects/puti/internal/pkg/config"
 	"github.com/puti-projects/puti/internal/pkg/logger"
-	optionCache "github.com/puti-projects/puti/internal/pkg/option"
 	"github.com/puti-projects/puti/internal/pkg/theme"
 	"github.com/puti-projects/puti/internal/routers/middleware"
 	apiMiddleware "github.com/puti-projects/puti/internal/routers/middleware/api"
 	webMiddleware "github.com/puti-projects/puti/internal/routers/middleware/web"
 	"github.com/puti-projects/puti/internal/utils"
+	"github.com/puti-projects/puti/internal/web/view"
 
 	"github.com/gin-gonic/gin"
 )
@@ -47,7 +46,9 @@ func NewRouter(runmode string) *gin.Engine {
 	g.Use(middleware.AccessLogger())
 	g.Use(middleware.Recovery())
 
-	currentTheme := optionCache.Options.Get("current_theme")
+	// TODO Hot restart after changing the theme, reload the template corresponding to the single-sign theme
+	// Now load all theme template files back
+	// currentTheme := optionCache.Options.Get("current_theme")
 
 	if runmode == gin.DebugMode {
 		g.Use(apiMiddleware.Options)
@@ -55,8 +56,8 @@ func NewRouter(runmode string) *gin.Engine {
 
 	loadHealthTest(g)
 	loadAPI(g)
-	loadWeb(g, currentTheme)
-	loadStatic(g, currentTheme)
+	loadWeb(g)
+	loadStatic(g)
 
 	return g
 }
@@ -75,36 +76,36 @@ func setFuncMap(g *gin.Engine) *gin.Engine {
 	return g
 }
 
-// loadWeb load frontend and backend entrance(SPA web)
-func loadWeb(g *gin.Engine, currentTheme string) {
-	// Group for backend
+// loadWeb load web and admin entrance(SPA view)
+func loadWeb(g *gin.Engine) {
+	// Group for admin
 	admin := g.Group("/admin")
 	admin.GET("", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "console.html", gin.H{})
 	})
 
-	// Group for frontend
+	// Group for web
 	// notice: page route is handle in NoRoute(), since the wildcard problem in root from httprouter
 	webGroup := g.Group("")
 	webGroup.Use(webMiddleware.Renderer)
 	{
-		webGroup.GET("", web.ShowIndex)
-		webGroup.GET("/article", web.ShowArticleList)
-		webGroup.GET("/category/:slug", web.ShowCategoryArticleList)
-		webGroup.GET("/tag/:slug", web.ShowTagArticleList)
-		webGroup.GET("/article/:id", web.ShowArticleDetail)
-		webGroup.GET("/archive", web.ShowArchive)
-		webGroup.GET("/subject", web.ShowTopSubjects)
-		webGroup.GET("/subject/:slug", web.ShowSubjects)
+		webGroup.GET("", view.ShowIndex)
+		webGroup.GET("/article", view.ShowArticleList)
+		webGroup.GET("/category/:slug", view.ShowCategoryArticleList)
+		webGroup.GET("/tag/:slug", view.ShowTagArticleList)
+		webGroup.GET("/article/:id", view.ShowArticleDetail)
+		webGroup.GET("/archive", view.ShowArchive)
+		webGroup.GET("/subject", view.ShowTopSubjects)
+		webGroup.GET("/subject/:slug", view.ShowSubjects)
 
 	}
 
 	// no route handle
-	g.NoRoute(webMiddleware.Renderer, web.ShowNotFound)
+	g.NoRoute(webMiddleware.Renderer, view.ShowNotFound)
 }
 
 // loadStatic load static resource
-func loadStatic(g *gin.Engine, currentTheme string) {
+func loadStatic(g *gin.Engine) {
 	// resource
 	g.Static("/static", config.StaticPath("console/static"))
 	g.Static("/uploads", config.StaticPath("uploads/"))
@@ -113,13 +114,13 @@ func loadStatic(g *gin.Engine, currentTheme string) {
 
 	// load theme templates file
 	var themeTemplates []string
-	for _, theme := range theme.Themes {
-		themePath := config.StaticPath("theme/" + theme)
-		g.Static("/theme/"+theme+"/public", themePath+"/public")
-		g.StaticFile("/theme/"+theme+"/thumbnail.jpg", themePath+"/thumbnail.jpg")
+	for _, t := range theme.Themes {
+		themePath := config.StaticPath("theme/" + t)
+		g.Static("/theme/"+t+"/public", themePath+"/public")
+		g.StaticFile("/theme/"+t+"/thumbnail.jpg", themePath+"/thumbnail.jpg")
 		themeTemplate, err := filepath.Glob(themePath + "/*.html")
 		if nil != err {
-			logger.Fatalf("load theme %s templates failed: %s", theme, err.Error())
+			logger.Fatalf("load theme %s templates failed: %s", t, err.Error())
 		}
 		themeTemplates = append(themeTemplates, themeTemplate...)
 	}
@@ -133,7 +134,7 @@ func loadStatic(g *gin.Engine, currentTheme string) {
 	}
 	templates := append(themeTemplates, commentTemplates...)
 	templates = append(templates, headTemplates...)
-	// load backend console html
+	// load admin console html
 	templates = append(templates, config.StaticPath("console/console.html"))
 	// load all files
 	g.LoadHTMLFiles(templates...)

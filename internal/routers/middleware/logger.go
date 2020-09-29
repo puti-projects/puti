@@ -13,7 +13,7 @@ import (
 // AccessLogger replace gin default access logger
 // Note: using zap logger
 // In puti, runmode in release will not generate log infomation
-// In production, it is better to let web server (nginx) to do this job
+// In production, it is better to let view server (nginx) to do this job
 func AccessLogger() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Start timer

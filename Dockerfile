@@ -58,7 +58,7 @@ WORKDIR /app/puti/
 # Copy useful files or filepath to path /app
 # binary
 COPY --from=builder /puti/puti ./puti
-# backend html
+# admin html
 COPY --from=builder /puti/console ./console
 # other static file
 COPY --from=builder /puti/assets ./assets

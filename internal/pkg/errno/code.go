@@ -13,8 +13,8 @@ var (
 	ErrValidation = &Errno{Code: 20001, Message: "Validation failed."}
 	// ErrDatabase Database error
 	ErrDatabase = &Errno{Code: 20002, Message: "Database error."}
-	// ErrToken JSON web token error
-	ErrToken = &Errno{Code: 20003, Message: "Error occurred while signing the JSON web token."}
+	// ErrToken JSON view token error
+	ErrToken = &Errno{Code: 20003, Message: "Error occurred while signing the JSON view token."}
 )
 
 // user auth errors

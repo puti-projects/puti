@@ -17,7 +17,7 @@ var (
 	ErrMissingToken = errors.New("Missing token")
 )
 
-// Context is the context of the JSON web token.
+// Context is the context of the JSON view token.
 type Context struct {
 	ID       uint64
 	Username string
