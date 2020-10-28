@@ -26,7 +26,7 @@ log:
 db:
   db_type: mysql
   name: db_puti # database name
-  addr: 127.0.0.1:3306 # host:port
+  addr: database:3306 # host:port
   username: putiroot 
   password: puti123456
   max_open_conns: 150

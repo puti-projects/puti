@@ -7,11 +7,15 @@ if [ "$1" = 'puti' ]; then
     INIT_PATH=/app/init
 
     for f in /configs /theme /uploads; do
+        # if ${BASE_DATA}$f not exist, create it
+        # ${BASE_DATA}$f is not exist means the container is new
+        # when the container is new
         if ! test -d ${BASE_DATA}$f; then
             echo "${BASE_DATA}$f is not exist, creating by copy"
             mkdir -p ${BASE_DATA}$f
         fi
 
+        # check if ${BASE_DATA}$f empty
         if [ "$(ls -A ${BASE_DATA}$f)" ]; then
             echo "${BASE_DATA}$f is not empty, continue without initialization"
         else
@@ -45,6 +49,9 @@ if [ "$1" = 'puti' ]; then
 
     chown -R putiuser:putiuser /data/puti /data/logs /app
     chmod 0755 -R /data /app
+
+    # Finally，data storage in /data/puti (for volumes binding) and link to /app/puti (for puti app runtime)
+    # logs in /data/logs (for volumes binding) and link to /app/puti/logs (for puti app runtime; logs real path to write from puti app)
 
     exec gosu putiuser /app/puti/puti
 fi
