@@ -24,6 +24,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/pflag"
 	"go.uber.org/zap"
+	"golang.org/x/crypto/acme/autocert"
 )
 
 var (
@@ -110,6 +111,7 @@ func httpServe(router *gin.Engine) {
 	signalHandle(srv)
 }
 
+// httpHandle handle HTTP
 func httpHandle(router *gin.Engine) *http.Server {
 	srv := &http.Server{
 		Addr:    ":" + config.Server.HttpPort,
@@ -126,26 +128,51 @@ func httpHandle(router *gin.Engine) *http.Server {
 	return srv
 }
 
+// httpsHandle handle HTTPS; there are two situation
+// Situation 1. Open auto cert.
+// Situation 2. Specify certification path.
 func httpsHandle(router *gin.Engine) *http.Server {
-	if config.Server.TlsCert == "" || config.Server.TlsKey == "" {
-		logger.Errorf("https opened but cert and key can not be empty, failed to listen https port")
-	}
-
 	srv := &http.Server{
 		Addr:    ":" + config.Server.HttpsPort,
 		Handler: router,
 	}
 
-	go func() {
-		logger.Info("start to listening the incoming https requests", zap.String("port", config.Server.HttpsPort))
-		if err := srv.ListenAndServeTLS(config.Server.TlsCert, config.Server.TlsKey); err != nil && err != http.ErrServerClosed {
-			logger.Fatalf("server.ListenAndServeTLS err: %v", err)
+	if config.Server.AutoCert {
+		// Open auto cert
+		// auto cert manager
+		m := &autocert.Manager{
+			Cache:      autocert.DirCache(config.StaticPath("configs/")),
+			Prompt:     autocert.AcceptTOS,
+			HostPolicy: autocert.HostWhitelist(config.Server.PutiDomain...),
 		}
-	}()
+		// set auto cert config to tls config
+		srv.TLSConfig = m.TLSConfig()
 
+		// Listen and serve
+		serveTLS(srv, "", "")
+	} else {
+		// Specify certification path
+		if config.Server.TlsCert == "" || config.Server.TlsKey == "" {
+			logger.Errorf("https opened but cert and key can not be empty, failed to listen https port")
+		}
+
+		// Listen and serve
+		serveTLS(srv, config.Server.TlsCert, config.Server.TlsKey)
+	}
 	return srv
 }
 
+// serveTLS serve https for all situation
+func serveTLS(srv *http.Server, certFile string, keyFile string) {
+	go func() {
+		logger.Info("start to listening the incoming https requests", zap.String("port", config.Server.HttpsPort))
+		if err := srv.ListenAndServeTLS(certFile, keyFile); err != nil && err != http.ErrServerClosed {
+			logger.Fatalf("server.ListenAndServeTLS err: %v", err)
+		}
+	}()
+}
+
+// signalHandle graceful shutdown based on http.server.Shutdown
 func signalHandle(srv *http.Server) {
 	quit := make(chan os.Signal)
 	// receive syscall.SIGINT and syscall.SIGTERM signal
@@ -165,10 +192,18 @@ func signalHandle(srv *http.Server) {
 
 // pingServer pings the http server to make sure the service is working.
 func pingServer() error {
-	for i := 0; i < config.Server.PingMaxNum; i++ {
+	var pingURL string
+	if true == config.Server.HttpsOpen {
+		pingURL = "https://127.0.0.1:" + config.Server.HttpsPort + "/check/health"
+	} else {
+		pingURL = "http://127.0.0.1:" + config.Server.HttpPort + "/check/health"
+	}
+
+	for i := 0; i < 10; i++ {
 		// Ping the server by sending a GET request to `/health`.
-		resp, err := http.Get(config.Server.PingUrl + "/check/health")
+		resp, err := http.Get(pingURL)
 		if err == nil && resp.StatusCode == 200 {
+			logger.Info("the health check has been completed and the HTTP service is normal.", zap.String("ping url", pingURL))
 			return nil
 		}
 

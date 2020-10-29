@@ -54,9 +54,10 @@ func InitConfig(cfg string) error {
 	}
 
 	c := &Config{vp}
-	c.readConfig()
+	if err := c.readConfig(); err != nil {
+		return err
+	}
 	c.watchConfigChange()
-
 	return nil
 }
 

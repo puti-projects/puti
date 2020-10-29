@@ -25,7 +25,9 @@ logs/
 # upload dir
 uploads/*
 
-configs/config.yaml
+# config path
+configs/
+!configs/config.yaml.example
 
 # the theme building path
 puti-themes/

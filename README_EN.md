@@ -9,9 +9,6 @@
     <a href="https://github.com/puti-projects/puti/actions?query=workflow%3Abuild">
         <img src="https://github.com/puti-projects/puti/workflows/build/badge.svg" alt="Github Actions">
     </a>
-    <a href="https://circleci.com/gh/puti-projects/puti">
-        <img src="https://circleci.com/gh/puti-projects/puti.svg?style=svg" alt="CircleCI">
-    </a>
     <a href="https://codecov.io/gh/puti-projects/puti">
         <img src="https://codecov.io/gh/puti-projects/puti/branch/master/graph/badge.svg" />
     </a>
@@ -35,15 +32,14 @@
 
 ## Project Status
 
-This project is still developing. Because it is the first project of the author to contact the Go language, the quality of the code is not in place and will be optimized in the future. Your contribution is very welcome. Also, for these terrible English translations, welcome to improve.
+This project is still developing, and the goal is the next generation writing system for geeks.
 
 ## Environmental requirements
 
 - Golang 1.13+ (Build using modules)
 - MySQL
-- Nginx (Optional)
   
-This project uses Go Modules, so it is recommended to use Go 1.13 or above; Nginx is optional.
+This project uses Go Modules, so it is recommended to use Go 1.13 or above; The project does not rely on Web Server such as Nginx, but you can configure and use Nginx.
 
 ## Features
 
@@ -82,7 +78,7 @@ The project plan implementation and the functions that have been implemented are
   * [ ] Mail service configuration
   * [ ] Toc support (not theme)
   * [ ] Configure image cropping
-  * [X] HTTPS
+  * [X] HTTPS (Support automatic HTTPS)
   * [x] WebService forwarding
   * [ ] Avatar access
   * [ ] OAuth 
@@ -106,12 +102,13 @@ Configuration to be aware of：
 
 | Configuration | Description |
 | :----- | :----- |
-| addr | HTTP Port |
-| jwt_secret |  Json web token secret key |
-| tls.https_open |  Open HTTPS  |
-| tls.addr |  HTTPS Port  |
-| tls.cert | SSL certificate path   |
-| tls.key |  SSL private key path  |
+| server.http_port | HTTP Port |
+| server.https_open |  Open HTTPS  |
+| server.auto_cert |  Open auto cert  |
+| server.https_port |  HTTPS Port  |
+| server.tls_cert | If it is not automatic cert，the SSL certificate path   |
+| server.tls_key |  If it is not automatic cert，the SSL private key path  |
+| safety.jwt_secret |  Json web token secret key |
 | db.name |  Database name  |
 | db.addr |  Database HOST:PORT  |
 | db.username |  Database user  |

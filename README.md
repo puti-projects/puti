@@ -10,9 +10,6 @@
     <a href="https://github.com/puti-projects/puti/actions?query=workflow%3Abuild">
         <img src="https://github.com/puti-projects/puti/workflows/build/badge.svg" alt="Github Actions">
     </a>
-    <a href="https://circleci.com/gh/puti-projects/puti">
-        <img src="https://circleci.com/gh/puti-projects/puti.svg?style=svg" alt="CircleCI">
-    </a>
     <a href="https://codecov.io/gh/puti-projects/puti">
         <img src="https://codecov.io/gh/puti-projects/puti/branch/master/graph/badge.svg" />
     </a>
@@ -36,17 +33,14 @@
 
 ## 状态
 
-Puti 项目现在仍在开发中。因为是作者接触 Go 语言的第一个项目，所以代码质量不到位之处，将会在未来不断优化。
-
-**开始模块化重构，除了继续完善功能，还将重构一些已实现的功能。目标是面向极客的下一代写作系统。**
+Puti 项目现在仍在开发中，目标是面向极客的下一代写作系统。
 
 ## 环境依赖
 
 - Golang 1.13+ (Build using modules)
 - MySQL
-- Nginx (Optional)
   
-本项目使用了 Go Modules，所以建议使用 Go 1.13 以上版本；Nginx 为可选配置。
+本项目使用了 Go Modules，所以建议使用 Go 1.13 以上版本；项目不依赖 Nginx 之类的 Web Server, 但是你可以配置并且使用 Nginx。
 
 ## 功能与计划
 
@@ -85,7 +79,7 @@ Puti 项目现在仍在开发中。因为是作者接触 Go 语言的第一个�
   * [ ] 邮件服务配置
   * [ ] TOC (目前在前端主题实现)
   * [ ] 配置图片裁切
-  * [X] HTTPS
+  * [X] HTTPS（支持自动 HTTPS）
   * [x] WebServer 转发
   * [ ] 头像接入
   * [ ] OAuth 
@@ -104,17 +98,18 @@ Puti 项目现在仍在开发中。因为是作者接触 Go 语言的第一个�
 
 ### 配置
 
-Puti 的配置文件位于configs下的config.yaml，初次使用可以从config.yaml.example 初始化配置文件。  
+Puti 的配置文件位于 `configs` 下的 `config.yaml`，初次使用可以从 `config.yaml.example` 初始化配置文件。  
 需要注意的配置：
 
 | 配置 | 说明 |
 | :----- | :----- | 
-| addr |  HTTP 端口 |
-| jwt_secret |  Json web token 秘钥 |
-| tls.https_open |  开启 HTTPS  |
-| tls.addr |  HTTPS 端口  |
-| tls.cert | SSL证书路径   |
-| tls.key |  SSL私钥路径  |
+| server.http_port |  HTTP 端口 |
+| server.https_open |  是否开启 HTTPS  |
+| server.auto_cert |  是否开启自动 HTTPS  |
+| server.https_port |  HTTPS 端口  |
+| server.tls_cert | 如果不是自动 HTTPS，配置 SSL 证书路径   |
+| server.tls_key |  如果不是自动 HTTPS，配置 SSL 私钥路径  |
+| safety.jwt_secret |  Json web token 秘钥 |
 | db.name |  数据库名称  |
 | db.addr |  数据库 HOST:PORT  |
 | db.username |  数据库登录名  |

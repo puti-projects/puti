@@ -5,10 +5,11 @@ server:
   http_port: 8000                  # HTTP 绑定端口
   https_open: false # 是否开启 HTTPS
   https_port: 8080 # HTTPS 绑定端口
-  tls_cert: configs/server.crt
-  tls_key: configs/server.key
-  ping_url: http://127.0.0.1:8000   # pingServer 函数请求的API服务器的 ip:port
-  ping_max_num: 10           # pingServer 函数 try 的次数
+  auto_cert: true # 是否开启自动 https
+  tls_cert: configs/server.crt # 如果不开启自动 https，配置的证书
+  tls_key: configs/server.key # 如果不开启自动 https，配置的证书
+  puti_domain:  # puti 主应用绑定的域名；例如：example.com
+    - puti.com
 
 # safety
 safety:

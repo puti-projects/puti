@@ -16,9 +16,9 @@ require (
 	github.com/spf13/pflag v1.0.5
 	github.com/spf13/viper v1.7.1
 	go.uber.org/zap v1.16.0
-	golang.org/x/crypto v0.0.0-20200820211705-5c72a883971a
+	golang.org/x/crypto v0.0.0-20201016220609-9e8e0b390897
 	golang.org/x/sys v0.0.0-20200905004654-be1d3432aa8f // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0
-	gorm.io/driver/mysql v1.0.1
-	gorm.io/gorm v1.20.1
+	gorm.io/driver/mysql v1.0.3
+	gorm.io/gorm v1.20.5
 )

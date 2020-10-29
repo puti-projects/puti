@@ -1,6 +1,12 @@
 # Changelog
 
+## v0.3.1 Auto HTTPS
+
 ### 功能和优化
+- 目录优化、CI 优化，代码质量检查
+- 增加自动 HTTPS（autocert），优化配置
+- 简化部署
+- 移除 Circle-CI，Github Action 取代
 
 ### Bug 修复
 - 修复 GORM v2 带来的兼容性问题
