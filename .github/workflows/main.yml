@@ -1,4 +1,4 @@
-name: build
+name: Project Build
 
 on:
   push:
@@ -11,7 +11,7 @@ on:
 
 jobs:
   test:
-    name: Go test
+    name: Go Test and Upload Coverage
     runs-on: ubuntu-latest
     steps:
       - name: Set up Go 1.x
@@ -30,7 +30,7 @@ jobs:
         run: bash <(curl -s https://codecov.io/bash)
 
   build:
-    name: Go build
+    name: Go Build
     strategy:
       matrix:
         go: [1.13, 1.15]
