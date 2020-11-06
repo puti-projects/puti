@@ -1,5 +1,18 @@
 # Changelog
 
+## v0.3.1 Auto HTTPS
+
+### Feature and Enhancement
+- Catalog optimization, CI optimization, code quality inspection
+- Add automatic HTTPS (autocert), optimize configuration
+- Simplified deployment
+- Remove Circle-CI and replace it with Github Action
+
+### Bug Fixed
+- Fix compatibility issues brought by GORM v2
+  
+---
+
 ## v0.3.0 Optimization [2020-09-12]
 
 ### Feature and Enhancement
