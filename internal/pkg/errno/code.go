@@ -86,3 +86,23 @@ var (
 	// ErrSubjectNotFount subject not found error
 	ErrSubjectNotFount = &Errno{Code: 20702, Message: "The subject was not found."}
 )
+
+// Knowledge errors
+var (
+	// ErrKnowledgeType illegal knowledge type
+	ErrKnowledgeType = &Errno{Code: 20801, Message: "The knowledge type is illegal."}
+	// ErrKnowledgeNotFount knowledge not found error
+	ErrKnowledgeNotFount = &Errno{Code: 20802, Message: "The knowledge was not found."}
+)
+
+// Knowledge item errors
+var (
+	// ErrKnowledgeNotFount knowledge not found error
+	ErrKnowledgeItemNotFount = &Errno{Code: 20902, Message: "The knowledge item was not found."}
+	// ErrUpdateKnowledgeItemContent update knowledge item content failed
+	ErrUpdateKnowledgeItemContent = &Errno{Code: 20903, Message: "Update failed"}
+	// ErrKnowledgeItemCreateFailed create knowledge item failed
+	ErrKnowledgeItemCreateFailed = &Errno{Code: 20904, Message: "Create knowledge item failed."}
+	// ErrKnowledgeItemCanNotBeDeleted delete knowledge item error
+	ErrKnowledgeItemCanNotBeDeleted = &Errno{Code: 20905, Message: "Knowledge item can not be deleted."}
+)

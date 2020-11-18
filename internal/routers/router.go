@@ -2,6 +2,8 @@ package routers
 
 import (
 	"database/sql"
+	"github.com/puti-projects/puti/internal/admin/api/knowledge"
+	"github.com/puti-projects/puti/internal/admin/api/knowledgeItem"
 	"html/template"
 	"net/http"
 	"path/filepath"
@@ -189,6 +191,16 @@ func loadAPI(g *gin.Engine) {
 		apiGroup.POST("/subject/:name", subject.Create)
 		apiGroup.PUT("/subject/:id", subject.Update)
 		apiGroup.DELETE("/subject/:id", subject.Delete)
+		apiGroup.GET("/knowledge", knowledge.List)
+		apiGroup.POST("/knowledge/:name", knowledge.Create)
+		apiGroup.GET("/knowledge/:id", knowledge.Detail)
+		apiGroup.PUT("/knowledge/:id", knowledge.Update)
+		//apiGroup.DELETE("/knowledge/:id", knowledge.Delete)
+		apiGroup.POST("/knowledge-item", knowledgeItem.Create)
+		apiGroup.GET("/knowledge-list/:id", knowledgeItem.List) // knowledge item list under knowledge :id
+		apiGroup.GET("/knowledge-item/:id", knowledgeItem.Detail)
+		apiGroup.PUT("/knowledge-item/:id", knowledgeItem.Update) // info and content
+		apiGroup.DELETE("/knowledge-item/:id", knowledgeItem.Delete)
 	}
 }
 

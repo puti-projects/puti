@@ -59,6 +59,7 @@ func (d *Dao) GetAllKnowledgeList() ([]*KnowledgeInfo, error) {
 		Select("pt_knowledge.id, pt_knowledge.name, pt_knowledge.slug, pt_knowledge.type, pt_knowledge.description, pt_resource.id as cover_image_id, pt_resource.title as cover_image_name, pt_resource.guid as cover_image_url, pt_knowledge.last_updated, pt_knowledge.created_time").
 		Joins("LEFT JOIN pt_resource ON pt_resource.`id` = pt_knowledge.`cover_image` AND pt_resource.`status` = 1 AND pt_resource.`deleted_time` is null").
 		Where("pt_knowledge.`deleted_time` is null").
+		Order("pt_knowledge.id desc").
 		Find(&results).Error
 	return results, err
 }

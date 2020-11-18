@@ -29,7 +29,7 @@ func getSnowflakeNodeInstance() *snowflake.Node {
 }
 
 // GenerateSnowflakeID generate a snowflake id
-func GenerateSnowflakeID() int64 {
+func GenerateSnowflakeID() uint64 {
 	sn := getSnowflakeNodeInstance()
-	return sn.Generate().Int64()
+	return uint64(sn.Generate().Int64())
 }

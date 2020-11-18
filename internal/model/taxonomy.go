@@ -42,6 +42,7 @@ func (t *TermTaxonomy) Create(db *gorm.DB) error {
 	return db.Create(t).Error
 }
 
+// Get get all by condition
 func (t *TermTaxonomy) Get(db *gorm.DB, where string, whereArgs []interface{}) ([]*TermTaxonomy, error) {
 	termTaxonomy := make([]*TermTaxonomy, 0)
 	err := db.Where(where, whereArgs...).Find(&termTaxonomy).Error

@@ -1,11 +1,22 @@
 package service
 
 import (
+	"fmt"
+	"strconv"
+	"strings"
+
 	"github.com/puti-projects/puti/internal/admin/dao"
 	"github.com/puti-projects/puti/internal/model"
 	"github.com/puti-projects/puti/internal/pkg/errno"
 	"github.com/puti-projects/puti/internal/pkg/snowflake"
-	"strings"
+	"github.com/puti-projects/puti/internal/utils"
+)
+
+const (
+	// KnowledgeItemUpdateTypeSave update type of 'save', only save current version content
+	KnowledgeItemUpdateTypeSave = "save"
+	// KnowledgeItemUpdateTypePublish update type of 'publish', publish will set now version as the published version
+	KnowledgeItemUpdateTypePublish = "publish"
 )
 
 // KnowledgeItemCreateRequest struct for binding knowledge item create
@@ -21,24 +32,55 @@ type KnowledgeItemCreateResponse struct {
 	Title         string `json:"title"`
 	ParentID      uint64 `json:"parent_id"`
 	Level         uint64 `json:"level"`
-	Index         uint64 `json:"index"`
+	Index         int64  `json:"index"`
 	Content       string `json:"content"`
-	Version       int64  `json:"version"`
+	Version       uint64 `json:"version"`
 	VersionStatus uint8  `json:"version_status"`
 }
 
-//type KnowledgeItemList struct {
-//	Lock     *sync.Mutex
-//	ItemTree []*KnowledgeItemInfo
-//}
+// KnowledgeItemUpdateInfoRequest struct bind to update knowledge item info
+type KnowledgeItemUpdateInfoRequest struct {
+	ID               uint64 `json:"knowledge_item_id" binding:"required"`
+	Title            string `json:"title" binding:"required"`
+	NodeChange       bool   `json:"node_change"`
+	ParentID         uint64 `json:"parent_id"`
+	IndexChange      string `json:"index_change"`
+	IndexRelatedNode uint64 `json:"index_related_node"`
+}
 
+// KnowledgeItemUpdateContentRequest struct bind to update knowledge item content
+type KnowledgeItemUpdateContentRequest struct {
+	ID       uint64 `json:"knowledge_item_id" binding:"required"`
+	SaveType string `json:"save_type" binding:"required"` // save or publish
+	Content  string `json:"content" binding:"required"`
+	Version  string `json:"version" binding:"required"`
+}
+
+// KnowledgeItemUpdateContentResponse update knowledge item content response
+type KnowledgeItemUpdateContentResponse struct {
+	ID      uint64 `json:"knowledge_item_id"`
+	Version uint64 `json:"version,string"`
+}
+
+// KnowledgeItemInfo knowledge info for list tree
 type KnowledgeItemInfo struct {
-	ID       uint64 `json:"knowledge_item_id"`
-	Title    string `json:"title"`
-	ParentID uint64 `json:"parent_id"`
-	Level    uint64 `json:"level"`
-	Index    uint64 `json:"index"`
-	Children []*KnowledgeItemInfo
+	ID       uint64               `json:"knowledge_item_id"`
+	Title    string               `json:"title"`
+	ParentID uint64               `json:"parent_id"`
+	Level    uint64               `json:"level"`
+	Index    int64                `json:"index"`
+	Children []*KnowledgeItemInfo `json:"children"`
+}
+
+// KnowledgeItemDetail knowledge detail info include content
+type KnowledgeItemDetail struct {
+	ID                      uint64 `json:"knowledge_item_id"`
+	Title                   string `json:"title"`
+	Content                 string `json:"content"`
+	ContentStatus           uint8  `json:"content_status"`
+	ContentPublishedVersion uint64 `json:"content_published_version"`
+	ContentNowVersion       uint64 `json:"content_now_version,string"`
+	ContentUpdatedTime      string `json:"content_updated_time"`
 }
 
 // CreateKnowledgeItem create knowledge item
@@ -54,11 +96,19 @@ func CreateKnowledgeItem(r *KnowledgeItemCreateRequest, userID uint64) (*Knowled
 		ViewCount:      0,
 	}
 
+	// TODO now directly set index to 0 if create a new item. should set it to the first one always
+	kItem.ParentID = r.ParentID
 	if r.ParentID == 0 {
-		kItem.ParentID = 0
-		kItem.Level = 0
-		kItem.Index = 0
+		kItem.Level = 1
+	} else {
+		// check parent's level
+		parent, err := dao.Engine.GetKnowledgeItemByID(r.ParentID)
+		if err != nil {
+			return nil, errno.New(errno.ErrDatabase, err)
+		}
+		kItem.Level = parent.Level + 1
 	}
+	kItem.Index = 0
 
 	// knowledge item content
 	content := "# " + strings.TrimSpace(r.Title)
@@ -117,4 +167,128 @@ func getKnowledgeItemTree(kItems []*model.KnowledgeItem, pID uint64) []*Knowledg
 		}
 	}
 	return tree
+}
+
+// GetKnowledgeItemInfo get knowledge item info
+func GetKnowledgeItemInfo(kiID int) (*KnowledgeItemDetail, error) {
+	ki, err := dao.Engine.GetKnowledgeItemByID(uint64(kiID))
+	if err != nil {
+		return nil, err
+	}
+
+	if ki != nil {
+		kiDetail := &KnowledgeItemDetail{
+			ID:                      ki.ID,
+			Title:                   ki.Title,
+			ContentPublishedVersion: ki.ContentVersion,
+		}
+
+		kic, err := dao.Engine.GetKnowledgeItemLastContent(ki)
+		if err != nil {
+			return nil, err
+		}
+
+		kiDetail.Content = kic.Content
+		kiDetail.ContentStatus = kic.Status
+		kiDetail.ContentNowVersion = kic.Version
+		kiDetail.ContentUpdatedTime = utils.GetFormatTime(&kic.UpdatedAt, "2006-01-02 15:04:05")
+
+		return kiDetail, nil
+	}
+
+	return nil, err
+}
+
+// UpdateKnowledgeItemInfo update knowledge item info
+func UpdateKnowledgeItemInfo(ir *KnowledgeItemUpdateInfoRequest, kItemID uint64) error {
+	// if change node
+	if ir.NodeChange {
+		if err := dao.Engine.UpdateKnowledgeItemWithNodeChange(kItemID, ir.ParentID, ir.IndexChange, ir.IndexRelatedNode); err != nil {
+			return err
+		}
+	} else {
+		//  do not change node, only update title
+		if err := dao.Engine.UpdateKnowledgeItemTitle(kItemID, ir.Title); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+// UpdateKnowledgeItemContent update knowledge item content
+func UpdateKnowledgeItemContent(cr *KnowledgeItemUpdateContentRequest, kItemID uint64) (*KnowledgeItemUpdateContentResponse, error) {
+	var err error
+
+	version, _ := strconv.Atoi(cr.Version)
+
+	kItemContent, err := dao.Engine.GetKnowledgeItemContentByVersion(kItemID, uint64(version))
+	if err != nil {
+		return nil, err
+	}
+
+	rsp := &KnowledgeItemUpdateContentResponse{
+		ID: kItemContent.KnowledgeItemID,
+	}
+	if cr.SaveType == KnowledgeItemUpdateTypeSave {
+		if kItemContent.Status == model.KnowledgeItemContentStatusCurrent {
+			// create a new version
+			newVersionContent := &model.KnowledgeItemContent{
+				KnowledgeItemID: kItemID,
+				Version:         snowflake.GenerateSnowflakeID(),
+				Status:          model.KnowledgeItemContentStatusCommon,
+				Content:         cr.Content,
+			}
+			err = dao.Engine.CreateKnowledgeItemContent(newVersionContent)
+			rsp.Version = newVersionContent.Version
+		} else if kItemContent.Status == model.KnowledgeItemContentStatusCommon {
+			// directly update
+			kItemContent.Content = cr.Content
+			err = dao.Engine.UpdateKnowledgeItemContent(kItemContent)
+			rsp.Version = kItemContent.Version
+		}
+	} else if cr.SaveType == KnowledgeItemUpdateTypePublish {
+		if kItemContent.Status == model.KnowledgeItemContentStatusCurrent {
+			// directly update
+			kItemContent.Content = cr.Content
+			err = dao.Engine.UpdateKnowledgeItemContent(kItemContent)
+			rsp.Version = kItemContent.Version
+		} else if kItemContent.Status == model.KnowledgeItemContentStatusCommon {
+			// set 1 to this version; update old version to 0
+			kItemContent.Status = model.KnowledgeItemContentStatusCurrent
+			err = dao.Engine.ChangePublishedKnowledgeItemContent(kItemContent)
+			rsp.Version = kItemContent.Version
+		}
+	}
+
+	if err != nil {
+		return nil, errno.New(errno.ErrUpdateKnowledgeItemContent, err)
+	}
+
+	return rsp, nil
+}
+
+// DeleteKnowledgeItem delete knowledge item
+// Note: content will not be deleted
+func DeleteKnowledgeItem(kItemID uint64) error {
+	kItem, err := dao.Engine.GetKnowledgeItemByID(kItemID)
+	if err != nil {
+		return err
+	}
+
+	// check if can delete
+	hasChild, err := dao.Engine.CheckKnowledgeItemHasChildren(kItemID, kItem.KnowledgeID)
+	if err != nil {
+		return err
+	}
+	fmt.Println(hasChild)
+	if hasChild {
+		return errno.ErrKnowledgeItemCanNotBeDeleted
+	}
+
+	if err := dao.Engine.DeleteKnowledgeItem(kItemID); err != nil {
+		return errno.New(errno.ErrDatabase, err)
+	}
+
+	return nil
 }

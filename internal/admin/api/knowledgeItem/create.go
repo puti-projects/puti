@@ -32,7 +32,7 @@ func Create(c *gin.Context) {
 
 	rsp, err := service.CreateKnowledgeItem(&r, userContext.ID)
 	if err != nil {
-		api.SendResponse(c, errno.ErrPageCreateFailed, nil)
+		api.SendResponse(c, errno.ErrKnowledgeItemCreateFailed, nil)
 		return
 	}
 

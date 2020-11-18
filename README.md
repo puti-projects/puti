@@ -16,9 +16,6 @@
     <a href="https://goreportcard.com/report/github.com/puti-projects/puti">
         <img src="https://goreportcard.com/badge/github.com/puti-projects/puti" alt="Go Report Card">
     </a>
-    <a href="https://app.fossa.io/projects/git%2Bgithub.com%2Fputi-projects%2Fputi?ref=badge_shield">
-        <img src="https://app.fossa.io/api/projects/git%2Bgithub.com%2Fputi-projects%2Fputi.svg?type=shield" alt="FOSSA Status">
-    </a>
     <a href="https://github.com/puti-projects/puti/releases">
         <img src="https://img.shields.io/github/release/puti-projects/puti.svg?style=flat" alt="Release">
     </a>
@@ -47,18 +44,22 @@ Puti 项目现在仍在开发中，目标是面向极客的下一代写作系统
 项目计划实现以及已经实现的功能如下：
 
 * [ ] 功能
+  * [x] 用户
   * [ ] 登录注册
     * [x] 登录
     * [ ] 注册
     * [ ] 第三方接入（github等）
-  * [x] 文章
-  * [x] 页面
-  * [x] 分类
-  * [x] 标签
-  * [x] 专题
-  * [ ] 链接
+  * [x] 博文系统
+    * [x] 文章
+    * [x] 页面
+    * [x] 分类
+    * [x] 标签
+    * [x] 专题
+  * [ ] 知识库系统
+    * [ ] 笔记本
+    * [ ] 文档集
   * [x] 媒体
-  * [x] 用户
+  * [ ] 链接
   * [ ] 评论
   * [ ] 设置
     * [x] 普通设置
@@ -68,9 +69,6 @@ Puti 项目现在仍在开发中，目标是面向极客的下一代写作系统
     * [X] 默认主题（Emma）
     * [X] 自由切换 
     * [ ] 管理界面直接修改主题模板文件
-  * [ ] 插件
-    * [ ] 插件支持
-    * [ ] 插件管理（上传、删除等）
   * [ ] 邮件
     * [ ] 邮件配置
     * [ ] 邮件发送
@@ -119,8 +117,7 @@ Puti 的配置文件位于 `configs` 下的 `config.yaml`，初次使用可以�
 
 #### 源码安装
 
-源码安装要求系统已经安装要求版本的 Go 语言，因为建议使用 Go 1.11 及以上版本，所以我们不关注 GOPATH 的问题。  
-鉴于某种因素，为了有更好的包下载体验，项目中已经内置了 Vendor 目录，并且统一用 go module 来管理。  
+项目使用了 Go Module，所以要求 Go 1.13 及以上的版本。目前移除了 Vendor 目录，因为现在 `go proxy` 已经能够很好地解决某些问题了。
 
 ```sh
 # 下载
@@ -201,6 +198,6 @@ Puti is a project by
 
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
-## License [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fputi-projects%2Fputi.svg?type=small)](https://app.fossa.com/projects/git%2Bgithub.com%2Fputi-projects%2Fputi?ref=badge_small)
+## License 
 
 Puti is under the GPL-3.0 license. See the [LICENSE](https://github.com/puti-projects/puti/blob/master/LICENSE) file for details.

@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.4.0 Knowledge Base
+
+### 功能和优化
+- 新增知识库大板块（含笔记和文档）
+
 ## v0.3.1 Auto HTTPS
 
 ### 功能和优化

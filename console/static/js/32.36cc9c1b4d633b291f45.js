@@ -1,1 +1,0 @@
-webpackJsonp([32],{KWLC:function(e,n,t){"use strict";Object.defineProperty(n,"__esModule",{value:!0});var s={render:function(){var e=this.$createElement;return(this._self._c||e)("div",{staticClass:"app-container"},[this._v("\n  "+this._s(this.$t("common.comingSoon"))+"\n")])},staticRenderFns:[]},i=t("VU/8")(null,s,!1,null,null,null);n.default=i.exports}});

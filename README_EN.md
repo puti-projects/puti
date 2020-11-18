@@ -15,9 +15,6 @@
     <a href="https://goreportcard.com/report/github.com/puti-projects/puti">
         <img src="https://goreportcard.com/badge/github.com/puti-projects/puti" alt="Go Report Card">
     </a>
-    <a href="https://app.fossa.io/projects/git%2Bgithub.com%2Fputi-projects%2Fputi?ref=badge_shield">
-        <img src="https://app.fossa.io/api/projects/git%2Bgithub.com%2Fputi-projects%2Fputi.svg?type=shield" alt="FOSSA Status">
-    </a>
     <a href="https://github.com/puti-projects/puti/releases">
         <img src="https://img.shields.io/github/release/puti-projects/puti.svg?style=flat" alt="Release">
     </a>
@@ -46,18 +43,22 @@ This project uses Go Modules, so it is recommended to use Go 1.13 or above; The 
 The project plan implementation and the functions that have been implemented are as follows:
 
 * [ ] Features
+  * [x] User
   * [ ] Loign and register
     * [x] Loign
     * [ ] Register
     * [ ] Third party access (github, etc.)
-  * [x] Article
-  * [x] Page
-  * [x] Category
-  * [x] Tag
-  * [x] Subject
-  * [ ] Link
+  * [x] Blog system
+    * [x] Article
+    * [x] Page
+    * [x] Category
+    * [x] Tag
+    * [x] Subject
+  * [ ] Knowledge base system
+    * [ ] Notebook
+    * [ ] Documentation set
   * [x] Media
-  * [x] User
+  * [ ] Link
   * [ ] Comments
   * [ ] Settings
     * [x] Normal setting
@@ -118,8 +119,7 @@ Configuration to be aware of：
 
 #### Source installation
 
-The source installation requires that the system has the required version of the Go language installed, as Go 1.11 and above is recommended, so we are not concerned about the GOPATH issue.  
-In view of certain factors, in order to have a better package download experience, the Vendor directory has been built into the project and managed with the go module.
+The project uses Go Module, so Go 1.13 and above are required. The Vendor directory is currently removed, because now `go proxy` can solve some problems well.
 
 ```sh
 # Download
@@ -197,6 +197,6 @@ Puti is a project by
 
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
-## License [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fputi-projects%2Fputi.svg?type=small)](https://app.fossa.com/projects/git%2Bgithub.com%2Fputi-projects%2Fputi?ref=badge_small)
+## License 
 
 Puti is under the GPL-3.0 license. See the [LICENSE](https://github.com/puti-projects/puti/blob/master/LICENSE) file for details.

@@ -1,4 +1,4 @@
-package knowledge
+package knowledgeItem
 
 import (
 	"strconv"
@@ -10,20 +10,21 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// Detail get knowledge info detail handler
+// Detail get knowledge item detail handler
 func Detail(c *gin.Context) {
 	ID := c.Param("id")
 	kID, _ := strconv.Atoi(ID)
 
 	if kID <= 0 {
 		api.SendResponse(c, errno.ErrValidation, nil)
-	}
-
-	knowledge, err := service.GetKnowledgeInfo(uint64(kID))
-	if err != nil {
-		api.SendResponse(c, errno.ErrKnowledgeNotFount, nil)
 		return
 	}
 
-	api.SendResponse(c, nil, knowledge)
+	knowledgeItem, err := service.GetKnowledgeItemInfo(kID)
+	if err != nil {
+		api.SendResponse(c, errno.ErrKnowledgeItemNotFount, nil)
+		return
+	}
+
+	api.SendResponse(c, nil, knowledgeItem)
 }
