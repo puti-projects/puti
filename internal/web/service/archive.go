@@ -11,7 +11,7 @@ import (
 
 // GetArchive get archive list and list sort
 func GetArchive() (map[string]map[string][]*ShowArchive, []string, map[string][]string, error) {
-	archives := []model.Post{}
+	var archives []model.Post
 
 	where := "`post_type` = ? AND `parent_id` = ? AND `status` = ?"
 	whereArgs := []interface{}{model.PostTypeArticle, 0, model.PostStatusPublish}
@@ -34,7 +34,7 @@ func GetArchive() (map[string]map[string][]*ShowArchive, []string, map[string][]
 	}
 
 	dataMap := map[string]map[string][]*ShowArchive{}
-	sortYear := []string{}
+	var sortYear []string
 	sortMonth := map[string][]string{}
 	for _, v := range archives {
 		postedYear := utils.GetFormatNullTime(&v.PostDate, "2006")

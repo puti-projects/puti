@@ -3,8 +3,9 @@ package view
 import (
 	"net/http"
 
-	"github.com/gin-gonic/gin"
 	"github.com/puti-projects/puti/internal/web/service"
+
+	"github.com/gin-gonic/gin"
 )
 
 // ShowArchive handle archive list

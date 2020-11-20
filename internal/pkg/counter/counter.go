@@ -1,92 +1,102 @@
 package counter
 
-import (
-	"fmt"
-	"time"
-
-	gocache "github.com/patrickmn/go-cache"
-)
-
 // Counter cache utils
 // It looks forward to create a cache buffer before calculate the post views
 // default to set a expiration time of 10 minutes, in this time one IP will be count as one view for one article or page
+// Note: For simple implementation, the calculation may be repeated in a short time, because this count does not need to be accurate to a certain extent.
 
-const (
-	// PostCounterKey key of post counter cache, store all post's count number as a map
-	PostCounterKey = "PUTI_POST_VIEWS_CACHE"
-	// PostCounterIPPoolKeyPrefix key prefix, IP Pool was be designed as a single key/value cache
-	PostCounterIPPoolKeyPrefix = "PUTI_POST_VIEWS_CACHE_IP_"
+import (
+	"strconv"
+	"strings"
+
+	"github.com/puti-projects/puti/internal/pkg/cache"
+	"github.com/puti-projects/puti/internal/pkg/config"
+	"github.com/puti-projects/puti/internal/pkg/logger"
+	"github.com/puti-projects/puti/internal/utils"
 )
-
-// CounterCacheExpiration default expiration time
-// The cache will store for 15 minutes, but these is a ticker running will clean the data for 10 minutes expiration
-var CounterCacheExpiration = 15 * time.Minute
-
-// CounterCachePurgesExpiration default purges expired items
-// Set for clean the cache, actually cache will be clean after ticker consume
-var CounterCachePurgesExpiration = 10 * time.Minute
-
-// CounterCache instance of counter cache
-var CounterCache = &counterCache{
-	cacheBody: gocache.New(CounterCacheExpiration, CounterCachePurgesExpiration),
-}
 
 // counterCache struct of counter cache
 type counterCache struct {
-	cacheBody *gocache.Cache
+	cacheBody *cache.Cache
+}
+
+// CounterCache instance of counter cache
+var CounterCache = &counterCache{
+	cacheBody: cache.GetInstance(),
 }
 
 // GetPostCounterIPPoolKey get the key of IP Pool cache
-func GetPostCounterIPPoolKey(postID uint64) string {
-	postCounterIPPoolKey := fmt.Sprintf("%s%v", PostCounterIPPoolKeyPrefix, postID)
+func GetPostCounterIPPoolKey(postID string) string {
+	var builder strings.Builder
+	builder.WriteString(config.CachePostCounterIPPoolKeyPrefix)
+	builder.WriteString(postID)
+	postCounterIPPoolKey := builder.String()
 	return postCounterIPPoolKey
 }
 
 // CountOne count the number for the post by post id
-func (cache *counterCache) CountOne(IP string, postID uint64) {
-	postCounterIPPoolKey := GetPostCounterIPPoolKey(postID)
-	counterIPPoolCache := make(map[string]bool)
-	if x, found := cache.cacheBody.Get(postCounterIPPoolKey); found {
-		counterIPPoolCachePointer := x.(*map[string]bool)
-		counterIPPoolCache = *counterIPPoolCachePointer
+func (c *counterCache) CountOne(IP string, postID uint64) {
+	postIDStr := strconv.Itoa(int(postID))
+	postCounterIPPoolKey := GetPostCounterIPPoolKey(postIDStr)
+
+	counterIPPoolCache := make(map[string]interface{})
+	iPPoolJSON, found := c.cacheBody.GetCacheWithByte(postCounterIPPoolKey)
+	if found {
+		if err := utils.JSON2Map(iPPoolJSON, &counterIPPoolCache); err != nil {
+			logger.Errorf("an error occurred when converting JSON to map. %s", err)
+		}
 		if _, ok := counterIPPoolCache[IP]; ok {
 			return
 		}
 	}
+
 	counterIPPoolCache[IP] = true
-	cache.cacheBody.Set(postCounterIPPoolKey, &counterIPPoolCache, CounterCacheExpiration)
+	counterIPPoolCacheByte, err := utils.Map2JSON(counterIPPoolCache)
+	if err != nil {
+		logger.Errorf("an error occurred when converting map to JSON. %s", err)
+	}
+	if err := c.cacheBody.SetCacheWithByte(postCounterIPPoolKey, counterIPPoolCacheByte); err != nil {
+		logger.Errorf("an error occurred when setting cache. %s", err)
+	}
 
 	// count ++
-	counterCache := make(map[uint64]int)
-	if postCounter, found := cache.cacheBody.Get(PostCounterKey); found {
-		counterCachePointer := postCounter.(*map[uint64]int)
-		counterCache = *counterCachePointer
-		number := 1
-		if number, ok := counterCache[postID]; ok {
-			number++
+	counterCache := make(map[string]interface{})
+	if postCounter, found := c.cacheBody.GetCacheWithByte(config.CachePostCounterKey); found {
+		if err := utils.JSON2Map(postCounter, &counterCache); err != nil {
+			logger.Errorf("an error occurred when converting JSON to map. %s", err)
 		}
-		counterCache[postID] = number
+
+		if number, ok := counterCache[postIDStr]; ok {
+			counterCache[postIDStr] = number.(int64) + 1
+		} else {
+			counterCache[postIDStr] = 1
+		}
 	} else {
-		counterCache[postID] = 1
+		counterCache[postIDStr] = 1
 	}
-	cache.cacheBody.Set(PostCounterKey, &counterCache, CounterCacheExpiration)
+
+	counterCacheByte, err := utils.Map2JSON(counterCache)
+	if err != nil {
+		logger.Errorf("an error occurred when converting map to JSON. %s", err)
+	}
+	if err := c.cacheBody.SetCacheWithByte(config.CachePostCounterKey, counterCacheByte); err != nil {
+		logger.Errorf("an error occurred when setting cache. %s", err)
+	}
 }
 
 // GetCounterCache get counter cache data
-func (cache *counterCache) GetCounterCache() (map[uint64]int, bool) {
-	var counterCache map[uint64]int
-	var found bool
-	if x, found := cache.cacheBody.Get(PostCounterKey); found {
-		counterCachePointer := x.(*map[uint64]int)
-		counterCache = *counterCachePointer
-
-		return counterCache, found
+func (c *counterCache) GetCounterCache() (map[string]interface{}, bool) {
+	counterCache := make(map[string]interface{})
+	if x, found := c.cacheBody.GetCacheWithByte(config.CachePostCounterKey); found {
+		if err := utils.JSON2Map(x, &counterCache); err != nil {
+			logger.Errorf("an error occurred when converting JSON to map. %s", err)
+		}
+		return counterCache, true
 	}
-	return counterCache, found
+	return counterCache, false
 }
 
 // DeleteCounterCache delete the counter cache after database action
-func (cache *counterCache) DeleteCounterCache(key string) {
-	cache.cacheBody.Delete(key)
-	return
+func (c *counterCache) DeleteCounterCache(key string) error {
+	return c.cacheBody.DeleteCache(key)
 }

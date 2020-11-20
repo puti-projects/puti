@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"strconv"
 
-	optionCache "github.com/puti-projects/puti/internal/pkg/option"
+	"github.com/puti-projects/puti/internal/pkg/cache"
 	"github.com/puti-projects/puti/internal/web/service"
 
 	"github.com/gin-gonic/gin"
@@ -15,7 +15,7 @@ func ShowIndex(c *gin.Context) {
 	// get renderer data include basic data
 	renderData := getRenderData(c)
 
-	showOnFront := optionCache.Options.Get("show_on_front")
+	showOnFront := cache.Options.Get("show_on_front")
 	if showOnFront == "article" {
 		// get params
 		currentPage, _ := strconv.Atoi(c.DefaultQuery("page", "1"))

@@ -4,9 +4,9 @@ import (
 	"fmt"
 
 	"github.com/puti-projects/puti/internal/admin/dao"
+	"github.com/puti-projects/puti/internal/pkg/cache"
 	"github.com/puti-projects/puti/internal/pkg/config"
 	"github.com/puti-projects/puti/internal/pkg/errno"
-	optionCache "github.com/puti-projects/puti/internal/pkg/option"
 	"github.com/puti-projects/puti/internal/pkg/theme"
 	"github.com/puti-projects/puti/internal/utils"
 )
@@ -93,7 +93,7 @@ func UpdateOptions(options map[string]interface{}) error {
 
 	// update options cache
 	for optionName, optionValue := range options {
-		optionCache.Options.Put(optionName, fmt.Sprintf("%v", optionValue))
+		cache.Options.Put(optionName, fmt.Sprintf("%v", optionValue))
 	}
 
 	return nil

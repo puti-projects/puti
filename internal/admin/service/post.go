@@ -5,12 +5,15 @@ package service
 import (
 	"database/sql"
 	"fmt"
+	"strconv"
 	"sync"
 	"time"
 
 	"github.com/puti-projects/puti/internal/admin/dao"
 	"github.com/puti-projects/puti/internal/model"
+	"github.com/puti-projects/puti/internal/pkg/config"
 	"github.com/puti-projects/puti/internal/pkg/errno"
+	"github.com/puti-projects/puti/internal/pkg/logger"
 	"github.com/puti-projects/puti/internal/utils"
 )
 
@@ -455,6 +458,11 @@ func UpdateArticle(a *ArticleUpdateRequest) error {
 		return errno.New(errno.ErrDatabase, err)
 	}
 
+	// update finished. clean cache.a
+	if err := SrvEngine.DeleteCache(config.CacheArticleDetailPrefix + strconv.Itoa(int(a.ID))); err != nil {
+		logger.Errorf("error deleting cache. %s", err)
+	}
+
 	return nil
 }
 
@@ -482,6 +490,11 @@ func UpdatePage(p *PageUpdateRequest) (err error) {
 	err = dao.Engine.UpdatePage(page, p.Description, p.PageTemplate)
 	if err != nil {
 		return errno.New(errno.ErrDatabase, err)
+	}
+
+	// update finished. clean cache.
+	if err := SrvEngine.DeleteCache(config.CachePageDetailPrefix + strconv.Itoa(int(p.ID))); err != nil {
+		logger.Errorf("error deleting cache. %s", err)
 	}
 
 	return nil

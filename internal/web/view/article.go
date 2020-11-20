@@ -2,6 +2,9 @@ package view
 
 import (
 	"errors"
+	"github.com/puti-projects/puti/internal/pkg/config"
+	"github.com/puti-projects/puti/internal/pkg/logger"
+	"html/template"
 	"net/http"
 	"strconv"
 	"strings"
@@ -102,23 +105,53 @@ func ShowArticleDetail(c *gin.Context) {
 	ID, _ := strconv.Atoi(articleID)
 	aID := uint64(ID)
 
-	articleDetail, err := service.GetArticleDetailByID(aID)
-	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			ShowNotFound(c)
+	// check cache
+	if data, exist := service.SrvEngine.GetCache(config.CacheArticleDetailPrefix + articleID); exist {
+		s := &map[string]interface{}{}
+		if err := service.SrvEngine.JSON.Unmarshal(data, s); err != nil {
+			logger.Errorf("found cache, but the conversion failed.")
+		}
+		articleDetail := (*s)["Article"].(map[string]interface{})
+		articleDetail["ContentHTML"] = template.HTML(articleDetail["ContentHTML"].(string))
+
+		renderData["Article"] = articleDetail
+		renderData["LastArticle"] = (*s)["LastArticle"]
+		renderData["NextArticle"] = (*s)["NextArticle"]
+		renderData["Title"] = articleDetail["Title"].(string) + " - " + renderData["Setting"].(map[string]interface{})["BlogName"].(string)
+	} else {
+		articleDetail, err := service.GetArticleDetailByID(aID)
+		if err != nil {
+			if errors.Is(err, gorm.ErrRecordNotFound) {
+				ShowNotFound(c)
+				return
+			}
+
+			ShowInternalServerError(c)
 			return
 		}
 
-		ShowInternalServerError(c)
-		return
+		renderData["Article"] = articleDetail
+		renderData["LastArticle"] = service.GetLastArticle(aID)
+		renderData["NextArticle"] = service.GetNextArticle(aID)
+		renderData["Title"] = renderData["Article"].(*service.ShowArticleDetail).Title + " - " + renderData["Setting"].(map[string]interface{})["BlogName"].(string)
+
+		// set cache
+		articleDetailCache := map[string]interface{}{
+			"Article":     renderData["Article"],
+			"LastArticle": renderData["LastArticle"],
+			"NextArticle": renderData["NextArticle"],
+		}
+
+		byteData, err := service.SrvEngine.JSON.Marshal(articleDetailCache)
+		if err != nil {
+			logger.Errorf("json convert failed before set cache. %s", err)
+		}
+		if err := service.SrvEngine.SetCache(config.CacheArticleDetailPrefix+articleID, byteData); err != nil {
+			logger.Errorf("set cache failed. %s", err)
+		}
 	}
 
 	counter.CounterCache.CountOne(c.ClientIP(), aID)
 
-	renderData["Article"] = articleDetail
-	renderData["LastArticle"] = service.GetLastArticle(aID)
-	renderData["NextArticle"] = service.GetNextArticle(aID)
-
-	renderData["Title"] = articleDetail.Title + " - " + renderData["Setting"].(map[string]interface{})["BlogName"].(string)
 	c.HTML(http.StatusOK, getTheme(c)+"/article-detail.html", renderData)
 }

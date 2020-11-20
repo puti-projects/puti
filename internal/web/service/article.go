@@ -10,10 +10,10 @@ import (
 	"sync"
 
 	"github.com/puti-projects/puti/internal/model"
+	"github.com/puti-projects/puti/internal/pkg/cache"
 	"github.com/puti-projects/puti/internal/pkg/config"
 	"github.com/puti-projects/puti/internal/pkg/db"
 	"github.com/puti-projects/puti/internal/pkg/logger"
-	optionCache "github.com/puti-projects/puti/internal/pkg/option"
 	"github.com/puti-projects/puti/internal/utils"
 )
 
@@ -26,7 +26,7 @@ type List struct {
 // GetArticleListByTaxonomy get articles list
 func GetArticleListByTaxonomy(currentPage int, taxonomyType, taxonomySlug, keyword string) (termName string, articleResult []*ShowArticle, pagination *utils.Pagination, err error) {
 	// get articles data
-	pageSize, _ := strconv.Atoi(optionCache.Options.Get("posts_per_page"))
+	pageSize, _ := strconv.Atoi(cache.Options.Get("posts_per_page"))
 	offset := (currentPage - 1) * pageSize
 	var count int64 = 0
 
@@ -80,7 +80,7 @@ func GetArticleListByTaxonomy(currentPage int, taxonomyType, taxonomySlug, keywo
 	errChan := make(chan error, 1)
 	finished := make(chan bool, 1)
 
-	siteURL := optionCache.Options.Get("site_url")
+	siteURL := cache.Options.Get("site_url")
 	for _, a := range articles {
 		wg.Add(1)
 		go func(a *model.Post) {
@@ -135,7 +135,7 @@ func GetArticleListByTaxonomy(currentPage int, taxonomyType, taxonomySlug, keywo
 // GetArticleList get articles list
 func GetArticleList(currentPage int, keyword string) (articleResult []*ShowArticle, pagination *utils.Pagination, err error) {
 	// get articles data
-	pageSize, _ := strconv.Atoi(optionCache.Options.Get("posts_per_page"))
+	pageSize, _ := strconv.Atoi(cache.Options.Get("posts_per_page"))
 	offset := (currentPage - 1) * pageSize
 	var count int64 = 0
 
@@ -177,7 +177,7 @@ func GetArticleList(currentPage int, keyword string) (articleResult []*ShowArtic
 	errChan := make(chan error, 1)
 	finished := make(chan bool, 1)
 
-	siteURL := optionCache.Options.Get("site_url")
+	siteURL := cache.Options.Get("site_url")
 	for _, a := range articles {
 		wg.Add(1)
 		go func(a *model.Post) {
@@ -280,7 +280,7 @@ func GetLatestArticlesList(getNums int) ([]*ShowWidgetLatestArticles, error) {
 	where := "`post_type` = ? AND `parent_id` = ? AND `status` = ?"
 	whereArgs := []interface{}{model.PostTypeArticle, 0, model.PostStatusPublish}
 
-	articles := []*ShowWidgetLatestArticles{}
+	var articles []*ShowWidgetLatestArticles
 	postModel := &model.Post{}
 	result := db.Engine.Table(postModel.TableName()).
 		Select("`id`, `title`, `guid`, `comment_count`, `view_count`, `posted_time`").
@@ -304,7 +304,7 @@ func GetArticleDetailByID(articleID uint64) (*ShowArticleDetail, error) {
 		return nil, err
 	}
 
-	siteURL := optionCache.Options.Get("site_url")
+	siteURL := cache.Options.Get("site_url")
 	articleCategory, articleTag, err := getArticleTaxonomyInfo(articleID, siteURL)
 	if err != nil {
 		return nil, err

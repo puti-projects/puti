@@ -173,15 +173,16 @@ Detailed changes for each release are documented in the [changelog file]((https:
 
 | 依赖 | 关于 |
 | :----- | :----- |
-| [gin-gonic/gin](https://github.com/gin-gonic/gin) |  HTTP web framework written in Go |
-| [go-gorm/gorm](https://github.com/go-gorm/gorm)  | The ORM library for Golang|
-| [patrickmn/go-cache](https://github.com/patrickmn/go-cache) | An in-memory key:value store/cache|
-| [spf13/viper](https://github.com/spf13/viper) |  Complete configuration solution|
-| [go.uber.org/zap](https://go.uber.org/zap) |  Fast, structured, leveled logging|
-| [vuejs/vue](https://github.com/vuejs/vue) | JavaScript framework for building UI on the web |
-| [ElemeFE/element](https://github.com/ElemeFE/element) | A Vue.js 2.0 UI Toolkit for Web  |
-| [PanJiaChen/vue-element-admin](https://github.com/PanJiaChen/vue-element-admin) | A front-end management background integration solution |
-| [hinesboy/mavonEditor](https://github.com/hinesboy/mavonEditor) | A markdown editor |
+| [gin-gonic/gin](https://github.com/gin-gonic/gin) |  HTTP web framework written in Go. |
+| [go-gorm/gorm](https://github.com/go-gorm/gorm)  | The ORM library for Golang. |
+| [allegro/bigcache](https://github.com/allegro/bigcache) | Efficient cache for gigabytes of data written in Go. |
+| [spf13/viper](https://github.com/spf13/viper) |  Complete configuration solution. |
+| [go.uber.org/zap](https://go.uber.org/zap) |  Fast, structured, leveled logging. |
+| [vuejs/vue](https://github.com/vuejs/vue) | JavaScript framework for building UI on the web. |
+| [ElemeFE/element](https://github.com/ElemeFE/element) | A Vue.js 2.0 UI Toolkit for Web.  |
+| [PanJiaChen/vue-element-admin](https://github.com/PanJiaChen/vue-element-admin) | A front-end management background integration solution. |
+| [hinesboy/mavonEditor](https://github.com/hinesboy/mavonEditor) (will be removed) | A markdown editor. |
+| [Vanessa219/vditor](https://github.com/Vanessa219/vditor) | An in-browser markdown editor. |
 
 ## Q & A
 

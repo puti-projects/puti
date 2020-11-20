@@ -1,27 +1,18 @@
-package option
+package cache
 
 import (
-	"time"
-
 	"github.com/puti-projects/puti/internal/admin/dao"
+	"github.com/puti-projects/puti/internal/pkg/config"
 	"github.com/puti-projects/puti/internal/pkg/logger"
-
-	gocache "github.com/patrickmn/go-cache"
 )
 
-// DefaultExpiration default expiration time of 2 hours for puti
-var DefaultExpiration = 2 * time.Hour
-
-// DefaultPurgesExpiration default purges expired items of 3 hours for puti
-var DefaultPurgesExpiration = 3 * time.Hour
-
 type optionCache struct {
-	gocacheBody *gocache.Cache
+	cacheBody *Cache
 }
 
 // Options cache
 var Options = &optionCache{
-	gocacheBody: gocache.New(DefaultExpiration, DefaultPurgesExpiration),
+	cacheBody: GetInstance(),
 }
 
 // LoadOptions load default options
@@ -41,22 +32,31 @@ func getAutoLoadOptions() error {
 	}
 
 	for _, option := range options {
-		Options.Put(option.OptionName, option.OptionValue)
+		if err := Options.Put(setOptionKeyPrefix(option.OptionName), option.OptionValue); err != nil {
+			return err
+		}
 	}
-
 	return nil
 }
 
+// setOptionKeyPrefix before set cache, add key prefix for option
+func setOptionKeyPrefix(optionName string) string {
+	return config.CacheOptionPrefix + optionName
+}
+
 // SetCache set option into cache
-func (cache *optionCache) Put(optionName, optionValue string) {
-	cache.gocacheBody.Set(optionName, optionValue, gocache.DefaultExpiration)
+func (oc *optionCache) Put(optionName, optionValue string) error {
+	if err := oc.cacheBody.SetCache(setOptionKeyPrefix(optionName), optionValue); err != nil {
+		return err
+	}
+	return nil
 }
 
 // Get one option value by optionName
-func (cache *optionCache) Get(optionName string) string {
-	optionValue, found := cache.gocacheBody.Get(optionName)
+func (oc *optionCache) Get(optionName string) string {
+	optionValue, found := oc.cacheBody.GetCache(setOptionKeyPrefix(optionName))
 	if found {
-		return optionValue.(string)
+		return optionValue
 	}
 
 	// If can not find the option by name in cache, get from db
@@ -78,22 +78,19 @@ func (cache *optionCache) Get(optionName string) string {
 	}
 
 	// set cache
-	Options.Put(option.OptionName, option.OptionValue)
+	if err := Options.Put(setOptionKeyPrefix(option.OptionName), option.OptionValue); err != nil {
+		logger.Errorf("error when setting option to cache. setting key: %s. err: %s", option.OptionName, err)
+	}
 
 	return option.OptionValue
 }
 
 // Delete an option from the cache. Does nothing if the option name is not in the cache as a key.
-func (cache *optionCache) Delete(optionName string) {
-	cache.gocacheBody.Delete(optionName)
+func (oc *optionCache) Delete(optionName string) error {
+	return oc.cacheBody.DeleteCache(setOptionKeyPrefix(optionName))
 }
 
 // Flush delete all options from the cache
-func (cache *optionCache) Flush() {
-	cache.gocacheBody.Flush()
-}
-
-// All get all options from the cache
-func (cache *optionCache) All() map[string]gocache.Item {
-	return cache.gocacheBody.Items()
+func (oc *optionCache) Flush() error {
+	return oc.cacheBody.Flush()
 }

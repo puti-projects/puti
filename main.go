@@ -12,11 +12,11 @@ import (
 	"time"
 
 	"github.com/puti-projects/puti/internal/admin/dao"
+	"github.com/puti-projects/puti/internal/pkg/cache"
 	"github.com/puti-projects/puti/internal/pkg/config"
 	"github.com/puti-projects/puti/internal/pkg/counter"
 	"github.com/puti-projects/puti/internal/pkg/db"
 	"github.com/puti-projects/puti/internal/pkg/logger"
-	"github.com/puti-projects/puti/internal/pkg/option"
 	"github.com/puti-projects/puti/internal/pkg/theme"
 	v "github.com/puti-projects/puti/internal/pkg/version"
 	"github.com/puti-projects/puti/internal/routers"
@@ -28,7 +28,7 @@ import (
 )
 
 var (
-	configPath = pflag.StringP("config", "c", "", "puti config file path.")
+	configPath = pflag.StringP("config", "c", "", "Puti config file path.")
 	version    = pflag.BoolP("version", "v", false, "show version info.")
 )
 
@@ -72,9 +72,16 @@ func init() {
 }
 
 func main() {
+	// load cache service
+	if err := cache.LoadCache(); err != nil {
+		logger.Errorf("init cache failed. %s", err)
+	} else {
+		logger.Info("cache service has been deployed successfully")
+	}
+
 	// load default options (need db connection)
-	if err := option.LoadOptions(); err != nil {
-		logger.Errorf("load options failed, %v", err)
+	if err := cache.LoadOptions(); err != nil {
+		logger.Panicf("load options failed, %v", err)
 	}
 	logger.Info("options has been deployed successfully")
 
@@ -180,7 +187,7 @@ func signalHandle(srv *http.Server) {
 
 	// if signal received
 	<-quit
-	logger.Warn("shuting down server")
+	logger.Warn("shutting down server")
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 

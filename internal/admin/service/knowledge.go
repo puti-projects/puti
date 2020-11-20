@@ -2,13 +2,15 @@ package service
 
 import (
 	"errors"
+	"strings"
+	"sync"
+
 	"github.com/puti-projects/puti/internal/admin/dao"
 	"github.com/puti-projects/puti/internal/model"
 	"github.com/puti-projects/puti/internal/pkg/errno"
 	"github.com/puti-projects/puti/internal/utils"
+
 	"gorm.io/gorm"
-	"strings"
-	"sync"
 )
 
 // KnowledgeCreateRequest struct bind to create knowledge

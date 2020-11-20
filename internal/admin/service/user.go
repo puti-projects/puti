@@ -5,13 +5,14 @@ import (
 	"strconv"
 	"sync"
 
-	"github.com/gin-gonic/gin"
 	"github.com/puti-projects/puti/internal/admin/dao"
 	"github.com/puti-projects/puti/internal/model"
 	"github.com/puti-projects/puti/internal/pkg/config"
 	"github.com/puti-projects/puti/internal/pkg/errno"
 	"github.com/puti-projects/puti/internal/pkg/token"
 	"github.com/puti-projects/puti/internal/utils"
+
+	"github.com/gin-gonic/gin"
 )
 
 // ListRequest is the user list request struct

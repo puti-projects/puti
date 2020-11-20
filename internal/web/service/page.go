@@ -1,11 +1,14 @@
 package service
 
 import (
+	"github.com/puti-projects/puti/internal/pkg/cache"
+	"github.com/puti-projects/puti/internal/pkg/config"
+	"github.com/puti-projects/puti/internal/pkg/logger"
 	"html/template"
+	"strconv"
 
 	"github.com/puti-projects/puti/internal/model"
 	"github.com/puti-projects/puti/internal/pkg/db"
-	optionCache "github.com/puti-projects/puti/internal/pkg/option"
 	"github.com/puti-projects/puti/internal/utils"
 )
 
@@ -24,13 +27,22 @@ func GetPageIDBySlug(slug string) uint64 {
 
 // GetPageDetailByID get page detail info by page id
 func GetPageDetailByID(pageID uint64) (*ShowPageDetail, error) {
+	// check cache
+	if data, exist := SrvEngine.GetCache(config.CachePageDetailPrefix + strconv.Itoa(int(pageID))); exist {
+		s := &ShowPageDetail{}
+		if err := SrvEngine.JSON.Unmarshal(data, s); err == nil {
+			return s, nil
+		}
+		logger.Errorf("found cache, but the conversion failed.")
+	}
+
 	p := &model.Post{}
 	err := db.Engine.Where("id = ? AND post_type = ? AND parent_id = ? AND status =?", pageID, model.PostTypePage, 0, model.PostStatusPublish).First(&p).Error
 	if err != nil {
 		return nil, err
 	}
 
-	siteURL := optionCache.Options.Get("site_url")
+	siteURL := cache.Options.Get("site_url")
 
 	pageDetail := &ShowPageDetail{
 		ID:            p.ID,
@@ -52,6 +64,15 @@ func GetPageDetailByID(pageID uint64) (*ShowPageDetail, error) {
 	}
 	for _, meta := range pm {
 		pageDetail.MetaData[meta.MetaKey] = meta.MetaValue
+	}
+
+	// set cache
+	byteData, err := SrvEngine.JSON.Marshal(pageDetail)
+	if err != nil {
+		logger.Errorf("json convert failed before set cache. %s", err)
+	}
+	if err := SrvEngine.SetCache(config.CachePageDetailPrefix+strconv.Itoa(int(pageID)), byteData); err != nil {
+		logger.Errorf("set cache failed. %s", err)
 	}
 
 	return pageDetail, nil
