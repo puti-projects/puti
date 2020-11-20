@@ -32,7 +32,7 @@ func (d *Dao) GetSubjectByID(subjectID uint64) (*model.Subject, error) {
 // UpdateSubject update subject
 func (d *Dao) UpdateSubject(subject *model.Subject) error {
 	// begin transcation
-	tx := db.DBEngine.Begin()
+	tx := db.Engine.Begin()
 	defer func() {
 		if r := recover(); r != nil {
 			tx.Rollback()

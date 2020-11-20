@@ -13,7 +13,7 @@ import (
 func GetPageIDBySlug(slug string) uint64 {
 	// get term id
 	var pageID uint64
-	getpageID := db.DBEngine.Table("pt_post").
+	getpageID := db.Engine.Table("pt_post").
 		Select("`id`").
 		Where("`slug` = ? AND `post_type` = ? AND `parent_id` = ? AND `status` = ? AND `deleted_time` IS NULL", slug, model.PostTypePage, 0, model.PostStatusPublish).
 		Row()
@@ -25,7 +25,7 @@ func GetPageIDBySlug(slug string) uint64 {
 // GetPageDetailByID get page detail info by page id
 func GetPageDetailByID(pageID uint64) (*ShowPageDetail, error) {
 	p := &model.Post{}
-	err := db.DBEngine.Where("id = ? AND post_type = ? AND parent_id = ? AND status =?", pageID, model.PostTypePage, 0, model.PostStatusPublish).First(&p).Error
+	err := db.Engine.Where("id = ? AND post_type = ? AND parent_id = ? AND status =?", pageID, model.PostTypePage, 0, model.PostStatusPublish).First(&p).Error
 	if err != nil {
 		return nil, err
 	}
@@ -46,7 +46,7 @@ func GetPageDetailByID(pageID uint64) (*ShowPageDetail, error) {
 
 	// get extra data of page
 	meta := &model.PostMeta{PostID: pageID}
-	pm, err := meta.GetAllByPostID(db.DBEngine)
+	pm, err := meta.GetAllByPostID(db.Engine)
 	if err != nil {
 		return nil, err
 	}

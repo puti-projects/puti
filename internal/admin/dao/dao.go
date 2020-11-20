@@ -13,8 +13,8 @@ type Dao struct {
 var Engine *Dao
 
 // NewDaoEngine create a dao instance
-// Note: after db.DBEngine inited
+// Note: after db.DBEngine init
 func NewDaoEngine() {
 	Engine = new(Dao)
-	Engine.db = db.DBEngine
+	Engine.db = db.Engine
 }

@@ -35,6 +35,8 @@ func renderBasicConfig(c *gin.Context, renderData *RenderData) *gin.Context {
 
 func renderBasicSetting(c *gin.Context, renderData *RenderData) *gin.Context {
 	settingMap := map[string]interface{}{}
+
+	// load some basic settings
 	settingMap["CurrentUrl"] = c.Request.URL.Path
 	settingMap["BlogName"] = optionCache.Options.Get("blog_name")
 	settingMap["BlogDescription"] = optionCache.Options.Get("blog_description")

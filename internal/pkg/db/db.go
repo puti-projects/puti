@@ -11,19 +11,19 @@ import (
 )
 
 var (
-	DBEngine *gorm.DB
+	Engine *gorm.DB
 )
 
 // InitDB init db connection pool
 func InitDB() error {
 	var err error
-	DBEngine, err = openDB(config.Db.Username, config.Db.Password, config.Db.Addr, config.Db.Name)
+	Engine, err = openDB(config.Db.Username, config.Db.Password, config.Db.Addr, config.Db.Name)
 	if err != nil {
 		return err
 	}
 
 	// set up config of db connection pool
-	err = setupDB(DBEngine)
+	err = setupDB(Engine)
 	if err != nil {
 		return err
 	}

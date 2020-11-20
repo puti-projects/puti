@@ -8,7 +8,7 @@ import (
 // GetcategoryList get category tree for widget
 func GetcategoryList() (taxonomyTree []*ShowWidgetCategoryTreeNode, err error) {
 	var termTaxonomy []*model.TermTaxonomy
-	err = db.DBEngine.Where("taxonomy = ? AND term_id != ?", "category", model.DefaultUnCategorizedID).Preload("Term").Find(&termTaxonomy).Error
+	err = db.Engine.Where("taxonomy = ? AND term_id != ?", "category", model.DefaultUnCategorizedID).Preload("Term").Find(&termTaxonomy).Error
 	if err != nil {
 		return nil, err
 	}

@@ -44,7 +44,7 @@ type ChildrenSubejctsResult struct {
 func GetChildrenSubejcts(parentID uint64) (subjectResult []*ShowSubjectList, err error) {
 	subjects := make([]*ChildrenSubejctsResult, 0)
 	subjectModel := &model.Subject{}
-	rows, err := db.DBEngine.Table(subjectModel.TableName()+" s").
+	rows, err := db.Engine.Table(subjectModel.TableName()+" s").
 		Select("s.`id`, s.`parent_id`, s.`name`, s.`slug`, s.`description`, r.`guid` as cover_image_url, s.`count`, s.`last_updated`").
 		Joins("LEFT JOIN pt_resource r ON r.id = s.`cover_image`").
 		Where("s.`parent_id` = ? AND s.`deleted_time` is null", parentID).
@@ -56,7 +56,7 @@ func GetChildrenSubejcts(parentID uint64) (subjectResult []*ShowSubjectList, err
 	for rows.Next() {
 		subject := &ChildrenSubejctsResult{}
 		// ScanRows scan a row into subject
-		if err := db.DBEngine.ScanRows(rows, &subject); err != nil {
+		if err := db.Engine.ScanRows(rows, &subject); err != nil {
 			return nil, err
 		}
 
@@ -131,7 +131,7 @@ func getDifferDayBetweenLastUpdatedTimeAndNow(lastUpdatedTime *sql.NullTime) str
 func GetSubjectInfoBySlug(subjectSlug string) (*ShowSubjectInfo, error) {
 	subjectResult := &SubejctInfoResult{}
 	subjectModel := &model.Subject{}
-	result := db.DBEngine.Table(subjectModel.TableName()+" s").
+	result := db.Engine.Table(subjectModel.TableName()+" s").
 		Select("s.`id`, s.`parent_id`, s.`name`, s.`slug`, s.`description`, r.`guid` as cover_image_url, s.`count`").
 		Joins("LEFT JOIN pt_resource r ON r.id = s.`cover_image`").
 		Where("s.`slug` = ? AND s.`deleted_time` is null", subjectSlug).
@@ -154,7 +154,7 @@ func GetSubjectInfoBySlug(subjectSlug string) (*ShowSubjectInfo, error) {
 	// get parent url
 	if subjectResult.ParentID > 0 {
 		parent := model.Subject{Model: model.Model{ID: subjectResult.ParentID}}
-		if err := parent.GetByID(db.DBEngine); err != nil {
+		if err := parent.GetByID(db.Engine); err != nil {
 			return nil, err
 		}
 		subjectInfo.ParentURL = "/subject/" + parent.Slug

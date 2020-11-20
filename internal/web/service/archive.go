@@ -16,7 +16,7 @@ func GetArchive() (map[string]map[string][]*ShowArchive, []string, map[string][]
 	where := "`post_type` = ? AND `parent_id` = ? AND `status` = ?"
 	whereArgs := []interface{}{model.PostTypeArticle, 0, model.PostStatusPublish}
 	postModel := &model.Post{}
-	rows, err := db.DBEngine.Table(postModel.TableName()).
+	rows, err := db.Engine.Table(postModel.TableName()).
 		Select("`id`, `title`, `guid`, `comment_count`, `view_count`, `posted_time`").
 		Where(where, whereArgs...).
 		Order("`posted_time` DESC").
@@ -29,7 +29,7 @@ func GetArchive() (map[string]map[string][]*ShowArchive, []string, map[string][]
 	for rows.Next() {
 		var archive model.Post
 		// ScanRows scan a row into archive
-		db.DBEngine.ScanRows(rows, &archive)
+		db.Engine.ScanRows(rows, &archive)
 		archives = append(archives, archive)
 	}
 

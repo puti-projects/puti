@@ -29,7 +29,7 @@ func InitCountTicker() {
 			case <-countTickerChan:
 				if counterCache, found := CounterCache.GetCounterCache(); found {
 					for postID, number := range counterCache {
-						err := db.DBEngine.Model(&model.Post{}).Where("`id` = ?", postID).Update("view_count", gorm.Expr("view_count + ?", number)).Error
+						err := db.Engine.Model(&model.Post{}).Where("`id` = ?", postID).Update("view_count", gorm.Expr("view_count + ?", number)).Error
 						if err != nil {
 							logger.Errorf("ticker: post count falied to update into database. %s", err)
 						}
