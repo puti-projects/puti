@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"net/http"
 	"os"
@@ -91,10 +90,7 @@ func main() {
 	// Ping the server to make sure the router is working.
 	// should before http server set up
 	go func() {
-		if err := pingServer(); err != nil {
-			logger.Fatal("The router has no response, or it might took too long to start up. Error Detail:" + err.Error())
-		}
-		logger.Info("the router has been deployed successfully")
+		pingServer()
 	}()
 
 	// init ticker
@@ -198,10 +194,14 @@ func signalHandle(srv *http.Server) {
 }
 
 // pingServer pings the http server to make sure the service is working.
-func pingServer() error {
+func pingServer() {
 	var pingURL string
 	if true == config.Server.HttpsOpen {
-		pingURL = "https://127.0.0.1:" + config.Server.HttpsPort + "/check/health"
+		if config.Server.AutoCert {
+			pingURL = "https://" + config.Server.PutiDomain[0] + "/check/health"
+		} else {
+			pingURL = "https://127.0.0.1:" + config.Server.HttpsPort + "/check/health"
+		}
 	} else {
 		pingURL = "http://127.0.0.1:" + config.Server.HttpPort + "/check/health"
 	}
@@ -210,8 +210,9 @@ func pingServer() error {
 		// Ping the server by sending a GET request to `/health`.
 		resp, err := http.Get(pingURL)
 		if err == nil && resp.StatusCode == 200 {
-			logger.Info("the health check has been completed and the HTTP service is normal.", zap.String("ping url", pingURL))
-			return nil
+			logger.Info("health check finished and the HTTP service is normal.", zap.String("ping url", pingURL))
+			logger.Info("the router has been deployed successfully")
+			return
 		}
 
 		// Sleep for a second to continue the next ping.
@@ -219,5 +220,6 @@ func pingServer() error {
 		time.Sleep(time.Second)
 	}
 
-	return errors.New("cannot connect to the router")
+	logger.Fatal("cannot connect to the router! The router has no response, or it might took too long to start up.", zap.String("ping url", pingURL))
+	return
 }
