@@ -16,7 +16,7 @@ func ShowTopSubjects(c *gin.Context) {
 	renderData := getRenderData(c)
 
 	// get content
-	subjectsList, err := service.GetChildrenSubejcts(0)
+	subjectsList, err := service.GetChildrenSubjects(0)
 	if err != nil {
 		ShowInternalServerError(c)
 		return
@@ -28,7 +28,7 @@ func ShowTopSubjects(c *gin.Context) {
 	c.HTML(http.StatusOK, getTheme(c)+"/subjects.html", renderData)
 }
 
-// ShowSubjects subejct list for children (parent id != 0)
+// ShowSubjects subject list for children (parent id != 0)
 func ShowSubjects(c *gin.Context) {
 	renderData := getRenderData(c)
 
@@ -48,7 +48,7 @@ func ShowSubjects(c *gin.Context) {
 	}
 
 	// get subject children
-	subjectsList, err := service.GetChildrenSubejcts(subjectInfo.ID)
+	subjectsList, err := service.GetChildrenSubjects(subjectInfo.ID)
 	if err != nil {
 		ShowInternalServerError(c)
 		return

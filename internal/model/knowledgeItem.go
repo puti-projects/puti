@@ -17,10 +17,10 @@ type KnowledgeItem struct {
 	Model
 
 	KnowledgeID    uint64       `gorm:"column:knowledge_id;not null"`
+	Symbol         uint64       `gorm:"column:symbol;not null"`
 	UserID         uint64       `gorm:"column:user_id;not null"`
 	Title          string       `gorm:"column:title;not null"`
 	ContentVersion uint64       `gorm:"column:content_version;not null"`
-	GUID           string       `gorm:"column:guid;not null"`
 	ParentID       uint64       `gorm:"column:parent_id;not null;default:0"`
 	Level          uint64       `gorm:"column:level;not null;default:0"`
 	Index          int64        `gorm:"column:index;not null;default:0"`

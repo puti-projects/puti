@@ -19,7 +19,7 @@ func Create(c *gin.Context) {
 	}
 
 	var r service.KnowledgeItemCreateRequest
-	if err := c.Bind(&r); err != nil {
+	if err := c.ShouldBind(&r); err != nil {
 		api.SendResponse(c, errno.ErrBind, nil)
 		return
 	}

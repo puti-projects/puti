@@ -2,26 +2,12 @@ package view
 
 import (
 	"net/http"
-	"strings"
-
-	"github.com/puti-projects/puti/internal/web/service"
 
 	"github.com/gin-gonic/gin"
 )
 
 // ShowNotFound 404 handler
 func ShowNotFound(c *gin.Context) {
-	if !strings.HasPrefix(c.Request.RequestURI, "/themes") {
-		// no static, and get slug
-		slug := strings.TrimLeft(c.Request.RequestURI, "/")
-		if !strings.Contains(slug, "/") {
-			if pageID := service.GetPageIDBySlug(slug); pageID > 0 {
-				ShowPageDetail(c, pageID)
-				return
-			}
-		}
-	}
-
 	// get renderer data include basic data
 	renderData := getRenderData(c)
 

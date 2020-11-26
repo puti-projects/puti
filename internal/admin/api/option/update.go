@@ -20,20 +20,20 @@ func Update(c *gin.Context) {
 	}
 
 	var u service.OptionUpdateRequest
-	u.Parms = make(map[string]interface{})
-	if err := utils.BindJSONIntoMap(c, u.Parms); err != nil {
+	u.Params = make(map[string]interface{})
+	if err := utils.BindJSONIntoMap(c, u.Params); err != nil {
 		api.SendResponse(c, errno.ErrBind, nil)
 		return
 	}
 
 	// filter those params
 	defaultOptionNames := service.GetDefaultOptionNamesByType(settingType)
-	if err := updateParamFilter(&u, defaultOptionNames); err != nil {
+	if err := paramFilter(&u, defaultOptionNames); err != nil {
 		api.SendResponse(c, err, nil)
 		return
 	}
 
-	if err := service.UpdateOptions(u.Parms); err != nil {
+	if err := service.UpdateOptions(u.Params); err != nil {
 		api.SendResponse(c, err, nil)
 		return
 	}
@@ -42,8 +42,8 @@ func Update(c *gin.Context) {
 	return
 }
 
-func updateParamFilter(u *service.OptionUpdateRequest, filterArr []string) error {
-	for optionName := range u.Parms {
+func paramFilter(u *service.OptionUpdateRequest, filterArr []string) error {
+	for optionName := range u.Params {
 		optionNameExist := false
 		for _, value := range filterArr {
 			if optionName == value {
@@ -54,7 +54,7 @@ func updateParamFilter(u *service.OptionUpdateRequest, filterArr []string) error
 		}
 
 		if !optionNameExist {
-			delete(u.Parms, optionName)
+			delete(u.Params, optionName)
 		}
 	}
 

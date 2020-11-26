@@ -16,7 +16,8 @@ func ShowIndex(c *gin.Context) {
 	renderData := getRenderData(c)
 
 	showOnFront := cache.Options.Get("show_on_front")
-	if showOnFront == "article" {
+	switch showOnFront {
+	case "article":
 		// get params
 		currentPage, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
 
@@ -32,8 +33,15 @@ func ShowIndex(c *gin.Context) {
 		renderData["Pagination"] = pagination.Page
 		pagination.SetPageURL("/article")
 		renderData["PageURL"] = pagination.PageURL
-	} else if showOnFront == "page" {
-	} else {
+	case "page":
+	case "knowledge":
+		knowledgeList, err := service.GetKnowledgeList()
+		if err != nil {
+			ShowInternalServerError(c)
+			return
+		}
+		renderData["Knowledge"] = knowledgeList
+	default:
 	}
 
 	renderData["Widgets"] = getWidgets()

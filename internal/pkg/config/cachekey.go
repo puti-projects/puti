@@ -14,4 +14,11 @@ const (
 
 	// CacheArticleDetailPrefix key prefix for article cache
 	CacheArticleDetailPrefix = "PUTI_ARTICLE_"
+
+	// CacheKnowledgeInfoPrefix key prefix for knowledge info
+	CacheKnowledgeInfoPrefix = "PUTI_K_"
+	// CacheKnowledgeItemListPrefix key prefix for knowledge item list
+	CacheKnowledgeItemListPrefix = "PUTI_KITEM_"
+	// CacheKnowledgeItemContentPrefix key prefix for knowledge item content
+	CacheKnowledgeItemContentPrefix = "PUTI_KITEM_CONTENT"
 )

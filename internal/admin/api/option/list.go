@@ -26,17 +26,10 @@ func List(c *gin.Context) {
 }
 
 func checkSettingType(settingType string) error {
-	if settingType != "general" &&
-		settingType != "property" &&
-		settingType != "theme" &&
-		settingType != "pubic-account" &&
-		settingType != "github" &&
-		settingType != "discuss" &&
-		settingType != "media" &&
-		settingType != "reading" &&
-		settingType != "writing" {
-		return errno.New(errno.ErrSettingType, nil)
+	for _, v := range service.OptionSettingTypeMap {
+		if v == settingType {
+			return nil
+		}
 	}
-
-	return nil
+	return errno.New(errno.ErrSettingType, nil)
 }

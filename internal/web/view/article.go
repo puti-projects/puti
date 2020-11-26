@@ -3,7 +3,6 @@ package view
 import (
 	"errors"
 	"github.com/puti-projects/puti/internal/pkg/config"
-	"github.com/puti-projects/puti/internal/pkg/logger"
 	"html/template"
 	"net/http"
 	"strconv"
@@ -108,9 +107,8 @@ func ShowArticleDetail(c *gin.Context) {
 	// check cache
 	if data, exist := service.SrvEngine.GetCache(config.CacheArticleDetailPrefix + articleID); exist {
 		s := &map[string]interface{}{}
-		if err := service.SrvEngine.JSON.Unmarshal(data, s); err != nil {
-			logger.Errorf("found cache, but the conversion failed.")
-		}
+		service.SrvEngine.JSONUnmarshal(data, &s)
+
 		articleDetail := (*s)["Article"].(map[string]interface{})
 		articleDetail["ContentHTML"] = template.HTML(articleDetail["ContentHTML"].(string))
 
@@ -141,14 +139,7 @@ func ShowArticleDetail(c *gin.Context) {
 			"LastArticle": renderData["LastArticle"],
 			"NextArticle": renderData["NextArticle"],
 		}
-
-		byteData, err := service.SrvEngine.JSON.Marshal(articleDetailCache)
-		if err != nil {
-			logger.Errorf("json convert failed before set cache. %s", err)
-		}
-		if err := service.SrvEngine.SetCache(config.CacheArticleDetailPrefix+articleID, byteData); err != nil {
-			logger.Errorf("set cache failed. %s", err)
-		}
+		service.SrvEngine.MarshalAndSetCache(config.CacheArticleDetailPrefix+articleID, articleDetailCache)
 	}
 
 	counter.CounterCache.CountOne(c.ClientIP(), aID)

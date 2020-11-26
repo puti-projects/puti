@@ -13,7 +13,7 @@ import (
 
 // OptionUpdateRequest update request include params which are dynamitly
 type OptionUpdateRequest struct {
-	Parms map[string]interface{}
+	Params map[string]interface{}
 }
 
 // OptionListResponse option list and extra data if exist
@@ -26,6 +26,86 @@ type OptionListResponse struct {
 type ListTheme struct {
 	Name      string `json:"name"`
 	Thumbnail string `json:"thumbnail"`
+}
+
+// optionSettingTypeMap option setting type that support
+var OptionSettingTypeMap = []string{
+	"general",
+	"property",
+	"menu",
+	"theme",
+	"output",
+	"pubic-account",
+	"github",
+	"discuss",
+	"media",
+	"reading",
+	"writing",
+}
+
+// OptionNamesMap option keys for those setting type
+var OptionNamesMap = map[string][]string{
+	"general": {
+		"blog_name",
+		"blog_description",
+		"site_url",
+		"admin_email",
+		"users_can_register",
+		"timezone_string",
+		"site_language",
+	},
+	"property": {
+		"site_description",
+		"site_keywords",
+		"footer_copyright",
+	},
+	"menu": {},
+	"theme": {
+		"current_theme",
+	},
+	"output": {
+		"show_on_front",
+		"show_on_front_page",
+		"posts_per_page",
+	},
+	"pubic-account": {},
+	"github":        {},
+	"discuss": {
+		"article_comment_status",
+		"page_comment_status",
+		"comment_need_register",
+		"show_comment_page",
+		"comment_per_page",
+		"comment_page_first",
+		"comment_page_top",
+		"comment_before_show",
+		"show_avatar",
+	},
+	"media": {
+		"image_thumbnail_width",
+		"image_thumbnail_height",
+		"image_medium_width",
+		"image_medium_height",
+		"image_large_width",
+		"image_large_height",
+	},
+	"reading": {
+		"open_XML",
+	},
+	"writing": {
+		"default_category",
+		"default_link_category",
+	},
+}
+
+// GetDefaultOptionsByType get default setting's option name
+func GetDefaultOptionNamesByType(settingType string) []string {
+	if settingType != "" {
+		if v, ok := OptionNamesMap[settingType]; ok {
+			return v
+		}
+	}
+	return []string{}
 }
 
 // ListOption get option list by setting type
@@ -97,35 +177,4 @@ func UpdateOptions(options map[string]interface{}) error {
 	}
 
 	return nil
-}
-
-// GetDefaultOptionsByType get default setting's option name
-func GetDefaultOptionNamesByType(settingType string) []string {
-	var optionNames []string
-	switch settingType {
-	case "general":
-		optionNames = []string{"blog_name", "blog_description", "site_url", "admin_email", "users_can_register", "timezone_string", "site_language"}
-	case "property":
-		optionNames = []string{"site_description", "site_keywords", "footer_copyright"}
-	case "menu":
-		optionNames = []string{""}
-	case "theme":
-		optionNames = []string{"current_theme"}
-	case "pubic-account":
-		optionNames = []string{""}
-	case "github":
-		optionNames = []string{""}
-	case "discuss":
-		optionNames = []string{"article_comment_status", "page_comment_status", "comment_need_register", "show_comment_page", "comment_per_page", "comment_page_first", "comment_page_top", "comment_before_show", "show_avatar"}
-	case "media":
-		optionNames = []string{"image_thumbnail_width", "image_thumbnail_height", "image_medium_width", "image_medium_height", "image_large_width", "image_large_height"}
-	case "reading":
-		optionNames = []string{"show_on_front", "show_on_front_page", "posts_per_page", "open_XML"}
-	case "writing":
-		optionNames = []string{"default_category", "default_link_category"}
-	default:
-		optionNames = []string{}
-	}
-
-	return optionNames
 }

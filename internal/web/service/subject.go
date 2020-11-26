@@ -16,8 +16,8 @@ type SubjectList struct {
 	IDMap map[uint64]*ShowSubjectList
 }
 
-// SubejctInfoResult use for scan subject info
-type SubejctInfoResult struct {
+// SubjectInfoResult use for scan subject info
+type SubjectInfoResult struct {
 	ID            uint64
 	ParentID      uint64
 	Name          string
@@ -27,8 +27,8 @@ type SubejctInfoResult struct {
 	Count         string
 }
 
-// ChildrenSubejctsResult use for scan
-type ChildrenSubejctsResult struct {
+// ChildrenSubjectsResult use for scan
+type ChildrenSubjectsResult struct {
 	ID            uint64
 	ParentID      uint64
 	Name          string
@@ -39,10 +39,10 @@ type ChildrenSubejctsResult struct {
 	LastUpdated   sql.NullTime
 }
 
-// GetChildrenSubejcts get subject's all children
+// GetChildrenSubjects get subject's all children
 // If the parentID is 0, get all top subjects
-func GetChildrenSubejcts(parentID uint64) (subjectResult []*ShowSubjectList, err error) {
-	subjects := make([]*ChildrenSubejctsResult, 0)
+func GetChildrenSubjects(parentID uint64) (subjectResult []*ShowSubjectList, err error) {
+	subjects := make([]*ChildrenSubjectsResult, 0)
 	subjectModel := &model.Subject{}
 	rows, err := db.Engine.Table(subjectModel.TableName()+" s").
 		Select("s.`id`, s.`parent_id`, s.`name`, s.`slug`, s.`description`, r.`guid` as cover_image_url, s.`count`, s.`last_updated`").
@@ -54,7 +54,7 @@ func GetChildrenSubejcts(parentID uint64) (subjectResult []*ShowSubjectList, err
 	}
 	defer rows.Close()
 	for rows.Next() {
-		subject := &ChildrenSubejctsResult{}
+		subject := &ChildrenSubjectsResult{}
 		// ScanRows scan a row into subject
 		if err := db.Engine.ScanRows(rows, &subject); err != nil {
 			return nil, err
@@ -64,7 +64,7 @@ func GetChildrenSubejcts(parentID uint64) (subjectResult []*ShowSubjectList, err
 	}
 
 	subjectResult = make([]*ShowSubjectList, 0)
-	ids := []uint64{}
+	var ids []uint64
 	for _, subject := range subjects {
 		ids = append(ids, subject.ID)
 	}
@@ -79,7 +79,7 @@ func GetChildrenSubejcts(parentID uint64) (subjectResult []*ShowSubjectList, err
 
 	for _, s := range subjects {
 		wg.Add(1)
-		go func(s *ChildrenSubejctsResult) {
+		go func(s *ChildrenSubjectsResult) {
 			defer wg.Done()
 
 			subjectList.Lock.Lock()
@@ -129,7 +129,7 @@ func getDifferDayBetweenLastUpdatedTimeAndNow(lastUpdatedTime *sql.NullTime) str
 
 // GetSubjectInfoBySlug get subject info by the unique slug
 func GetSubjectInfoBySlug(subjectSlug string) (*ShowSubjectInfo, error) {
-	subjectResult := &SubejctInfoResult{}
+	subjectResult := &SubjectInfoResult{}
 	subjectModel := &model.Subject{}
 	result := db.Engine.Table(subjectModel.TableName()+" s").
 		Select("s.`id`, s.`parent_id`, s.`name`, s.`slug`, s.`description`, r.`guid` as cover_image_url, s.`count`").

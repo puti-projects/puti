@@ -1,7 +1,6 @@
 package service
 
 import (
-	"fmt"
 	"strconv"
 	"strings"
 
@@ -21,6 +20,7 @@ const (
 
 // KnowledgeItemCreateRequest struct for binding knowledge item create
 type KnowledgeItemCreateRequest struct {
+	CreateType  string `json:"create_type" binding:"required,oneof=doc note"`
 	KnowledgeID uint64 `json:"knowledge_id"`
 	Title       string `json:"title"`
 	ParentID    uint64 `json:"parent_id"`
@@ -51,7 +51,8 @@ type KnowledgeItemUpdateInfoRequest struct {
 // KnowledgeItemUpdateContentRequest struct bind to update knowledge item content
 type KnowledgeItemUpdateContentRequest struct {
 	ID       uint64 `json:"knowledge_item_id" binding:"required"`
-	SaveType string `json:"save_type" binding:"required"` // save or publish
+	EditType string `json:"edit_type" binding:"required,oneof=doc note"`     // doc or note
+	SaveType string `json:"save_type" binding:"required,oneof=save publish"` // save or publish
 	Content  string `json:"content" binding:"required"`
 	Version  string `json:"version" binding:"required"`
 }
@@ -88,10 +89,10 @@ func CreateKnowledgeItem(r *KnowledgeItemCreateRequest, userID uint64) (*Knowled
 	// knowledge item
 	kItem := &model.KnowledgeItem{
 		KnowledgeID:    r.KnowledgeID,
+		Symbol:         snowflake.GenerateSnowflakeID(),
 		UserID:         userID,
 		Title:          strings.TrimSpace(r.Title),
 		ContentVersion: 0,
-		GUID:           "",
 		CommentCount:   0,
 		ViewCount:      0,
 	}
@@ -110,10 +111,16 @@ func CreateKnowledgeItem(r *KnowledgeItemCreateRequest, userID uint64) (*Knowled
 	}
 	kItem.Index = 0
 
-	// knowledge item content
+	// init a knowledge item content record
 	content := "# " + strings.TrimSpace(r.Title)
 	contentVersion := snowflake.GenerateSnowflakeID()
-	var contentStatus uint8 = 0
+	var contentStatus uint8
+	switch r.CreateType {
+	case model.KnowledgeTypeDoc:
+		contentStatus = 0
+	case model.KnowledgeTypeNote:
+		contentStatus = 1
+	}
 	kItem.ItemContents = []model.KnowledgeItemContent{
 		{
 			Version: contentVersion,
@@ -213,6 +220,9 @@ func UpdateKnowledgeItemInfo(ir *KnowledgeItemUpdateInfoRequest, kItemID uint64)
 		}
 	}
 
+	// clean list cache
+	kID, _ := dao.Engine.GetKnowledgeIDByItemID(kItemID)
+	SrvEngine.CleanCacheKnowledgeItemList(kID)
 	return nil
 }
 
@@ -230,34 +240,44 @@ func UpdateKnowledgeItemContent(cr *KnowledgeItemUpdateContentRequest, kItemID u
 	rsp := &KnowledgeItemUpdateContentResponse{
 		ID: kItemContent.KnowledgeItemID,
 	}
-	if cr.SaveType == KnowledgeItemUpdateTypeSave {
-		if kItemContent.Status == model.KnowledgeItemContentStatusCurrent {
-			// create a new version
-			newVersionContent := &model.KnowledgeItemContent{
-				KnowledgeItemID: kItemID,
-				Version:         snowflake.GenerateSnowflakeID(),
-				Status:          model.KnowledgeItemContentStatusCommon,
-				Content:         cr.Content,
+
+	switch cr.EditType {
+	case model.KnowledgeTypeNote:
+		// only one version for note; directly update
+		kItemContent.Content = cr.Content
+		err = dao.Engine.UpdateKnowledgeItemContent(kItemContent)
+		rsp.Version = kItemContent.Version
+	case model.KnowledgeTypeDoc:
+		if cr.SaveType == KnowledgeItemUpdateTypeSave {
+			if kItemContent.Status == model.KnowledgeItemContentStatusCurrent {
+				// create a new version
+				newVersionContent := &model.KnowledgeItemContent{
+					KnowledgeItemID: kItemID,
+					Version:         snowflake.GenerateSnowflakeID(),
+					Status:          model.KnowledgeItemContentStatusCommon,
+					Content:         cr.Content,
+				}
+				err = dao.Engine.CreateKnowledgeItemContent(newVersionContent)
+				rsp.Version = newVersionContent.Version
+			} else if kItemContent.Status == model.KnowledgeItemContentStatusCommon {
+				// directly update
+				kItemContent.Content = cr.Content
+				err = dao.Engine.UpdateKnowledgeItemContent(kItemContent)
+				rsp.Version = kItemContent.Version
 			}
-			err = dao.Engine.CreateKnowledgeItemContent(newVersionContent)
-			rsp.Version = newVersionContent.Version
-		} else if kItemContent.Status == model.KnowledgeItemContentStatusCommon {
-			// directly update
-			kItemContent.Content = cr.Content
-			err = dao.Engine.UpdateKnowledgeItemContent(kItemContent)
-			rsp.Version = kItemContent.Version
-		}
-	} else if cr.SaveType == KnowledgeItemUpdateTypePublish {
-		if kItemContent.Status == model.KnowledgeItemContentStatusCurrent {
-			// directly update
-			kItemContent.Content = cr.Content
-			err = dao.Engine.UpdateKnowledgeItemContent(kItemContent)
-			rsp.Version = kItemContent.Version
-		} else if kItemContent.Status == model.KnowledgeItemContentStatusCommon {
-			// set 1 to this version; update old version to 0
-			kItemContent.Status = model.KnowledgeItemContentStatusCurrent
-			err = dao.Engine.ChangePublishedKnowledgeItemContent(kItemContent)
-			rsp.Version = kItemContent.Version
+		} else if cr.SaveType == KnowledgeItemUpdateTypePublish {
+			if kItemContent.Status == model.KnowledgeItemContentStatusCurrent {
+				// directly update
+				kItemContent.Content = cr.Content
+				err = dao.Engine.UpdateKnowledgeItemContent(kItemContent)
+				rsp.Version = kItemContent.Version
+			} else if kItemContent.Status == model.KnowledgeItemContentStatusCommon {
+				// set 1 to this version; update old version to 0
+				kItemContent.Status = model.KnowledgeItemContentStatusCurrent
+				kItemContent.Content = cr.Content
+				err = dao.Engine.ChangePublishedKnowledgeItemContent(kItemContent)
+				rsp.Version = kItemContent.Version
+			}
 		}
 	}
 
@@ -265,6 +285,9 @@ func UpdateKnowledgeItemContent(cr *KnowledgeItemUpdateContentRequest, kItemID u
 		return nil, errno.New(errno.ErrUpdateKnowledgeItemContent, err)
 	}
 
+	// update finished. clean cache.
+	symbol, _ := dao.Engine.GetKnowledgeItemSymbolByID(kItemID)
+	SrvEngine.CleanCacheAfterUpdateKnowledgeItemContent(symbol)
 	return rsp, nil
 }
 
@@ -281,7 +304,7 @@ func DeleteKnowledgeItem(kItemID uint64) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println(hasChild)
+
 	if hasChild {
 		return errno.ErrKnowledgeItemCanNotBeDeleted
 	}
@@ -290,5 +313,7 @@ func DeleteKnowledgeItem(kItemID uint64) error {
 		return errno.New(errno.ErrDatabase, err)
 	}
 
+	// clean list cache
+	SrvEngine.CleanCacheKnowledgeItemList(kItem.KnowledgeID)
 	return nil
 }

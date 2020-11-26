@@ -109,7 +109,7 @@ type ShowSubjectInfo struct {
 	Count         string
 }
 
-// ShowSubjectList show subejcts list output model
+// ShowSubjectList show subjects list output model
 type ShowSubjectList struct {
 	ID                uint64
 	URL               string
@@ -120,4 +120,40 @@ type ShowSubjectList struct {
 	Count             uint64
 	LastUpdated       string
 	SubLastUpdatedDay string
+}
+
+// ShowKnowledgeList show knowledge list output model
+type ShowKnowledgeList struct {
+	ID            uint64
+	URL           string
+	Name          string
+	Slug          string
+	Description   string
+	CoverImageURL string
+	UpdatedTime   string
+}
+
+// ShowKnowledgeInfo knowledge info output model
+type ShowKnowledgeInfo struct {
+	ID          uint64
+	Name        string
+	LastUpdated string
+}
+
+// ShowWidgetCategoryTreeNode category tree node for widget
+type ShowKnowledgeItemTreeNode struct {
+	ID       uint64
+	Symbol   uint64
+	Title    string
+	URL      string
+	Level    uint64
+	Index    int64
+	Children []*ShowKnowledgeItemTreeNode
+}
+
+// ShowKnowledgeItemContent knowledge item content
+type ShowKnowledgeItemContent struct {
+	Symbol  uint64
+	Title   string
+	Content template.HTML
 }

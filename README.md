@@ -55,9 +55,9 @@ Puti 项目现在仍在开发中，目标是面向极客的下一代写作系统
     * [x] 分类
     * [x] 标签
     * [x] 专题
-  * [ ] 知识库系统
-    * [ ] 笔记本
-    * [ ] 文档集
+  * [x] 知识库系统
+    * [x] 笔记本
+    * [x] 文档集
   * [x] 媒体
   * [ ] 链接
   * [ ] 评论
@@ -89,8 +89,9 @@ Puti 项目现在仍在开发中，目标是面向极客的下一代写作系统
 
 ## 截图
 
-![Docker use](./docs/images/screenshot_one_.png)
-![Docker use](./docs/images/screenshot_two.png)
+![screenshot_1](./docs/images/screenshot_one.png)
+![screenshot_2](./docs/images/screenshot_two.png)
+![screenshot_3](./docs/images/screenshot_three.png)
 
 ## 快速开始
 
@@ -183,6 +184,7 @@ Detailed changes for each release are documented in the [changelog file]((https:
 | [PanJiaChen/vue-element-admin](https://github.com/PanJiaChen/vue-element-admin) | A front-end management background integration solution. |
 | [hinesboy/mavonEditor](https://github.com/hinesboy/mavonEditor) (will be removed) | A markdown editor. |
 | [Vanessa219/vditor](https://github.com/Vanessa219/vditor) | An in-browser markdown editor. |
+| [88250/lute](https://github.com/88250/lute) | A structured Markdown engine that supports Go and JavaScript. |
 
 ## Q & A
 

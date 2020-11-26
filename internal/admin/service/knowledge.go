@@ -92,6 +92,8 @@ func UpdateKnowledge(r *KnowledgeUpdateRequest) error {
 		return errno.New(errno.ErrDatabase, err)
 	}
 
+	// update finished. clean cache.
+	SrvEngine.CleanCacheAfterUpdateKnowledge(k.Slug)
 	return nil
 }
 

@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.4.0 Knowledge Base
+
+### Feature and Enhancement
+- Added knowledge base section (including notes and documents; documents have multi-version functions but notes do not)
+- Increase cache for some pages in the foreground
+
+---
+
 ## v0.3.1 Auto HTTPS
 
 ### Feature and Enhancement

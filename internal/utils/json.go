@@ -11,8 +11,8 @@ var json = jsoniter.ConfigCompatibleWithStandardLibrary
 
 // BindJSONIntoMap decodes json body to map, skips fields which are not in allowedFields
 // Example usage:
-// u.Parms = make(map[string]interface{})
-// err := utils.BindJSONIntoMap(c, u.Parms)
+// u.Params = make(map[string]interface{})
+// err := utils.BindJSONIntoMap(c, u.Params)
 func BindJSONIntoMap(context *gin.Context, obj map[string]interface{}) error {
 	if context.Request.Method == "GET" {
 		return nil

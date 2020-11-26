@@ -54,9 +54,9 @@ The project plan implementation and the functions that have been implemented are
     * [x] Category
     * [x] Tag
     * [x] Subject
-  * [ ] Knowledge base system
-    * [ ] Notebook
-    * [ ] Documentation set
+  * [x] Knowledge base system
+    * [x] Notebook
+    * [x] Documentation set
   * [x] Media
   * [ ] Link
   * [ ] Comments
@@ -91,8 +91,9 @@ The project plan implementation and the functions that have been implemented are
 
 ## Screenshot
 
-![Docker use](./docs/images/screenshot_one_.png)
-![Docker use](./docs/images/screenshot_two.png)
+![screenshot_1](./docs/images/screenshot_one.png)
+![screenshot_2](./docs/images/screenshot_two.png)
+![screenshot_3](./docs/images/screenshot_three.png)
 
 ## Getting Started
 
@@ -187,6 +188,7 @@ Thanks for these great open source libraries:
 | [PanJiaChen/vue-element-admin](https://github.com/PanJiaChen/vue-element-admin) | A front-end management background integration solution. |
 | [hinesboy/mavonEditor](https://github.com/hinesboy/mavonEditor) (will be removed) | A markdown editor. |
 | [Vanessa219/vditor](https://github.com/Vanessa219/vditor) | An in-browser markdown editor. |
+| [88250/lute](https://github.com/88250/lute) | A structured Markdown engine that supports Go and JavaScript. |
 
 ## Q & A
 

@@ -15,6 +15,7 @@ type Knowledge struct {
 	Type        string       `gorm:"column:type;not null"`
 	Description string       `gorm:"column:description;not null"`
 	CoverImage  uint64       `gorm:"column:cover_image;not null;default:0"`
+	Status      uint8        `gorm:"column:status;not null;default:1"`
 	LastUpdated sql.NullTime `gorm:"column:last_updated;default:null"`
 }
 

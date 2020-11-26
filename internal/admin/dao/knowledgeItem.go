@@ -51,6 +51,24 @@ func (d *Dao) GetKnowledgeItemByID(kiID uint64) (*model.KnowledgeItem, error) {
 	return kItem, nil
 }
 
+// GetKnowledgeIDByItemID get knowledge item's knowledge ID
+func (d *Dao) GetKnowledgeIDByItemID(kiID uint64) (uint64, error) {
+	kItem, err := d.GetKnowledgeItemByID(kiID)
+	if err != nil {
+		return 0, err
+	}
+	return kItem.KnowledgeID, err
+}
+
+// GetKnowledgeItemSymbolByID get knowledge item symbol (unique sign) by ID
+func (d *Dao) GetKnowledgeItemSymbolByID(kiID uint64) (uint64, error) {
+	kItem, err := d.GetKnowledgeItemByID(kiID)
+	if err != nil {
+		return 0, err
+	}
+	return kItem.Symbol, err
+}
+
 // GetKnowledgeItemLastContent get last version of item content
 func (d *Dao) GetKnowledgeItemLastContent(ki *model.KnowledgeItem) (*model.KnowledgeItemContent, error) {
 	itemContents, err := ki.GetItemContent(d.db, "", "updated_time desc")
@@ -75,6 +93,7 @@ func (d *Dao) CreateKnowledgeItemContent(kItemContent *model.KnowledgeItemConten
 	return kItemContent.Create(d.db)
 }
 
+// UpdateKnowledgeItemWithNodeChange update knowledge item with node change
 func (d *Dao) UpdateKnowledgeItemWithNodeChange(kItemID uint64, newParentID uint64, indexChange string, indexRelatedNode uint64) error {
 	return d.db.Transaction(func(tx *gorm.DB) error {
 		kItem := &model.KnowledgeItem{
@@ -221,14 +240,19 @@ func (d *Dao) ChangePublishedKnowledgeItemContent(kItemContent *model.KnowledgeI
 	if err := d.db.Model(&kItem).Association("ItemContents").Find(&nowKItemContent); err != nil {
 		return err
 	}
-	for k, v := range nowKItemContent {
-		if v.Status == model.KnowledgeItemContentStatusCurrent {
-			nowKItemContent[k].Status = model.KnowledgeItemContentStatusCommon
-		}
 
+	// bug
+	for k, v := range nowKItemContent {
 		if v.Version == kItemContent.Version {
 			nowKItemContent[k].Status = model.KnowledgeItemContentStatusCurrent
 			nowKItemContent[k].Content = kItemContent.Content
+		}
+
+		// if published before; old version set to 0
+		if kItem.ContentVersion > 0 {
+			if v.Status == model.KnowledgeItemContentStatusCurrent {
+				nowKItemContent[k].Status = model.KnowledgeItemContentStatusCommon
+			}
 		}
 	}
 

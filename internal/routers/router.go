@@ -99,11 +99,12 @@ func loadWeb(g *gin.Engine) {
 		webGroup.GET("/archive", view.ShowArchive)
 		webGroup.GET("/subject", view.ShowTopSubjects)
 		webGroup.GET("/subject/:slug", view.ShowSubjects)
-
+		webGroup.GET("/knowledge/:type/:slug", view.ShowKnowledgeDetail)
+		webGroup.GET("/knowledge/:type/:slug/:symbol", view.ShowKnowledgeDetail)
 	}
 
 	// no route handle
-	g.NoRoute(webMiddleware.Renderer, view.ShowNotFound)
+	g.NoRoute(webMiddleware.Renderer, view.CheckAndShowPage)
 }
 
 // loadStatic load static resource
