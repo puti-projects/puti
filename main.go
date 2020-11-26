@@ -216,10 +216,10 @@ func pingServer() {
 		}
 
 		// Sleep for a second to continue the next ping.
-		logger.Info("waiting for the router, retry in 1 second")
+		logger.Warn("waiting for the router, retry in 1 second")
 		time.Sleep(time.Second)
 	}
 
-	logger.Fatal("cannot connect to the router! The router has no response, or it might took too long to start up.", zap.String("ping url", pingURL))
+	logger.Error("cannot connect to the router! The router has no response, or it might took too long to start up.", zap.String("ping url", pingURL))
 	return
 }
