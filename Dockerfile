@@ -79,7 +79,7 @@ COPY --from=builder /puti/scripts/docker/docker-entrypoint.sh /puti/scripts/dock
 RUN ln -s /usr/local/bin/docker-entrypoint.sh /
 
 VOLUME ["/data"]
-EXPOSE 8000 8080
+#EXPOSE 8000 8080
 
 ENTRYPOINT ["/docker-entrypoint.sh"]
 CMD ["puti"]
