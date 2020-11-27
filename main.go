@@ -144,7 +144,7 @@ func httpsHandle(router *gin.Engine) *http.Server {
 		// Open auto cert
 		// auto cert manager
 		m := &autocert.Manager{
-			Cache:      autocert.DirCache(config.StaticPath("configs/")),
+			Cache:      autocert.DirCache(config.StaticPath("configs/cert/")),
 			Prompt:     autocert.AcceptTOS,
 			HostPolicy: autocert.HostWhitelist(config.Server.PutiDomain...),
 		}

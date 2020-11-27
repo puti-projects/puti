@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.4.1
+
+### 功能和优化
+- 优化 Auto HTTPS 和 Health Check；目前不做重定向判断，如根域名到 www 域名，HTTP 到 HTTPS；较好的实践是再加一层 WebServer。
+
+### Bug 修复
+
+
 ## v0.4.0 Knowledge Base
 
 ### 功能和优化

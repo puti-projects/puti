@@ -157,6 +157,7 @@ $ docker start puti
 我们提供了简单方便地一键部署 Docker-compose 脚本文件，懒人必备。具体使用查看：[puti-projects/puti-environment](https://github.com/puti-projects/puti-environment)
 
 ### 使用
+初始化失败，可能是数据库配置的问题（目前没有安装引导）。默认初始化一个账号 `admin` 密码 `admin` 的默认账号，请创建自己的账号后移除默认账号。功能完善后会考虑安装引导。
 
 ## 主题
 
@@ -186,13 +187,11 @@ Detailed changes for each release are documented in the [changelog file]((https:
 | [Vanessa219/vditor](https://github.com/Vanessa219/vditor) | An in-browser markdown editor. |
 | [88250/lute](https://github.com/88250/lute) | A structured Markdown engine that supports Go and JavaScript. |
 
-## Q & A
+## 说明
 
-## 作者
+### 部署
+可以不使用 Nginx 之类的 WebServer，且支持自动 HTTPS；目前不做重定向判断，如根域名到 www 域名，HTTP 到 HTTPS；较好的实践是再加一层 WebServer。
 
-Puti is a project by
-
-- Goozp ([@goozp](https://www.goozp.com))
 
 ## 贡献
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->

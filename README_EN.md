@@ -159,6 +159,7 @@ More information：[Docker use](./scripts/docker.README.md)
 We provide a one-click deployment of the Docker-compose script file, which is convenience for build the working environment. [puti-projects/puti-environment](https://github.com/puti-projects/puti-environment)
 
 ### Usage
+If initialization failed, which may be a problem with the database configuration (currently there is no installation guide). An account is initialized by default with the default account `admin` and password `admin`. Please create your own account and remove the default account. Installation and guidance will be considered after the functions are complete.
 
 ## Theme
 
@@ -190,13 +191,11 @@ Thanks for these great open source libraries:
 | [Vanessa219/vditor](https://github.com/Vanessa219/vditor) | An in-browser markdown editor. |
 | [88250/lute](https://github.com/88250/lute) | A structured Markdown engine that supports Go and JavaScript. |
 
-## Q & A
+## Description
 
-## Authors
+### Deploy
+It is not necessary to use a WebServer such as Nginx, and supports automatic HTTPS; currently, no redirection judgment is made, such as root domain to `www` domain, HTTP to HTTPS; better practice is to add another layer of WebServer.
 
-Puti is a project by
-
-- Goozp ([@goozp](https://www.goozp.com))
 
 ## Contributors
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
