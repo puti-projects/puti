@@ -571,7 +571,7 @@ func (d *Dao) ListPost(postType, title string, page, number int, sort, status st
 	// list
 	offset := (page - 1) * number
 	var order string
-	if "" != sort {
+	if "" != sort && (sort == "ASC" || sort == "DESC") {
 		order = "id " + sort
 	} else {
 		order = "id DESC"

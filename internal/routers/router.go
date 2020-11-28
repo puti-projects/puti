@@ -132,7 +132,7 @@ func loadStatic(g *gin.Engine) {
 
 		themeTemplate, err := filepath.Glob(themePath + "/*.html")
 		if nil != err {
-			logger.Fatalf("load theme %s templates failed: %s", t, err.Error())
+			logger.Fatalf("load theme %s templates failed: %s", t.Name, err.Error())
 		}
 		themeTemplates = append(themeTemplates, themeTemplate...)
 	}

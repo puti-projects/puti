@@ -283,7 +283,7 @@ func ListPost(postType, title string, page, number int, sort, status string) ([]
 		return nil, count, err
 	}
 
-	ids := []uint64{}
+	var ids []uint64
 	for _, post := range posts {
 		ids = append(ids, post.ID)
 	}

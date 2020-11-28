@@ -114,7 +114,7 @@ func (p *Post) Count(db *gorm.DB, where string, whereArgs []interface{}) (int64,
 // List get user list
 func (p *Post) List(db *gorm.DB, where string, whereArgs []interface{}, offset, number int, order string) ([]*Post, error) {
 	post := make([]*Post, 0)
-	err := db.Where(where, whereArgs...).Offset(offset).Limit(number).Order(order).Find(&post).Error
+	err := db.Where(order, whereArgs...).Offset(offset).Limit(number).Order(order).Find(&post).Error
 	return post, err
 }
 
