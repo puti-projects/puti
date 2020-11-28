@@ -3,7 +3,7 @@
 </p>
 <h1 align="center">Puti</h1>
 <p align="center">
-    <em>:black_nib:Puti is a blog system written in Golang.</em>
+    <em>:black_nib: Puti is a full-featured writing system written in Golang.</em>
 </p>
 <p align="center">
     <a href="https://github.com/puti-projects/puti/actions?query=workflow%3Abuild">

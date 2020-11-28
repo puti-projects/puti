@@ -133,14 +133,14 @@ func generalThemeExtra() []*ListTheme {
 	for _, t := range theme.Themes {
 		var themeThumbnail string
 		// thumbnail
-		if exist, _ := utils.PathExists(config.StaticPath("theme/"+t) + "/thumbnail.jpg"); exist == true {
-			themeThumbnail = config.StaticPath("theme/"+t) + "/thumbnail.jpg"
+		if exist, _ := utils.PathExists(config.StaticPath("theme/"+t.Name) + "/thumbnail.jpg"); exist == true {
+			themeThumbnail = config.StaticPath("theme/"+t.Name) + "/thumbnail.jpg"
 		} else {
 			themeThumbnail = config.StaticPath("assets/images/") + "/image_default.png"
 		}
 
 		themeInfo := &ListTheme{
-			Name:      t,
+			Name:      t.Name,
 			Thumbnail: themeThumbnail,
 		}
 		themes = append(themes, themeInfo)

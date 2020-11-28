@@ -1,6 +1,6 @@
 # Changelog
 
-## v0.4.0 Knowledge Base
+## v0.4.0 Knowledge Base [2020-11-26]
 
 ### Feature and Enhancement
 - Added knowledge base section (including notes and documents; documents have multi-version functions but notes do not)
@@ -8,7 +8,7 @@
 
 ---
 
-## v0.3.1 Auto HTTPS
+## v0.3.1 Auto HTTPS [2020-11-06]
 
 ### Feature and Enhancement
 - Catalog optimization, CI optimization, code quality inspection

@@ -1,14 +1,15 @@
 # Changelog
 
-## v0.4.1
+## v0.4.1 
 
 ### 功能和优化
 - 优化 Auto HTTPS 和 Health Check；目前不做重定向判断，如根域名到 www 域名，HTTP 到 HTTPS；较好的实践是再加一层 WebServer。
+- 主题支持 favicon.ico 自定义
 
 ### Bug 修复
+- 修复一个缓存刷新问题
 
-
-## v0.4.0 Knowledge Base
+## v0.4.0 Knowledge Base [2020-11-26]
 
 ### 功能和优化
 - 新增知识库大板块（含笔记和文档；文档有多版本功能而笔记没有）
@@ -16,7 +17,7 @@
 
 ---
 
-## v0.3.1 Auto HTTPS
+## v0.3.1 Auto HTTPS [2020-11-06]
 
 ### 功能和优化
 - 目录优化、CI 优化，代码质量检查

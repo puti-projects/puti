@@ -143,6 +143,8 @@ func CreateKnowledgeItem(r *KnowledgeItemCreateRequest, userID uint64) (*Knowled
 		VersionStatus: contentStatus,
 	}
 
+	// clean list cache
+	SrvEngine.CleanCacheKnowledgeItemList(kItem.KnowledgeID)
 	return rsp, nil
 }
 

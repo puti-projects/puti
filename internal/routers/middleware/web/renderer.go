@@ -1,8 +1,10 @@
 package web
 
 import (
-	"github.com/puti-projects/puti/internal/pkg/cache"
+	"github.com/puti-projects/puti/internal/pkg/theme"
 	"html/template"
+
+	"github.com/puti-projects/puti/internal/pkg/cache"
 
 	"github.com/gin-gonic/gin"
 )
@@ -20,38 +22,50 @@ func Renderer(c *gin.Context) {
 	// (*dataModel)["User"] = session
 
 	renderBasicSetting(c, renderData)
-
+	renderThemeSetting(c, renderData)
 	c.Next()
 }
 
 func renderBasicConfig(c *gin.Context, renderData *RenderData) *gin.Context {
-	configMap := map[string]interface{}{}
-	configMap["StaticServer"] = ""
+	configMap := map[string]interface{}{
+		"StaticServer": "",
+	}
 
 	(*renderData)["Config"] = configMap
 	return c
 }
 
 func renderBasicSetting(c *gin.Context, renderData *RenderData) *gin.Context {
-	settingMap := map[string]interface{}{}
-
 	// load some basic settings
-	settingMap["CurrentUrl"] = c.Request.URL.Path
-	settingMap["BlogName"] = cache.Options.Get("blog_name")
-	settingMap["BlogDescription"] = cache.Options.Get("blog_description")
-	settingMap["SiteUrl"] = cache.Options.Get("site_url")
-	settingMap["SiteDescription"] = cache.Options.Get("site_description")
-	settingMap["SiteKeywords"] = cache.Options.Get("site_keywords")
-	settingMap["FooterCopyright"] = template.HTML(cache.Options.Get("footer_copyright"))
-	settingMap["SiteLanguage"] = cache.Options.Get("site_language")
-	settingMap["CurrentTheme"] = cache.Options.Get("current_theme")
+	settingMap := map[string]interface{}{
+		"CurrentUrl":      c.Request.URL.Path,
+		"BlogName":        cache.Options.Get("blog_name"),
+		"BlogDescription": cache.Options.Get("blog_description"),
+		"SiteUrl":         cache.Options.Get("site_url"),
+		"SiteDescription": cache.Options.Get("site_description"),
+		"SiteKeywords":    cache.Options.Get("site_keywords"),
+		"FooterCopyright": template.HTML(cache.Options.Get("footer_copyright")),
+		"SiteLanguage":    cache.Options.Get("site_language"),
+		"CurrentTheme":    cache.Options.Get("current_theme"),
 
-	settingMap["ShowOnFront"] = cache.Options.Get("show_on_front")
-
-	settingMap["ArticleCommentStatus"] = cache.Options.Get("article_comment_status")
-	settingMap["pageCommentStatus"] = cache.Options.Get("page_comment_status")
+		"ShowOnFront":          cache.Options.Get("show_on_front"),
+		"ArticleCommentStatus": cache.Options.Get("article_comment_status"),
+		"pageCommentStatus":    cache.Options.Get("page_comment_status"),
+	}
 
 	(*renderData)["Setting"] = settingMap
+	return c
+}
 
+func renderThemeSetting(c *gin.Context, renderData *RenderData) *gin.Context {
+	themeMap := map[string]interface{}{}
+
+	if t, ok := theme.Themes[cache.Options.Get("current_theme")]; ok && t.FaviconExist {
+		themeMap["Favicon"] = "/theme/" + cache.Options.Get("current_theme") + "/favicon.ico"
+	} else {
+		themeMap["Favicon"] = "/favicon.ico"
+	}
+
+	(*renderData)["Theme"] = themeMap
 	return c
 }

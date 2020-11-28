@@ -2,8 +2,6 @@ package routers
 
 import (
 	"database/sql"
-	"github.com/puti-projects/puti/internal/admin/api/knowledge"
-	"github.com/puti-projects/puti/internal/admin/api/knowledgeItem"
 	"html/template"
 	"net/http"
 	"path/filepath"
@@ -11,6 +9,8 @@ import (
 	"github.com/puti-projects/puti/internal/admin/api"
 	"github.com/puti-projects/puti/internal/admin/api/article"
 	"github.com/puti-projects/puti/internal/admin/api/auth"
+	"github.com/puti-projects/puti/internal/admin/api/knowledge"
+	"github.com/puti-projects/puti/internal/admin/api/knowledgeItem"
 	"github.com/puti-projects/puti/internal/admin/api/media"
 	"github.com/puti-projects/puti/internal/admin/api/option"
 	"github.com/puti-projects/puti/internal/admin/api/page"
@@ -113,20 +113,30 @@ func loadStatic(g *gin.Engine) {
 	g.Static("/static", config.StaticPath("console/static"))
 	g.Static("/uploads", config.StaticPath("uploads/"))
 	g.Static("/assets", config.StaticPath("assets/"))
-	g.StaticFile("/favicon.ico", config.StaticPath("assets/favicon.ico"))
+	g.StaticFile("/favicon.ico", config.StaticPath("assets/favicon.ico")) // default
 
 	// load theme templates file
 	var themeTemplates []string
 	for _, t := range theme.Themes {
-		themePath := config.StaticPath("theme/" + t)
-		g.Static("/theme/"+t+"/public", themePath+"/public")
-		g.StaticFile("/theme/"+t+"/thumbnail.jpg", themePath+"/thumbnail.jpg")
+		themePath := config.StaticPath(config.StaticPathTheme + "/" + t.Name)
+		g.Static("/theme/"+t.Name+"/public", themePath+"/public")
+
+		// thumbnail
+		if t.ThumbnailExist {
+			g.StaticFile("/theme/"+t.Name+"/thumbnail.jpg", themePath+"/thumbnail.jpg")
+		}
+		// favicon
+		if t.FaviconExist {
+			g.StaticFile("/theme/"+t.Name+"/favicon.ico", themePath+"/favicon.ico")
+		}
+
 		themeTemplate, err := filepath.Glob(themePath + "/*.html")
 		if nil != err {
 			logger.Fatalf("load theme %s templates failed: %s", t, err.Error())
 		}
 		themeTemplates = append(themeTemplates, themeTemplate...)
 	}
+	// common templates
 	commentTemplates, err := filepath.Glob(config.StaticPath("theme/common/comment/*.html"))
 	if nil != err {
 		logger.Fatal("load comment templates failed: " + err.Error())
@@ -135,6 +145,8 @@ func loadStatic(g *gin.Engine) {
 	if nil != err {
 		logger.Fatal("load head templates failed: " + err.Error())
 	}
+
+	// all templates
 	templates := append(themeTemplates, commentTemplates...)
 	templates = append(templates, headTemplates...)
 	// load admin console html
@@ -205,7 +217,7 @@ func loadAPI(g *gin.Engine) {
 	}
 }
 
-// loadHelthTest the health check handlers
+// loadHealthTest the health check handlers
 func loadHealthTest(g *gin.Engine) {
 	// Group for health check
 	svcd := g.Group("/check")

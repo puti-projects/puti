@@ -1,3 +1,4 @@
+// Cache basic cache package; use allegro/bigcache
 package cache
 
 import (
