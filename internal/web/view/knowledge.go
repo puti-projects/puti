@@ -50,20 +50,22 @@ func ShowKnowledgeDetail(c *gin.Context) {
 	renderData["KiList"] = treeList
 
 	// check symbol
-	if kiSymbol != "" {
-		var content *service.ShowKnowledgeItemContent
-		if data, exist := service.SrvEngine.GetCache(config.CacheKnowledgeItemContentPrefix + kiSymbol); exist {
-			service.SrvEngine.JSONUnmarshal(data, &content)
-		} else {
-			content, err = service.GetKnowledgeItemContentBySymbol(kiSymbol)
-			if err != nil {
-				ShowInternalServerError(c)
-				return
-			}
-			service.SrvEngine.MarshalAndSetCache(config.CacheKnowledgeItemContentPrefix+kiSymbol, content)
-		}
-		renderData["KiContent"] = content
+	if kiSymbol == "" {
+		// give a default symbol; first page
+		kiSymbol = strconv.Itoa(int(treeList[0].Symbol))
 	}
+	var content *service.ShowKnowledgeItemContent
+	if data, exist := service.SrvEngine.GetCache(config.CacheKnowledgeItemContentPrefix + kiSymbol); exist {
+		service.SrvEngine.JSONUnmarshal(data, &content)
+	} else {
+		content, err = service.GetKnowledgeItemContentBySymbol(kiSymbol)
+		if err != nil {
+			ShowInternalServerError(c)
+			return
+		}
+		service.SrvEngine.MarshalAndSetCache(config.CacheKnowledgeItemContentPrefix+kiSymbol, content)
+	}
+	renderData["KiContent"] = content
 
 	renderData["Title"] = kInfo.Name + " - " + renderData["Setting"].(map[string]interface{})["BlogName"].(string)
 	c.HTML(http.StatusOK, getTheme(c)+"/knowledge.html", renderData)
