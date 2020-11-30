@@ -104,17 +104,17 @@ func (p *PostMeta) GetOneByPostID(db *gorm.DB) error {
 	return nil
 }
 
-// Count count user
+// Count count post
 func (p *Post) Count(db *gorm.DB, where string, whereArgs []interface{}) (int64, error) {
 	var count int64
 	err := db.Model(p).Where(where, whereArgs...).Count(&count).Error
 	return count, err
 }
 
-// List get user list
+// List get post list
 func (p *Post) List(db *gorm.DB, where string, whereArgs []interface{}, offset, number int, order string) ([]*Post, error) {
 	post := make([]*Post, 0)
-	err := db.Where(order, whereArgs...).Offset(offset).Limit(number).Order(order).Find(&post).Error
+	err := db.Where(where, whereArgs...).Offset(offset).Limit(number).Order(order).Find(&post).Error
 	return post, err
 }
 
@@ -136,7 +136,7 @@ func (p *Post) CheckSlug(db *gorm.DB) bool {
 	return true
 }
 
-// TotalView gte total view of all post
+// TotalView get total view of all post
 func (p *Post) TotalView(db *gorm.DB) (totalViews int64, err error) {
 	row := db.Model(p).
 		Where("`status` != ? AND `deleted_time` is null", "deleted").

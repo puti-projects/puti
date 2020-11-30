@@ -572,8 +572,13 @@ func (d *Dao) ListPost(postType, title string, page, number int, sort, status st
 	offset := (page - 1) * number
 	var order string
 	if "" != sort && (sort == "ASC" || sort == "DESC") {
-		order = "id " + sort
+		if sort == "ASC" {
+			order = "id ASC"
+		} else if sort == "DESC" {
+			order = "id DESC"
+		}
 	} else {
+		// default
 		order = "id DESC"
 	}
 	posts, err := post.List(d.db, where, whereArgs, offset, number, order)
