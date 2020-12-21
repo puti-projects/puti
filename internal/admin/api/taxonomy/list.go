@@ -17,7 +17,8 @@ func List(c *gin.Context) {
 		return
 	}
 
-	termTaxonomy, err := service.GetTaxonomyList(taxonomyType)
+	svc := service.New(c.Request.Context())
+	termTaxonomy, err := svc.GetTaxonomyList(taxonomyType)
 	if err != nil {
 		api.SendResponse(c, err, nil)
 		return

@@ -4,7 +4,7 @@ import (
 	"gorm.io/gorm"
 )
 
-// Dao data manipulation layer for backend
+// Dao data manipulation layer for frontend
 type Dao struct {
 	db *gorm.DB
 }

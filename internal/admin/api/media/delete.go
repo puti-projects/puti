@@ -13,7 +13,8 @@ import (
 func Delete(c *gin.Context) {
 	mediaID, _ := strconv.Atoi(c.Param("id"))
 
-	if err := service.DeleteMedia(uint64(mediaID)); err != nil {
+	svc := service.New(c.Request.Context())
+	if err := svc.DeleteMedia(uint64(mediaID)); err != nil {
 		api.SendResponse(c, err, nil)
 		return
 	}

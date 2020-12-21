@@ -16,6 +16,7 @@ func Create(c *gin.Context) {
 	userContext, err := token.ParseToken(t)
 
 	var r service.ArticleCreateRequest
+	svc := service.New(c.Request.Context())
 	if err := c.Bind(&r); err != nil {
 		api.SendResponse(c, errno.ErrBind, nil)
 		return
@@ -27,7 +28,7 @@ func Create(c *gin.Context) {
 		return
 	}
 
-	rsp, err := service.CreateArticle(&r, userContext.ID)
+	rsp, err := svc.CreateArticle(&r, userContext.ID)
 	if err != nil {
 		api.SendResponse(c, errno.ErrArticleCreateFailed, nil)
 		return

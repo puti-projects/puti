@@ -17,7 +17,8 @@ func List(c *gin.Context) {
 		return
 	}
 
-	rsp, err := service.ListOption(settingType)
+	svc := service.New(c.Request.Context())
+	rsp, err := svc.ListOption(settingType)
 	if err != nil {
 		api.SendResponse(c, err, nil)
 	}

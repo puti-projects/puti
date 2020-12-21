@@ -17,13 +17,14 @@ func Delete(c *gin.Context) {
 
 	termID := uint64(ID)
 
+	svc := service.New(c.Request.Context())
 	// check
-	if err := checkIfCanDelete(termID, taxonomyType); err != nil {
+	if err := checkIfCanDelete(&svc, termID, taxonomyType); err != nil {
 		api.SendResponse(c, err, nil)
 		return
 	}
 
-	if err := service.DeleteTaxonomy(termID, taxonomyType); err != nil {
+	if err := svc.DeleteTaxonomy(termID, taxonomyType); err != nil {
 		api.SendResponse(c, errno.ErrDatabase, nil)
 		return
 	}
@@ -31,12 +32,12 @@ func Delete(c *gin.Context) {
 	api.SendResponse(c, nil, nil)
 }
 
-func checkIfCanDelete(termID uint64, taxonomyType string) error {
+func checkIfCanDelete(svc *service.Service, termID uint64, taxonomyType string) error {
 	if taxonomyType != "category" && taxonomyType != "tag" {
 		return errno.New(errno.ErrValidation, nil).Add("error taxonomy.")
 	}
 
-	ifHasChild, err := service.IfTaxonomyHasChild(termID, taxonomyType)
+	ifHasChild, err := svc.IfTaxonomyHasChild(termID, taxonomyType)
 	if err != nil {
 		return err
 	}

@@ -35,7 +35,7 @@ func ShowIndex(c *gin.Context) {
 		renderData["PageURL"] = pagination.PageURL
 	case "page":
 	case "knowledge":
-		knowledgeList, err := service.GetKnowledgeList()
+		knowledgeList, err := service.SrvEngine.GetKnowledgeList()
 		if err != nil {
 			ShowInternalServerError(c)
 			return

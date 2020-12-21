@@ -148,7 +148,7 @@ Deprecations:
 
 ## Version 10.2.1
 
- Parser Engine:
+ Parser Service:
 
  -  fix(parser) complete fix for resuming matches from same index (#2678) [Josh Goebel][]
 
@@ -157,7 +157,7 @@ Deprecations:
 
 ## Version 10.2.0
 
-Parser Engine:
+Parser Service:
 
 - (fix) When ignoring a potential match highlighting can terminate early (#2649) [Josh Goebel][]
 
@@ -215,7 +215,7 @@ New themes:
 - *NNFX* and *NNFX-dark* by [Jim Mason][]
 - *lioshi* by [lioshi][]
 
-Parser Engine:
+Parser Service:
 
 - (parser) Now escapes quotes in text content when escaping HTML (#2564) [Josh Goebel][]
 - (parser) Adds `keywords.$pattern` key to grammar definitions (#2519) [Josh Goebel][]
@@ -283,7 +283,7 @@ Brower build:
 - [Issue](https://github.com/highlightjs/highlight.js/issues/2505) (bug) Fix: Version 10 fails to load as CommonJS module. (#2511) [Josh Goebel][]
 - [Issue](https://github.com/highlightjs/highlight.js/issues/2505) (removal) AMD module loading support has been removed. (#2511) [Josh Goebel][]
 
-Parser Engine Changes:
+Parser Service Changes:
 
 - [Issue](https://github.com/highlightjs/highlight.js/issues/2522) fix(parser) Fix freez issue with illegal 0 width matches (#2524) [Josh Goebel][]
 
@@ -293,7 +293,7 @@ Parser Engine Changes:
 
 ## Version 10.0.1
 
-Parser Engine Changes:
+Parser Service Changes:
 
 - (bug) Fix sublanguage with no relevance score (#2506) [Josh Goebel][]
 
@@ -312,7 +312,7 @@ New themes:
 
 - *Srcery* by [Chen Bin][]
 
-Parser Engine Changes:
+Parser Service Changes:
 
 - (bug) Fix `beginKeywords` to ignore . matches (#2434) [Josh Goebel][]
 - (enh) add `before:highlight` plugin API callback (#2395) [Josh Goebel][]

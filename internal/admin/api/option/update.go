@@ -26,14 +26,15 @@ func Update(c *gin.Context) {
 		return
 	}
 
+	svc := service.New(c.Request.Context())
 	// filter those params
-	defaultOptionNames := service.GetDefaultOptionNamesByType(settingType)
+	defaultOptionNames := svc.GetDefaultOptionNamesByType(settingType)
 	if err := paramFilter(&u, defaultOptionNames); err != nil {
 		api.SendResponse(c, err, nil)
 		return
 	}
 
-	if err := service.UpdateOptions(u.Params); err != nil {
+	if err := svc.UpdateOptions(u.Params); err != nil {
 		api.SendResponse(c, err, nil)
 		return
 	}

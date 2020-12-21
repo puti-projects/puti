@@ -1,7 +1,6 @@
 package service
 
 import (
-	"github.com/puti-projects/puti/internal/admin/dao"
 	"github.com/puti-projects/puti/internal/model"
 	"github.com/puti-projects/puti/internal/pkg/errno"
 )
@@ -49,12 +48,12 @@ type TreeNode struct {
 }
 
 //CreateTaxonomy create term taxonomy
-func CreateTaxonomy(r *TaxonomyCreateRequest) error {
+func (svc Service) CreateTaxonomy(r *TaxonomyCreateRequest) error {
 	if r.Slug == "" {
 		r.Slug = r.Name
 	}
 
-	level, err := dao.Engine.GetTaxonomyLevel(r.ParentID, r.Taxonomy)
+	level, err := svc.dao.GetTaxonomyLevel(r.ParentID, r.Taxonomy)
 	if err != nil {
 		return err
 	}
@@ -72,7 +71,7 @@ func CreateTaxonomy(r *TaxonomyCreateRequest) error {
 		TermGroup:    0,
 	}
 
-	if err := dao.Engine.CreateTaxonomy(termTaxonomy); err != nil {
+	if err := svc.dao.CreateTaxonomy(termTaxonomy); err != nil {
 		return errno.New(errno.ErrDatabase, err)
 	}
 
@@ -80,20 +79,20 @@ func CreateTaxonomy(r *TaxonomyCreateRequest) error {
 }
 
 // GetTaxonomyList get taxonomy tree by type and return a tree structure
-func GetTaxonomyList(taxonomyType string) (taxonomyTree []*TreeNode, err error) {
-	allTermTaxonomy, err := dao.Engine.GetAllByType(taxonomyType)
+func (svc Service) GetTaxonomyList(taxonomyType string) (taxonomyTree []*TreeNode, err error) {
+	allTermTaxonomy, err := svc.dao.GetAllByType(taxonomyType)
 	if err != nil {
 		return nil, err
 	}
 
 	// pid is 0 means level 1; begin from level 1
-	list := GetTaxonomyTree(allTermTaxonomy, 0)
+	list := svc.GetTaxonomyTree(allTermTaxonomy, 0)
 
 	return list, nil
 }
 
 // GetTaxonomyTree return a taxonomy tree
-func GetTaxonomyTree(allTermTaxonomy []*model.TermTaxonomy, pid uint64) []*TreeNode {
+func (svc Service) GetTaxonomyTree(allTermTaxonomy []*model.TermTaxonomy, pid uint64) []*TreeNode {
 	var tree []*TreeNode
 
 	for _, v := range allTermTaxonomy {
@@ -110,7 +109,7 @@ func GetTaxonomyTree(allTermTaxonomy []*model.TermTaxonomy, pid uint64) []*TreeN
 				Level:        v.Level,
 			}
 			// get their children
-			treeNode.Children = GetTaxonomyTree(allTermTaxonomy, v.TermID)
+			treeNode.Children = svc.GetTaxonomyTree(allTermTaxonomy, v.TermID)
 			tree = append(tree, &treeNode)
 		}
 	}
@@ -119,8 +118,8 @@ func GetTaxonomyTree(allTermTaxonomy []*model.TermTaxonomy, pid uint64) []*TreeN
 }
 
 // GetTaxonomyInfo get term info by term_id
-func GetTaxonomyInfo(termID uint64) (*TermInfo, error) {
-	termTaxonomy, err := dao.Engine.GetTermTaxonomyByTermID(termID)
+func (svc Service) GetTaxonomyInfo(termID uint64) (*TermInfo, error) {
+	termTaxonomy, err := svc.dao.GetTermTaxonomyByTermID(termID)
 	if err != nil {
 		return nil, err
 	}
@@ -137,7 +136,7 @@ func GetTaxonomyInfo(termID uint64) (*TermInfo, error) {
 }
 
 // UpdateTaxonomy update term and term taxonomy
-func UpdateTaxonomy(r *TaxonomyUpdateRequest, termID uint64) error {
+func (svc Service) UpdateTaxonomy(r *TaxonomyUpdateRequest, termID uint64) error {
 	termTaxonomy := &model.TermTaxonomy{
 		Term: model.Term{
 			ID:          termID,
@@ -150,7 +149,7 @@ func UpdateTaxonomy(r *TaxonomyUpdateRequest, termID uint64) error {
 	}
 
 	// Update changed fields.
-	if err := dao.Engine.UpdateTaxonomy(termTaxonomy, r.Taxonomy); err != nil {
+	if err := svc.dao.UpdateTaxonomy(termTaxonomy, r.Taxonomy); err != nil {
 		return errno.New(errno.ErrDatabase, err)
 	}
 
@@ -158,8 +157,8 @@ func UpdateTaxonomy(r *TaxonomyUpdateRequest, termID uint64) error {
 }
 
 // IfTaxonomyHasChild check the taxonomy has children or not
-func IfTaxonomyHasChild(termID uint64, taxonomyType string) (bool, error) {
-	count, err := dao.Engine.GetTermChildrenNumber(termID, taxonomyType)
+func (svc Service) IfTaxonomyHasChild(termID uint64, taxonomyType string) (bool, error) {
+	count, err := svc.dao.GetTermChildrenNumber(termID, taxonomyType)
 	if err != nil {
 		return true, errno.New(errno.ErrDatabase, err)
 	}
@@ -172,11 +171,11 @@ func IfTaxonomyHasChild(termID uint64, taxonomyType string) (bool, error) {
 }
 
 // CheckTaxonomyNameExist check if taxonomy name are aleady exist
-func CheckTaxonomyNameExist(name, taxonomy string) bool {
-	return dao.Engine.CheckTaxonomyNameExist(name, taxonomy)
+func (svc Service) CheckTaxonomyNameExist(name, taxonomy string) bool {
+	return svc.dao.CheckTaxonomyNameExist(name, taxonomy)
 }
 
 // DeleteTaxonomy delete term directly
-func DeleteTaxonomy(termID uint64, taxonomyType string) error {
-	return dao.Engine.DeleteTaxonomy(termID, taxonomyType)
+func (svc Service) DeleteTaxonomy(termID uint64, taxonomyType string) error {
+	return svc.dao.DeleteTaxonomy(termID, taxonomyType)
 }

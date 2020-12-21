@@ -12,7 +12,8 @@ import (
 func Get(c *gin.Context) {
 	username := c.Param("username")
 
-	user, err := service.GetUser(username)
+	svc := service.New(c.Request.Context())
+	user, err := svc.GetUser(username)
 	if err != nil {
 		api.SendResponse(c, errno.ErrUserNotFound, nil)
 		return

@@ -14,7 +14,8 @@ func Upload(c *gin.Context) {
 	usage := c.DefaultPostForm("usage", "common")
 	file, _ := c.FormFile("file")
 
-	ID, GUID, err := service.UploadMedia(c, userID, usage, file)
+	svc := service.New(c.Request.Context())
+	ID, GUID, err := svc.UploadMedia(c, userID, usage, file)
 	if err != nil {
 		api.SendResponse(c, err, nil)
 	}

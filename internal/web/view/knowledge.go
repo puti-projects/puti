@@ -1,15 +1,17 @@
 package view
 
 import (
+	"net/http"
+	"strconv"
+
 	"github.com/puti-projects/puti/internal/model"
 	"github.com/puti-projects/puti/internal/pkg/config"
 	"github.com/puti-projects/puti/internal/web/service"
-	"net/http"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
 
+// ShowKnowledgeDetail show knowledge detail
 func ShowKnowledgeDetail(c *gin.Context) {
 	renderData := getRenderData(c)
 
@@ -27,7 +29,7 @@ func ShowKnowledgeDetail(c *gin.Context) {
 	if data, exist := service.SrvEngine.GetCache(config.CacheKnowledgeInfoPrefix + kSlug); exist {
 		service.SrvEngine.JSONUnmarshal(data, &kInfo)
 	} else {
-		kInfo, err = service.GetKnowledgeBySlug(kType, kSlug)
+		kInfo, err = service.SrvEngine.GetKnowledgeBySlug(kType, kSlug)
 		if err != nil {
 			ShowInternalServerError(c)
 			return
@@ -40,7 +42,7 @@ func ShowKnowledgeDetail(c *gin.Context) {
 	if data, exist := service.SrvEngine.GetCache(config.CacheKnowledgeItemListPrefix + strconv.Itoa(int(kInfo.ID))); exist {
 		service.SrvEngine.JSONUnmarshal(data, &treeList)
 	} else {
-		treeList, err = service.GetKnowledgeItemList(kType, kSlug, kInfo.ID)
+		treeList, err = service.SrvEngine.GetKnowledgeItemList(kType, kSlug, kInfo.ID)
 		if err != nil {
 			ShowInternalServerError(c)
 			return
@@ -61,7 +63,7 @@ func ShowKnowledgeDetail(c *gin.Context) {
 		if data, exist := service.SrvEngine.GetCache(config.CacheKnowledgeItemContentPrefix + kiSymbol); exist {
 			service.SrvEngine.JSONUnmarshal(data, &content)
 		} else {
-			content, err = service.GetKnowledgeItemContentBySymbol(kiSymbol)
+			content, err = service.SrvEngine.GetKnowledgeItemContentBySymbol(kiSymbol)
 			if err != nil {
 				ShowInternalServerError(c)
 				return

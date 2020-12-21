@@ -11,7 +11,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/puti-projects/puti/internal/admin/dao"
 	"github.com/puti-projects/puti/internal/model"
 	"github.com/puti-projects/puti/internal/pkg/config"
 	"github.com/puti-projects/puti/internal/pkg/errno"
@@ -69,7 +68,7 @@ type MediaList struct {
 }
 
 // UploadMedia upload media and save record
-func UploadMedia(c *gin.Context, userID, usage string, file *multipart.FileHeader) (ID uint64, GUID string, err error) {
+func (svc Service) UploadMedia(c *gin.Context, userID, usage string, file *multipart.FileHeader) (ID uint64, GUID string, err error) {
 	fileNameWithoutExt, fileExt, pathName, dst, err := getFileSavePath(usage, file)
 	if err != nil {
 		return
@@ -86,7 +85,7 @@ func UploadMedia(c *gin.Context, userID, usage string, file *multipart.FileHeade
 		return
 	}
 
-	ID, GUID, err = dao.Engine.CreateMedia(uID, file.Filename, fileNameWithoutExt, fileExt, pathName, usage)
+	ID, GUID, err = svc.dao.CreateMedia(uID, file.Filename, fileNameWithoutExt, fileExt, pathName, usage)
 	return
 }
 
@@ -161,8 +160,8 @@ func getSavePath(usage string) (string, error) {
 }
 
 // GetMediaByID get media by ID
-func GetMediaByID(ID uint64) (*model.Media, error) {
-	media, err := dao.Engine.GetMediaByID(ID)
+func (svc Service) GetMediaByID(ID uint64) (*model.Media, error) {
+	media, err := svc.dao.GetMediaByID(ID)
 	if err != nil {
 		return nil, err
 	}
@@ -170,9 +169,9 @@ func GetMediaByID(ID uint64) (*model.Media, error) {
 	return media, nil
 }
 
-// GetMedia return media info if database select success
-func GetMediaDetail(ID uint64) (*MediaDetail, error) {
-	media, err := dao.Engine.GetMediaByID(ID)
+// GetMediaDetail return media info if database select success
+func (svc Service) GetMediaDetail(ID uint64) (*MediaDetail, error) {
+	media, err := svc.dao.GetMediaByID(ID)
 	if err != nil {
 		return nil, err
 	}
@@ -193,15 +192,15 @@ func GetMediaDetail(ID uint64) (*MediaDetail, error) {
 }
 
 // ListMedia returns current page media list and the total number of media
-func ListMedia(limit, page int) ([]*MediaInfo, int64, error) {
+func (svc Service) ListMedia(limit, page int) ([]*MediaInfo, int64, error) {
 	infos := make([]*MediaInfo, 0)
 
-	medias, count, err := dao.Engine.ListMedia(limit, page)
+	medias, count, err := svc.dao.ListMedia(limit, page)
 	if err != nil {
 		return nil, count, err
 	}
 
-	ids := []uint64{}
+	var ids []uint64
 	for _, media := range medias {
 		ids = append(ids, media.ID)
 	}
@@ -247,8 +246,8 @@ func ListMedia(limit, page int) ([]*MediaInfo, int64, error) {
 }
 
 // UpdateMedia update media info
-func UpdateMedia(r *MediaUpdateRequest, userID int) (err error) {
-	if err := dao.Engine.UpdateMedia(uint64(userID), r.Title, r.Slug, r.Description); err != nil {
+func (svc Service) UpdateMedia(r *MediaUpdateRequest, userID int) (err error) {
+	if err := svc.dao.UpdateMedia(uint64(userID), r.Title, r.Slug, r.Description); err != nil {
 		return errno.New(errno.ErrDatabase, err)
 	}
 
@@ -256,8 +255,8 @@ func UpdateMedia(r *MediaUpdateRequest, userID int) (err error) {
 }
 
 // DeleteMedia delete media
-func DeleteMedia(userID uint64) error {
-	if err := dao.Engine.DeleteMediaByID(userID); err != nil {
+func (svc Service) DeleteMedia(userID uint64) error {
+	if err := svc.dao.DeleteMediaByID(userID); err != nil {
 		return errno.New(errno.ErrDatabase, err)
 	}
 

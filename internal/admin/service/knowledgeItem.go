@@ -4,7 +4,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/puti-projects/puti/internal/admin/dao"
 	"github.com/puti-projects/puti/internal/model"
 	"github.com/puti-projects/puti/internal/pkg/errno"
 	"github.com/puti-projects/puti/internal/pkg/snowflake"
@@ -85,7 +84,7 @@ type KnowledgeItemDetail struct {
 }
 
 // CreateKnowledgeItem create knowledge item
-func CreateKnowledgeItem(r *KnowledgeItemCreateRequest, userID uint64) (*KnowledgeItemCreateResponse, error) {
+func (svc *Service) CreateKnowledgeItem(r *KnowledgeItemCreateRequest, userID uint64) (*KnowledgeItemCreateResponse, error) {
 	// knowledge item
 	kItem := &model.KnowledgeItem{
 		KnowledgeID:    r.KnowledgeID,
@@ -103,7 +102,7 @@ func CreateKnowledgeItem(r *KnowledgeItemCreateRequest, userID uint64) (*Knowled
 		kItem.Level = 1
 	} else {
 		// check parent's level
-		parent, err := dao.Engine.GetKnowledgeItemByID(r.ParentID)
+		parent, err := svc.dao.GetKnowledgeItemByID(r.ParentID)
 		if err != nil {
 			return nil, errno.New(errno.ErrDatabase, err)
 		}
@@ -129,7 +128,7 @@ func CreateKnowledgeItem(r *KnowledgeItemCreateRequest, userID uint64) (*Knowled
 		},
 	}
 
-	k, err := dao.Engine.CreateKnowledgeItem(kItem)
+	k, err := svc.dao.CreateKnowledgeItem(kItem)
 	if err != nil {
 		return nil, errno.New(errno.ErrDatabase, err)
 	}
@@ -144,13 +143,13 @@ func CreateKnowledgeItem(r *KnowledgeItemCreateRequest, userID uint64) (*Knowled
 	}
 
 	// clean list cache
-	SrvEngine.CleanCacheKnowledgeItemList(kItem.KnowledgeID)
+	svc.CleanCacheKnowledgeItemList(kItem.KnowledgeID)
 	return rsp, nil
 }
 
 // GetKnowledgeItemList get knowledge item list as a tree
-func GetKnowledgeItemList(kID int) ([]*KnowledgeItemInfo, error) {
-	kItems, err := dao.Engine.GetKnowledgeItemListByKnowledgeID(uint64(kID))
+func (svc *Service) GetKnowledgeItemList(kID int) ([]*KnowledgeItemInfo, error) {
+	kItems, err := svc.dao.GetKnowledgeItemListByKnowledgeID(uint64(kID))
 	if err != nil {
 		return nil, errno.New(errno.ErrDatabase, err)
 	}
@@ -179,8 +178,8 @@ func getKnowledgeItemTree(kItems []*model.KnowledgeItem, pID uint64) []*Knowledg
 }
 
 // GetKnowledgeItemInfo get knowledge item info
-func GetKnowledgeItemInfo(kiID int) (*KnowledgeItemDetail, error) {
-	ki, err := dao.Engine.GetKnowledgeItemByID(uint64(kiID))
+func (svc *Service) GetKnowledgeItemInfo(kiID int) (*KnowledgeItemDetail, error) {
+	ki, err := svc.dao.GetKnowledgeItemByID(uint64(kiID))
 	if err != nil {
 		return nil, err
 	}
@@ -192,7 +191,7 @@ func GetKnowledgeItemInfo(kiID int) (*KnowledgeItemDetail, error) {
 			ContentPublishedVersion: ki.ContentVersion,
 		}
 
-		kic, err := dao.Engine.GetKnowledgeItemLastContent(ki)
+		kic, err := svc.dao.GetKnowledgeItemLastContent(ki)
 		if err != nil {
 			return nil, err
 		}
@@ -209,32 +208,32 @@ func GetKnowledgeItemInfo(kiID int) (*KnowledgeItemDetail, error) {
 }
 
 // UpdateKnowledgeItemInfo update knowledge item info
-func UpdateKnowledgeItemInfo(ir *KnowledgeItemUpdateInfoRequest, kItemID uint64) error {
+func (svc *Service) UpdateKnowledgeItemInfo(ir *KnowledgeItemUpdateInfoRequest, kItemID uint64) error {
 	// if change node
 	if ir.NodeChange {
-		if err := dao.Engine.UpdateKnowledgeItemWithNodeChange(kItemID, ir.ParentID, ir.IndexChange, ir.IndexRelatedNode); err != nil {
+		if err := svc.dao.UpdateKnowledgeItemWithNodeChange(kItemID, ir.ParentID, ir.IndexChange, ir.IndexRelatedNode); err != nil {
 			return err
 		}
 	} else {
 		//  do not change node, only update title
-		if err := dao.Engine.UpdateKnowledgeItemTitle(kItemID, ir.Title); err != nil {
+		if err := svc.dao.UpdateKnowledgeItemTitle(kItemID, ir.Title); err != nil {
 			return err
 		}
 	}
 
 	// clean list cache
-	kID, _ := dao.Engine.GetKnowledgeIDByItemID(kItemID)
-	SrvEngine.CleanCacheKnowledgeItemList(kID)
+	kID, _ := svc.dao.GetKnowledgeIDByItemID(kItemID)
+	svc.CleanCacheKnowledgeItemList(kID)
 	return nil
 }
 
 // UpdateKnowledgeItemContent update knowledge item content
-func UpdateKnowledgeItemContent(cr *KnowledgeItemUpdateContentRequest, kItemID uint64) (*KnowledgeItemUpdateContentResponse, error) {
+func (svc *Service) UpdateKnowledgeItemContent(cr *KnowledgeItemUpdateContentRequest, kItemID uint64) (*KnowledgeItemUpdateContentResponse, error) {
 	var err error
 
 	version, _ := strconv.Atoi(cr.Version)
 
-	kItemContent, err := dao.Engine.GetKnowledgeItemContentByVersion(kItemID, uint64(version))
+	kItemContent, err := svc.dao.GetKnowledgeItemContentByVersion(kItemID, uint64(version))
 	if err != nil {
 		return nil, err
 	}
@@ -247,7 +246,7 @@ func UpdateKnowledgeItemContent(cr *KnowledgeItemUpdateContentRequest, kItemID u
 	case model.KnowledgeTypeNote:
 		// only one version for note; directly update
 		kItemContent.Content = cr.Content
-		err = dao.Engine.UpdateKnowledgeItemContent(kItemContent)
+		err = svc.dao.UpdateKnowledgeItemContent(kItemContent)
 		rsp.Version = kItemContent.Version
 	case model.KnowledgeTypeDoc:
 		if cr.SaveType == KnowledgeItemUpdateTypeSave {
@@ -259,25 +258,25 @@ func UpdateKnowledgeItemContent(cr *KnowledgeItemUpdateContentRequest, kItemID u
 					Status:          model.KnowledgeItemContentStatusCommon,
 					Content:         cr.Content,
 				}
-				err = dao.Engine.CreateKnowledgeItemContent(newVersionContent)
+				err = svc.dao.CreateKnowledgeItemContent(newVersionContent)
 				rsp.Version = newVersionContent.Version
 			} else if kItemContent.Status == model.KnowledgeItemContentStatusCommon {
 				// directly update
 				kItemContent.Content = cr.Content
-				err = dao.Engine.UpdateKnowledgeItemContent(kItemContent)
+				err = svc.dao.UpdateKnowledgeItemContent(kItemContent)
 				rsp.Version = kItemContent.Version
 			}
 		} else if cr.SaveType == KnowledgeItemUpdateTypePublish {
 			if kItemContent.Status == model.KnowledgeItemContentStatusCurrent {
 				// directly update
 				kItemContent.Content = cr.Content
-				err = dao.Engine.UpdateKnowledgeItemContent(kItemContent)
+				err = svc.dao.UpdateKnowledgeItemContent(kItemContent)
 				rsp.Version = kItemContent.Version
 			} else if kItemContent.Status == model.KnowledgeItemContentStatusCommon {
 				// set 1 to this version; update old version to 0
 				kItemContent.Status = model.KnowledgeItemContentStatusCurrent
 				kItemContent.Content = cr.Content
-				err = dao.Engine.ChangePublishedKnowledgeItemContent(kItemContent)
+				err = svc.dao.ChangePublishedKnowledgeItemContent(kItemContent)
 				rsp.Version = kItemContent.Version
 			}
 		}
@@ -288,21 +287,21 @@ func UpdateKnowledgeItemContent(cr *KnowledgeItemUpdateContentRequest, kItemID u
 	}
 
 	// update finished. clean cache.
-	symbol, _ := dao.Engine.GetKnowledgeItemSymbolByID(kItemID)
-	SrvEngine.CleanCacheAfterUpdateKnowledgeItemContent(symbol)
+	symbol, _ := svc.dao.GetKnowledgeItemSymbolByID(kItemID)
+	svc.CleanCacheAfterUpdateKnowledgeItemContent(symbol)
 	return rsp, nil
 }
 
 // DeleteKnowledgeItem delete knowledge item
 // Note: content will not be deleted
-func DeleteKnowledgeItem(kItemID uint64) error {
-	kItem, err := dao.Engine.GetKnowledgeItemByID(kItemID)
+func (svc *Service) DeleteKnowledgeItem(kItemID uint64) error {
+	kItem, err := svc.dao.GetKnowledgeItemByID(kItemID)
 	if err != nil {
 		return err
 	}
 
 	// check if can delete
-	hasChild, err := dao.Engine.CheckKnowledgeItemHasChildren(kItemID, kItem.KnowledgeID)
+	hasChild, err := svc.dao.CheckKnowledgeItemHasChildren(kItemID, kItem.KnowledgeID)
 	if err != nil {
 		return err
 	}
@@ -311,11 +310,11 @@ func DeleteKnowledgeItem(kItemID uint64) error {
 		return errno.ErrKnowledgeItemCanNotBeDeleted
 	}
 
-	if err := dao.Engine.DeleteKnowledgeItem(kItemID); err != nil {
+	if err := svc.dao.DeleteKnowledgeItem(kItemID); err != nil {
 		return errno.New(errno.ErrDatabase, err)
 	}
 
 	// clean list cache
-	SrvEngine.CleanCacheKnowledgeItemList(kItem.KnowledgeID)
+	svc.CleanCacheKnowledgeItemList(kItem.KnowledgeID)
 	return nil
 }

@@ -14,7 +14,8 @@ import (
 func Get(c *gin.Context) {
 	termID, _ := strconv.Atoi(c.Param("id"))
 
-	term, err := service.GetTaxonomyInfo(uint64(termID))
+	svc := service.New(c.Request.Context())
+	term, err := svc.GetTaxonomyInfo(uint64(termID))
 	if err != nil {
 		api.SendResponse(c, errno.ErrTermNotFount, nil)
 		return

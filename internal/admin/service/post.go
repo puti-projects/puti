@@ -8,7 +8,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/puti-projects/puti/internal/admin/dao"
 	"github.com/puti-projects/puti/internal/model"
 	"github.com/puti-projects/puti/internal/pkg/errno"
 	"github.com/puti-projects/puti/internal/utils"
@@ -172,7 +171,7 @@ type PageDetail struct {
 }
 
 // CreateArticle create article
-func CreateArticle(r *ArticleCreateRequest, userID uint64) (*ArticleCreateResponse, error) {
+func (svc Service) CreateArticle(r *ArticleCreateRequest, userID uint64) (*ArticleCreateResponse, error) {
 	// post data
 	article := &model.Post{
 		UserID:          userID,
@@ -202,7 +201,7 @@ func CreateArticle(r *ArticleCreateRequest, userID uint64) (*ArticleCreateRespon
 		},
 	}
 
-	article, err := dao.Engine.CreateArticle(article, descriptionMeta, r.Category, r.Tag, r.Subject)
+	article, err := svc.dao.CreateArticle(article, descriptionMeta, r.Category, r.Tag, r.Subject)
 	if err != nil {
 		return nil, errno.New(errno.ErrDatabase, err)
 	}
@@ -215,7 +214,7 @@ func CreateArticle(r *ArticleCreateRequest, userID uint64) (*ArticleCreateRespon
 }
 
 // CreatePage create page
-func CreatePage(r *PageCreateRequest, userID uint64) (*PageCreateResponse, error) {
+func (svc Service) CreatePage(r *PageCreateRequest, userID uint64) (*PageCreateResponse, error) {
 	// page data
 	page := &model.Post{
 		UserID:          userID,
@@ -253,7 +252,7 @@ func CreatePage(r *PageCreateRequest, userID uint64) (*PageCreateResponse, error
 		},
 	}
 
-	page, err := dao.Engine.CreatePage(page, meta)
+	page, err := svc.dao.CreatePage(page, meta)
 	if err != nil {
 		return nil, errno.New(errno.ErrDatabase, err)
 	}
@@ -266,19 +265,19 @@ func CreatePage(r *PageCreateRequest, userID uint64) (*PageCreateResponse, error
 }
 
 // ListArticle article list
-func ListArticle(postType string, r *ArticleListRequest) ([]*PostInfo, int64, error) {
-	return ListPost(postType, r.Title, r.Page, r.Number, r.Sort, r.Status)
+func (svc Service) ListArticle(postType string, r *ArticleListRequest) ([]*PostInfo, int64, error) {
+	return svc.ListPost(postType, r.Title, r.Page, r.Number, r.Sort, r.Status)
 }
 
 // ListPage page list
-func ListPage(postType string, r *PageListRequest) ([]*PostInfo, int64, error) {
-	return ListPost(postType, r.Title, r.Page, r.Number, r.Sort, r.Status)
+func (svc Service) ListPage(postType string, r *PageListRequest) ([]*PostInfo, int64, error) {
+	return svc.ListPost(postType, r.Title, r.Page, r.Number, r.Sort, r.Status)
 }
 
 // ListPost post list
-func ListPost(postType, title string, page, number int, sort, status string) ([]*PostInfo, int64, error) {
+func (svc Service) ListPost(postType, title string, page, number int, sort, status string) ([]*PostInfo, int64, error) {
 	infos := make([]*PostInfo, 0)
-	posts, count, err := dao.Engine.ListPost(postType, title, page, number, sort, status)
+	posts, count, err := svc.dao.ListPost(postType, title, page, number, sort, status)
 	if err != nil {
 		return nil, count, err
 	}
@@ -331,20 +330,20 @@ func ListPost(postType, title string, page, number int, sort, status string) ([]
 }
 
 // CheckPageSlugExist check if page slug name exist
-func CheckPageSlugExist(pageID uint64, slug string) bool {
-	return dao.Engine.CheckPageSlugExist(pageID, slug)
+func (svc Service) CheckPageSlugExist(pageID uint64, slug string) bool {
+	return svc.dao.CheckPageSlugExist(pageID, slug)
 }
 
 // GetArticleDetail get article detail by id
-func GetArticleDetail(articleID uint64) (*ArticleDetail, error) {
+func (svc Service) GetArticleDetail(articleID uint64) (*ArticleDetail, error) {
 	// get article
-	article, err := dao.Engine.GetPostByID(articleID)
+	article, err := svc.dao.GetPostByID(articleID)
 	if err != nil {
 		return nil, err
 	}
 
 	// get extra data of article
-	articleMeta, err := dao.Engine.GetPostMetaByPostID(articleID)
+	articleMeta, err := svc.dao.GetPostMetaByPostID(articleID)
 	if err != nil {
 		return nil, err
 	}
@@ -370,7 +369,7 @@ func GetArticleDetail(articleID uint64) (*ArticleDetail, error) {
 		ArticleDetail.MetaData[meta.MetaKey] = meta.MetaValue
 	}
 	// taxonomy data
-	articleTaxonomy, err := dao.Engine.GetArticleTaxonomy(nil, articleID)
+	articleTaxonomy, err := svc.dao.GetArticleTaxonomy(nil, articleID)
 	if err != nil {
 		return nil, err
 	}
@@ -383,7 +382,7 @@ func GetArticleDetail(articleID uint64) (*ArticleDetail, error) {
 		ArticleDetail.Tag = tag
 	}
 	// subject
-	articleSubjectGroup, err := GetArticleSubejctID(articleID)
+	articleSubjectGroup, err := svc.GetArticleSubjectID(articleID)
 	if err != nil {
 		return nil, err
 	}
@@ -393,15 +392,15 @@ func GetArticleDetail(articleID uint64) (*ArticleDetail, error) {
 }
 
 // GetPageDetail get page detail by id
-func GetPageDetail(pageID uint64) (*PageDetail, error) {
+func (svc Service) GetPageDetail(pageID uint64) (*PageDetail, error) {
 	// get page
-	page, err := dao.Engine.GetPostByID(pageID)
+	page, err := svc.dao.GetPostByID(pageID)
 	if err != nil {
 		return nil, err
 	}
 
 	// get extra data of page
-	pageMeta, err := dao.Engine.GetPostMetaByPostID(pageID)
+	pageMeta, err := svc.dao.GetPostMetaByPostID(pageID)
 	if err != nil {
 		return nil, err
 	}
@@ -429,9 +428,9 @@ func GetPageDetail(pageID uint64) (*PageDetail, error) {
 
 // UpdateArticle update article
 // TODO: In this version, article meta data just update description, it should be more than one choise.
-func UpdateArticle(a *ArticleUpdateRequest) error {
+func (svc *Service) UpdateArticle(a *ArticleUpdateRequest) error {
 	// get old article data
-	article, err := dao.Engine.GetPostByID(a.ID)
+	article, err := svc.dao.GetPostByID(a.ID)
 	if err != nil {
 		return err
 	}
@@ -450,20 +449,20 @@ func UpdateArticle(a *ArticleUpdateRequest) error {
 		article.PostDate = sql.NullTime{Time: time.Now(), Valid: true}
 	}
 
-	err = dao.Engine.UpdateArticle(article, a.Description, a.Category, a.Tag, a.Subject)
+	err = svc.dao.UpdateArticle(article, a.Description, a.Category, a.Tag, a.Subject)
 	if err != nil {
 		return errno.New(errno.ErrDatabase, err)
 	}
 
 	// update finished. clean cache.a
-	SrvEngine.CleanCacheAfterEditArticle(a.ID)
+	svc.CleanCacheAfterEditArticle(a.ID)
 	return nil
 }
 
 // UpdatePage update page
-func UpdatePage(p *PageUpdateRequest) (err error) {
+func (svc *Service) UpdatePage(p *PageUpdateRequest) (err error) {
 	// get old page data
-	page, err := dao.Engine.GetPostByID(p.ID)
+	page, err := svc.dao.GetPostByID(p.ID)
 	if err != nil {
 		return err
 	}
@@ -481,20 +480,20 @@ func UpdatePage(p *PageUpdateRequest) (err error) {
 	}
 	page.ParentID = p.ParentID
 
-	err = dao.Engine.UpdatePage(page, p.Description, p.PageTemplate)
+	err = svc.dao.UpdatePage(page, p.Description, p.PageTemplate)
 	if err != nil {
 		return errno.New(errno.ErrDatabase, err)
 	}
 
 	// update finished. clean cache.
-	SrvEngine.CleanCacheAfterEditPage(p.ID)
+	svc.CleanCacheAfterEditPage(p.ID)
 	return nil
 }
 
 // DeletePost delete post by soft delete
 // Note: meta data was reserved
-func DeletePost(postType string, articleID uint64) error {
-	if err := dao.Engine.DeletePost(postType, articleID); err != nil {
+func (svc Service) DeletePost(postType string, articleID uint64) error {
+	if err := svc.dao.DeletePost(postType, articleID); err != nil {
 		return errno.New(errno.ErrDatabase, err)
 	}
 
@@ -503,8 +502,8 @@ func DeletePost(postType string, articleID uint64) error {
 
 // TrashPost put the post into the trash by "delete" button
 // The different between DeleteArticle and TrashPost is that TrashPost just set the status to deleted
-func TrashPost(postID uint64) error {
-	if err := dao.Engine.TrashPost(postID); err != nil {
+func (svc Service) TrashPost(postID uint64) error {
+	if err := svc.dao.TrashPost(postID); err != nil {
 		return errno.New(errno.ErrDatabase, err)
 	}
 
@@ -513,8 +512,8 @@ func TrashPost(postID uint64) error {
 
 // RestorePost restore the post which had been put to the trash
 // this restore action will set the post as a draft status
-func RestorePost(postID uint64) error {
-	if err := dao.Engine.RestorePost(postID); err != nil {
+func (svc Service) RestorePost(postID uint64) error {
+	if err := svc.dao.RestorePost(postID); err != nil {
 		return errno.New(errno.ErrDatabase, err)
 	}
 

@@ -21,13 +21,15 @@ func Create(c *gin.Context) {
 		return
 	}
 
+	svc := service.New(c.Request.Context())
+
 	// check params
-	if err := checkCreateParam(&r); err != nil {
+	if err := checkCreateParam(&svc, &r); err != nil {
 		api.SendResponse(c, err, nil)
 		return
 	}
 
-	rsp, err := service.CreatePage(&r, userContext.ID)
+	rsp, err := svc.CreatePage(&r, userContext.ID)
 	if err != nil {
 		api.SendResponse(c, errno.ErrPageCreateFailed, nil)
 		return
@@ -36,7 +38,7 @@ func Create(c *gin.Context) {
 	api.SendResponse(c, nil, rsp)
 }
 
-func checkCreateParam(r *service.PageCreateRequest) error {
+func checkCreateParam(svc *service.Service, r *service.PageCreateRequest) error {
 	if r.Title == "" {
 		return errno.New(errno.ErrValidation, nil).Add("Title can not be empty.")
 	}
@@ -53,7 +55,7 @@ func checkCreateParam(r *service.PageCreateRequest) error {
 		return errno.New(errno.ErrValidation, nil).Add("Status is incorrect.")
 	}
 
-	if isExist := service.CheckPageSlugExist(0, r.Slug); isExist == true {
+	if isExist := svc.CheckPageSlugExist(0, r.Slug); isExist == true {
 		return errno.New(errno.ErrSlugExist, nil)
 	}
 

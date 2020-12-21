@@ -16,7 +16,8 @@ func Login(c *gin.Context) {
 		return
 	}
 
-	token, err := service.LoginAuth(c, u.Username, u.Password)
+	svc := service.New(c.Request.Context())
+	token, err := svc.LoginAuth(c, u.Username, u.Password)
 	if err != nil {
 		api.SendResponse(c, err, nil)
 		return

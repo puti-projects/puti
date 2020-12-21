@@ -1,4 +1,4 @@
-package knowledgeItem
+package knowledgeitem
 
 import (
 	"strconv"
@@ -20,7 +20,8 @@ func Detail(c *gin.Context) {
 		return
 	}
 
-	knowledgeItem, err := service.GetKnowledgeItemInfo(kID)
+	svc := service.New(c.Request.Context())
+	knowledgeItem, err := svc.GetKnowledgeItemInfo(kID)
 	if err != nil {
 		api.SendResponse(c, errno.ErrKnowledgeItemNotFount, nil)
 		return

@@ -3,20 +3,25 @@ package cache
 import (
 	"github.com/puti-projects/puti/internal/admin/dao"
 	"github.com/puti-projects/puti/internal/pkg/config"
+	"github.com/puti-projects/puti/internal/pkg/db"
 	"github.com/puti-projects/puti/internal/pkg/logger"
 )
 
 type optionCache struct {
 	cacheBody *Cache
+	dao       *dao.Dao
 }
 
-// Options cache
-var Options = &optionCache{
-	cacheBody: GetInstance(),
-}
+// Options option instance
+var Options *optionCache
 
 // LoadOptions load default options
 func LoadOptions() error {
+	Options = &optionCache{
+		cacheBody: GetInstance(),
+		dao:       dao.New(db.Engine),
+	}
+
 	if err := getAutoLoadOptions(); err != nil {
 		return err
 	}
@@ -26,7 +31,7 @@ func LoadOptions() error {
 
 // getAutoLoadOptions get options need to load
 func getAutoLoadOptions() error {
-	options, err := dao.Engine.GetAutoLoadOptions()
+	options, err := Options.dao.GetAutoLoadOptions()
 	if err != nil {
 		return err
 	}
@@ -60,7 +65,7 @@ func (oc *optionCache) Get(optionName string) string {
 	}
 
 	// If can not find the option by name in cache, get from db
-	option, err := dao.Engine.GetOptionByName(optionName)
+	option, err := oc.dao.GetOptionByName(optionName)
 	if err != nil {
 		logger.Errorf("getting option failed. Option name: %s. %s", optionName, err)
 		return ""

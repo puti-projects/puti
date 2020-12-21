@@ -9,7 +9,8 @@ import (
 
 // List knowledge list handler
 func List(c *gin.Context) {
-	knowledgeList, err := service.GetKnowledgeList()
+	svc := service.New(c.Request.Context())
+	knowledgeList, err := svc.GetKnowledgeList()
 	if err != nil {
 		api.SendResponse(c, err, nil)
 		return

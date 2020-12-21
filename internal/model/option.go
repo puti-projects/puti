@@ -4,7 +4,7 @@ import (
 	"gorm.io/gorm"
 )
 
-// OptionModel site options
+// Option site options
 type Option struct {
 	ID          uint64 `gorm:"primaryKey;autoIncrement;column:id"`
 	OptionName  string `gorm:"column:option_name;not null"`
@@ -26,13 +26,13 @@ func (o *Option) GetByName(db *gorm.DB) error {
 	return db.Error
 }
 
-// Save savr option
+// Save save option
 func (o *Option) Save(db *gorm.DB) error {
 	return db.Save(o).Error
 }
 
-// GetAllOptions get all options by options name
-func GetAllOptions(db *gorm.DB, optionNames []string) ([]*Option, error) {
+// GetAll get all options by options name
+func (o *Option) GetAll(db *gorm.DB, optionNames []string) ([]*Option, error) {
 	options := make([]*Option, len(optionNames))
 	if err := db.Where("option_name in (?)", optionNames).Find(&options).Error; err != nil {
 		return nil, err
@@ -41,8 +41,8 @@ func GetAllOptions(db *gorm.DB, optionNames []string) ([]*Option, error) {
 	return options, nil
 }
 
-// GetAutoLoadOptions get options need autoload
-func GetAutoLoadOptions(db *gorm.DB) ([]*Option, error) {
+// GetAllAutoLoad get options need autoload
+func (o *Option) GetAllAutoLoad(db *gorm.DB) ([]*Option, error) {
 	var options []*Option
 	if err := db.Where("`autoload` = 1").Find(&options).Error; err != nil {
 		return options, err

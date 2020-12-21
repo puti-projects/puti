@@ -26,7 +26,8 @@ func Update(c *gin.Context) {
 		return
 	}
 
-	if err := service.UpdateTaxonomy(&r, termID); err != nil {
+	svc := service.New(c.Request.Context())
+	if err := svc.UpdateTaxonomy(&r, termID); err != nil {
 		api.SendResponse(c, err, nil)
 		return
 	}

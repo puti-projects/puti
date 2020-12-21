@@ -5,7 +5,6 @@ import (
 	"strconv"
 	"sync"
 
-	"github.com/puti-projects/puti/internal/admin/dao"
 	"github.com/puti-projects/puti/internal/model"
 	"github.com/puti-projects/puti/internal/pkg/config"
 	"github.com/puti-projects/puti/internal/pkg/errno"
@@ -15,7 +14,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// ListRequest is the user list request struct
+// UserListRequest is the user list request struct
 type UserListRequest struct {
 	Username string `form:"username"`
 	Number   int    `form:"number"`
@@ -24,7 +23,7 @@ type UserListRequest struct {
 	Role     string `form:"role"`
 }
 
-// ListResponse is the use list response struct
+// UserListResponse is the use list response struct
 type UserListResponse struct {
 	TotalCount int64       `json:"totalCount"`
 	UserList   []*UserInfo `json:"userList"`
@@ -33,7 +32,7 @@ type UserListResponse struct {
 // UserInfo is the user struct for user list
 type UserInfo struct {
 	ID             uint64 `json:"id"`
-	Accout         string `json:"account"`
+	Account        string `json:"account"`
 	Nickname       string `json:"nickname"`
 	Email          string `json:"email"`
 	Avatar         string `json:"avatar"`
@@ -44,7 +43,7 @@ type UserInfo struct {
 	DeletedTime    string `json:"deleted_time"`
 }
 
-// CreateRequest is the create user request params struct
+// UserCreateRequest is the create user request params struct
 type UserCreateRequest struct {
 	Account       string `form:"account"`
 	Nickname      string `form:"nickname"`
@@ -55,21 +54,21 @@ type UserCreateRequest struct {
 	Website       string `form:"website"`
 }
 
-// CreateResponse is the create user request's response struct
+// UserCreateResponse is the create user request's response struct
 type UserCreateResponse struct {
 	Account  string
 	Nickname string
 }
 
 // GetUser get userInfo by username(account)
-func GetUser(username string) (*UserInfo, error) {
-	u, err := dao.Engine.GetUser(username)
+func (svc Service) GetUser(username string) (*UserInfo, error) {
+	u, err := svc.dao.GetUser(username)
 	if err != nil {
 		return nil, err
 	}
 	userInfo := &UserInfo{
 		ID:             u.ID,
-		Accout:         u.Username,
+		Account:        u.Username,
 		Nickname:       u.Nickname,
 		Email:          u.Email,
 		Avatar:         u.Avatar,
@@ -84,13 +83,13 @@ func GetUser(username string) (*UserInfo, error) {
 }
 
 // GetUserByToken get userInfo by token(JWT)
-func GetUserByToken(t string) (*UserInfo, error) {
+func (svc Service) GetUserByToken(t string) (*UserInfo, error) {
 	userContext, err := token.ParseToken(t)
 	if err != nil {
 		return nil, err
 	}
 
-	userInfo, err := GetUser(userContext.Username)
+	userInfo, err := svc.GetUser(userContext.Username)
 	if err != nil {
 		return nil, err
 	}
@@ -105,9 +104,9 @@ type UserList struct {
 }
 
 // ListUser show the user list in page
-func ListUser(username, role string, number, page, status int) ([]*UserInfo, int64, error) {
+func (svc Service) ListUser(username, role string, number, page, status int) ([]*UserInfo, int64, error) {
 	// get user list
-	users, count, err := dao.Engine.ListUser(username, role, number, page, status)
+	users, count, err := svc.dao.ListUser(username, role, number, page, status)
 	if err != nil {
 		return nil, count, err
 	}
@@ -136,7 +135,7 @@ func ListUser(username, role string, number, page, status int) ([]*UserInfo, int
 			defer userList.Lock.Unlock()
 			userList.IDMap[u.ID] = &UserInfo{
 				ID:             u.ID,
-				Accout:         u.Username,
+				Account:        u.Username,
 				Nickname:       u.Nickname,
 				Email:          u.Email,
 				Status:         u.Status,
@@ -163,7 +162,7 @@ func ListUser(username, role string, number, page, status int) ([]*UserInfo, int
 }
 
 // CreateUser create a new user
-func CreateUser(u *UserCreateRequest) (string, string, error) {
+func (svc Service) CreateUser(u *UserCreateRequest) (string, string, error) {
 	if "" == u.Nickname {
 		u.Nickname = u.Account
 	}
@@ -178,14 +177,14 @@ func CreateUser(u *UserCreateRequest) (string, string, error) {
 		Roles:    u.Role,
 	}
 
-	if err := dao.Engine.CreateUser(user); err != nil {
+	if err := svc.dao.CreateUser(user); err != nil {
 		return "", "", err
 	}
 
 	return user.Username, user.Nickname, nil
 }
 
-// UpdateRequest is the update user request params struct
+// UserUpdateRequest is the update user request params struct
 type UserUpdateRequest struct {
 	ID       uint64 `json:"id"`
 	Nickname string `json:"nickname"`
@@ -194,13 +193,13 @@ type UserUpdateRequest struct {
 	Website  string `json:"website"`
 }
 
-// UpdateStatusRequest only use for update user status
+// UserUpdateStatusRequest only use for update user status
 type UserUpdateStatusRequest struct {
 	ID     uint64 `json:"id"`
 	Status int    `json:"status" binding:"required"`
 }
 
-// UpdatePasswordRequest user for reset user's password during the profile page
+// UserUpdatePasswordRequest user for reset user's password during the profile page
 type UserUpdatePasswordRequest struct {
 	ID            uint64 `json:"id"`
 	Password      string `json:"password" binding:"required"`
@@ -208,8 +207,8 @@ type UserUpdatePasswordRequest struct {
 }
 
 // UpdateUser update user info by id
-func UpdateUser(u *UserUpdateRequest, userID int) error {
-	err := dao.Engine.UpdateUser(uint64(userID), u.Nickname, u.Email, u.Website, u.Role)
+func (svc Service) UpdateUser(u *UserUpdateRequest, userID int) error {
+	err := svc.dao.UpdateUser(uint64(userID), u.Nickname, u.Email, u.Website, u.Role)
 	if err != nil {
 		return errno.New(errno.ErrDatabase, err)
 	}
@@ -218,8 +217,8 @@ func UpdateUser(u *UserUpdateRequest, userID int) error {
 }
 
 // UpdateUserStatus update user status
-func UpdateUserStatus(u *UserUpdateStatusRequest, userID int) error {
-	err := dao.Engine.UpdateUserStatus(uint64(userID), u.Status)
+func (svc Service) UpdateUserStatus(u *UserUpdateStatusRequest, userID int) error {
+	err := svc.dao.UpdateUserStatus(uint64(userID), u.Status)
 	if err != nil {
 		return errno.New(errno.ErrDatabase, err)
 	}
@@ -228,8 +227,8 @@ func UpdateUserStatus(u *UserUpdateStatusRequest, userID int) error {
 }
 
 // UpdateUserPassword just reset user's password
-func UpdateUserPassword(u *UserUpdatePasswordRequest, userID int) error {
-	err := dao.Engine.UpdateUserPassword(uint64(userID), u.Password)
+func (svc Service) UpdateUserPassword(u *UserUpdatePasswordRequest, userID int) error {
+	err := svc.dao.UpdateUserPassword(uint64(userID), u.Password)
 	if err != nil {
 		return errno.New(errno.ErrDatabase, err)
 	}
@@ -238,7 +237,7 @@ func UpdateUserPassword(u *UserUpdatePasswordRequest, userID int) error {
 }
 
 // UpdateUserAvatar update user avatar
-func UpdateUserAvatar(c *gin.Context, userID string, file *multipart.FileHeader) error {
+func (svc Service) UpdateUserAvatar(c *gin.Context, userID string, file *multipart.FileHeader) error {
 	fileExt := utils.GetFileExt(file)
 	newFileName := "user_" + userID + fileExt
 
@@ -255,7 +254,7 @@ func UpdateUserAvatar(c *gin.Context, userID string, file *multipart.FileHeader)
 		return errno.New(errno.ErrSaveAvatar, err)
 	}
 
-	err = dao.Engine.UpdateUserAvatar(uint64(ID), pathName)
+	err = svc.dao.UpdateUserAvatar(uint64(ID), pathName)
 	if err != nil {
 		return errno.New(errno.ErrDatabase, err)
 	}
@@ -264,8 +263,8 @@ func UpdateUserAvatar(c *gin.Context, userID string, file *multipart.FileHeader)
 }
 
 // DeleteUser delete user by ID
-func DeleteUser(userID int) error {
-	err := dao.Engine.DeleteUser(uint64(userID))
+func (svc Service) DeleteUser(userID int) error {
+	err := svc.dao.DeleteUser(uint64(userID))
 	if err != nil {
 		return errno.New(errno.ErrDatabase, err)
 	}

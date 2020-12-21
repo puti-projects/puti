@@ -7,7 +7,7 @@ import (
 	"github.com/puti-projects/puti/internal/pkg/db"
 )
 
-// KnowledgeResult
+// KnowledgeResult knowledge info for list
 type KnowledgeResult struct {
 	ID            uint64
 	Name          string
@@ -19,9 +19,9 @@ type KnowledgeResult struct {
 }
 
 // GetKnowledgeList get knowledge list
-func GetKnowledgeList() ([]*KnowledgeResult, error) {
+func (d *Dao) GetKnowledgeList() ([]*KnowledgeResult, error) {
 	var result []*KnowledgeResult
-	if err := db.Engine.Model(&model.Knowledge{}).
+	if err := d.db.Model(&model.Knowledge{}).
 		Select("pt_knowledge.`id`, pt_knowledge.`name`, pt_knowledge.`slug`, pt_knowledge.`type`, pt_knowledge.`description`," +
 			"pt_knowledge.`updated_time`, pt_resource.`guid` as cover_image_url").
 		Joins("LEFT JOIN pt_resource ON pt_resource.id = pt_knowledge.`cover_image`").
@@ -33,7 +33,7 @@ func GetKnowledgeList() ([]*KnowledgeResult, error) {
 	return result, nil
 }
 
-// KnowledgeItemResult
+// KnowledgeItemResult knowledge info for item
 type KnowledgeItemResult struct {
 	ID             uint64
 	Symbol         uint64
@@ -45,7 +45,7 @@ type KnowledgeItemResult struct {
 }
 
 // GetKnowledgeItemList get knowledge item list
-func GetKnowledgeItemList(knowledgeID uint64) ([]*KnowledgeItemResult, error) {
+func (d *Dao) GetKnowledgeItemList(knowledgeID uint64) ([]*KnowledgeItemResult, error) {
 	var result []*KnowledgeItemResult
 	if err := db.Engine.Model(&model.KnowledgeItem{}).
 		Select("`id`, `symbol`, `title`, `content_version`, `parent_id`, `level`, `index`").
@@ -58,7 +58,7 @@ func GetKnowledgeItemList(knowledgeID uint64) ([]*KnowledgeItemResult, error) {
 }
 
 // GetKnowledgeBySlug get knowledge by knowledge slug and type
-func GetKnowledgeBySlug(kType, kSlug string) (*model.Knowledge, error) {
+func (d *Dao) GetKnowledgeBySlug(kType, kSlug string) (*model.Knowledge, error) {
 	k := &model.Knowledge{}
 	if err := db.Engine.Model(&model.Knowledge{}).Where("`slug` = ? AND `type` = ?", kSlug, kType).First(k).
 		Error; err != nil {
@@ -67,7 +67,7 @@ func GetKnowledgeBySlug(kType, kSlug string) (*model.Knowledge, error) {
 	return k, nil
 }
 
-// KnowledgeItemContentResult
+// KnowledgeItemContentResult knowledge content
 type KnowledgeItemContentResult struct {
 	Symbol  uint64
 	Title   string
@@ -75,7 +75,7 @@ type KnowledgeItemContentResult struct {
 }
 
 // GetKnowledgeItemContentBySymbol get knowledge item content by knowledge item symbol
-func GetKnowledgeItemContentBySymbol(kiSymbol string) (*KnowledgeItemContentResult, error) {
+func (d *Dao) GetKnowledgeItemContentBySymbol(kiSymbol string) (*KnowledgeItemContentResult, error) {
 	result := &KnowledgeItemContentResult{}
 	if err := db.Engine.Model(&model.KnowledgeItem{}).
 		Select("pt_knowledge_item.`symbol`, pt_knowledge_item.`title`, pt_knowledge_item_content.`content`").

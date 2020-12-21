@@ -15,7 +15,8 @@ func Detail(c *gin.Context) {
 	ID := c.Param("id")
 	subjectID, _ := strconv.Atoi(ID)
 
-	subject, err := service.GetSubjectInfo(uint64(subjectID))
+	svc := service.New(c.Request.Context())
+	subject, err := svc.GetSubjectInfo(uint64(subjectID))
 	if err != nil {
 		api.SendResponse(c, errno.ErrSubjectNotFount, nil)
 		return

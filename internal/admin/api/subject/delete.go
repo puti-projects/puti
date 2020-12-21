@@ -15,7 +15,8 @@ func Delete(c *gin.Context) {
 	ID, _ := strconv.Atoi(c.Param("id"))
 	subjectID := uint64(ID)
 
-	if err := service.DeleteSubject(subjectID); err != nil {
+	svc := service.New(c.Request.Context())
+	if err := svc.DeleteSubject(subjectID); err != nil {
 		api.SendResponse(c, errno.ErrDatabase, nil)
 		return
 	}

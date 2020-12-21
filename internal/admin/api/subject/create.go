@@ -16,13 +16,15 @@ func Create(c *gin.Context) {
 		return
 	}
 
+	svc := service.New(c.Request.Context())
+
 	// check params
-	if err := checkCreateParam(&r); err != nil {
+	if err := checkCreateParam(&svc, &r); err != nil {
 		api.SendResponse(c, err, nil)
 		return
 	}
 
-	if err := service.CreateSubject(&r); err != nil {
+	if err := svc.CreateSubject(&r); err != nil {
 		api.SendResponse(c, err, nil)
 		return
 	}
@@ -30,7 +32,7 @@ func Create(c *gin.Context) {
 	api.SendResponse(c, nil, nil)
 }
 
-func checkCreateParam(r *service.SubjectCreateRequest) error {
+func checkCreateParam(svc *service.Service, r *service.SubjectCreateRequest) error {
 	if r.Name == "" {
 		return errno.New(errno.ErrValidation, nil).Add("name is empty.")
 	}
@@ -39,7 +41,7 @@ func checkCreateParam(r *service.SubjectCreateRequest) error {
 		r.Slug = r.Name
 	}
 
-	if ifExist := service.CheckSubjectNameExist(0, r.Name); ifExist == true {
+	if ifExist := svc.CheckSubjectNameExist(0, r.Name); ifExist == true {
 		return errno.New(errno.ErrTaxonomyNameExist, nil).Add(r.Name)
 	}
 

@@ -10,7 +10,9 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/puti-projects/puti/internal/admin/dao"
+	"github.com/puti-projects/puti/internal/web/service"
+
+	"github.com/gin-gonic/gin"
 	"github.com/puti-projects/puti/internal/pkg/cache"
 	"github.com/puti-projects/puti/internal/pkg/config"
 	"github.com/puti-projects/puti/internal/pkg/counter"
@@ -19,8 +21,6 @@ import (
 	"github.com/puti-projects/puti/internal/pkg/theme"
 	v "github.com/puti-projects/puti/internal/pkg/version"
 	"github.com/puti-projects/puti/internal/routers"
-
-	"github.com/gin-gonic/gin"
 	"github.com/spf13/pflag"
 	"go.uber.org/zap"
 	"golang.org/x/crypto/acme/autocert"
@@ -63,8 +63,6 @@ func init() {
 	if err != nil {
 		logger.Panicf("database connection failed. error(%v)", err)
 	}
-	// if init db without problem, set up dao engine
-	dao.NewDaoEngine()
 
 	// load theme path
 	theme.LoadInstalled()
@@ -83,6 +81,12 @@ func main() {
 		logger.Panicf("load options failed, %v", err)
 	}
 	logger.Info("options has been deployed successfully")
+
+	// new service engine for frontend as a global engine
+	if err := service.NewServiceEngine(); err != nil {
+		logger.Panicf("new service engine failed, %v", err)
+	}
+	logger.Info("new service engine successfully")
 
 	// routers
 	router := routers.NewRouter(config.Server.Runmode)

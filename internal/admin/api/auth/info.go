@@ -12,7 +12,8 @@ import (
 func Info(c *gin.Context) {
 	t := c.Query("token")
 
-	user, err := service.GetUserByToken(t)
+	svc := service.New(c.Request.Context())
+	user, err := svc.GetUserByToken(t)
 	if err != nil {
 		api.SendResponse(c, errno.ErrUserNotFound, nil)
 		return

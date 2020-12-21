@@ -16,13 +16,14 @@ func Create(c *gin.Context) {
 		return
 	}
 
+	svc := service.New(c.Request.Context())
 	// check params
-	if err := checkCreateParam(&r); err != nil {
+	if err := checkCreateParam(&svc, &r); err != nil {
 		api.SendResponse(c, err, nil)
 		return
 	}
 
-	if err := service.CreateKnowledge(&r); err != nil {
+	if err := svc.CreateKnowledge(&r); err != nil {
 		api.SendResponse(c, err, nil)
 		return
 	}
@@ -30,8 +31,8 @@ func Create(c *gin.Context) {
 	api.SendResponse(c, nil, nil)
 }
 
-func checkCreateParam(r *service.KnowledgeCreateRequest) error {
-	if !service.CheckKnowledgeType(r.Type) {
+func checkCreateParam(svc *service.Service, r *service.KnowledgeCreateRequest) error {
+	if !svc.CheckKnowledgeType(r.Type) {
 		return errno.New(errno.ErrKnowledgeType, nil)
 	}
 

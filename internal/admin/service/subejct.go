@@ -3,7 +3,6 @@ package service
 import (
 	"errors"
 
-	"github.com/puti-projects/puti/internal/admin/dao"
 	"github.com/puti-projects/puti/internal/model"
 	"github.com/puti-projects/puti/internal/pkg/errno"
 	"github.com/puti-projects/puti/internal/utils"
@@ -55,7 +54,7 @@ type SubjectDetail struct {
 }
 
 // CreateSubject create a subject
-func CreateSubject(r *SubjectCreateRequest) error {
+func (svc Service) CreateSubject(r *SubjectCreateRequest) error {
 	s := &model.Subject{
 		ParentID:    r.ParentID,
 		Name:        r.Name,
@@ -64,7 +63,7 @@ func CreateSubject(r *SubjectCreateRequest) error {
 		CoverImage:  r.CoverImage,
 	}
 
-	if err := dao.Engine.CreateSubject(s); err != nil {
+	if err := svc.dao.CreateSubject(s); err != nil {
 		return errno.New(errno.ErrDatabase, err)
 	}
 
@@ -72,13 +71,13 @@ func CreateSubject(r *SubjectCreateRequest) error {
 }
 
 // CheckSubjectNameExist check the subject name
-func CheckSubjectNameExist(subjectID uint64, name string) bool {
-	return dao.Engine.CheckSubjectNameExist(subjectID, name)
+func (svc Service) CheckSubjectNameExist(subjectID uint64, name string) bool {
+	return svc.dao.CheckSubjectNameExist(subjectID, name)
 }
 
 // GetSubjectList get subject list by tree struct
-func GetSubjectList() ([]*SubjectTreeNode, error) {
-	subjects, err := dao.Engine.GetAllSubjects()
+func (svc Service) GetSubjectList() ([]*SubjectTreeNode, error) {
+	subjects, err := svc.dao.GetAllSubjects()
 	if err != nil {
 		return nil, errno.New(errno.ErrDatabase, err)
 	}
@@ -117,8 +116,8 @@ func getSubjectTree(subjects []*model.Subject, pid uint64) []*SubjectTreeNode {
 }
 
 // GetSubjectInfo get subject detail by id
-func GetSubjectInfo(subjectID uint64) (*SubjectDetail, error) {
-	s, err := dao.Engine.GetSubjectByID(subjectID)
+func (svc Service) GetSubjectInfo(subjectID uint64) (*SubjectDetail, error) {
+	s, err := svc.dao.GetSubjectByID(subjectID)
 	if err != nil {
 		return nil, err
 	}
@@ -126,7 +125,7 @@ func GetSubjectInfo(subjectID uint64) (*SubjectDetail, error) {
 	var coverImageStatus string
 	var coverImageURL string
 	if s.CoverImage != 0 {
-		m, err := GetMediaByID(s.CoverImage)
+		m, err := svc.GetMediaByID(s.CoverImage)
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			coverImageStatus = "关联封面图不存在，可能已被删除。"
 		}
@@ -147,8 +146,8 @@ func GetSubjectInfo(subjectID uint64) (*SubjectDetail, error) {
 	return subjectInfo, nil
 }
 
-// UpdateSubject udpate subject info
-func UpdateSubject(r *SubjectUpdateRequest) error {
+// UpdateSubject update subject info
+func (svc Service) UpdateSubject(r *SubjectUpdateRequest) error {
 	subject := &model.Subject{
 		Model: model.Model{ID: r.ID},
 
@@ -159,16 +158,16 @@ func UpdateSubject(r *SubjectUpdateRequest) error {
 		CoverImage:  r.CoverImage,
 	}
 
-	if err := dao.Engine.UpdateSubject(subject); err != nil {
+	if err := svc.dao.UpdateSubject(subject); err != nil {
 		return errno.New(errno.ErrDatabase, err)
 	}
 
 	return nil
 }
 
-// GetArticleSubejct get article's subject by article id
-func GetArticleSubejctID(articleID uint64) ([]uint64, error) {
-	subjectRelation, err := dao.Engine.GetArticleSubjectByArticleID(articleID)
+// GetArticleSubjectID get article's subject by article id
+func (svc Service) GetArticleSubjectID(articleID uint64) ([]uint64, error) {
+	subjectRelation, err := svc.dao.GetArticleSubjectByArticleID(articleID)
 	if err != nil {
 		return nil, err
 	}
@@ -181,9 +180,9 @@ func GetArticleSubejctID(articleID uint64) ([]uint64, error) {
 	return articleSubject, nil
 }
 
-// checkIfSubjecCanDelete check the subject has children or not
-func checkIfSubjecCanDelete(subjectID uint64) error {
-	if ifHasChild := dao.Engine.IfSubjectHasChild(subjectID); ifHasChild == true {
+// checkIfSubjectCanDelete check the subject has children or not
+func (svc Service) checkIfSubjectCanDelete(subjectID uint64) error {
+	if ifHasChild := svc.dao.IfSubjectHasChild(subjectID); ifHasChild == true {
 		return errno.New(errno.ErrValidation, nil).Add("subject has children and can not be deleted")
 	}
 
@@ -191,13 +190,13 @@ func checkIfSubjecCanDelete(subjectID uint64) error {
 }
 
 // DeleteSubject delete subject directly
-func DeleteSubject(subjectID uint64) error {
+func (svc Service) DeleteSubject(subjectID uint64) error {
 	// check
-	if err := checkIfSubjecCanDelete(subjectID); err != nil {
+	if err := svc.checkIfSubjectCanDelete(subjectID); err != nil {
 		return err
 	}
 
-	if err := dao.Engine.DeleteSubject(subjectID); err != nil {
+	if err := svc.dao.DeleteSubject(subjectID); err != nil {
 		return errno.New(errno.ErrDatabase, err)
 	}
 

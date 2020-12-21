@@ -15,14 +15,15 @@ func Update(c *gin.Context) {
 		return
 	}
 
+	svc := service.New(c.Request.Context())
 	// check params
-	if err := checkUpdateParam(&r); err != nil {
+	if err := checkUpdateParam(&svc, &r); err != nil {
 		api.SendResponse(c, err, nil)
 		return
 	}
 
 	// Update changed fields.
-	if err := service.UpdateKnowledge(&r); err != nil {
+	if err := svc.UpdateKnowledge(&r); err != nil {
 		api.SendResponse(c, err, nil)
 		return
 	}
@@ -30,8 +31,8 @@ func Update(c *gin.Context) {
 	api.SendResponse(c, nil, nil)
 }
 
-func checkUpdateParam(r *service.KnowledgeUpdateRequest) error {
-	if !service.CheckKnowledgeType(r.Type) {
+func checkUpdateParam(svc *service.Service, r *service.KnowledgeUpdateRequest) error {
+	if !svc.CheckKnowledgeType(r.Type) {
 		return errno.New(errno.ErrKnowledgeType, nil)
 	}
 

@@ -24,24 +24,26 @@ func Update(c *gin.Context) {
 
 	pageID := uint64(ID)
 
+	svc := service.New(c.Request.Context())
+
 	// check params
-	if err := checkUpdateParam(&r, pageID); err != nil {
+	if err := checkUpdateParam(&svc, &r, pageID); err != nil {
 		api.SendResponse(c, err, nil)
 		return
 	}
 
 	if r.Status == "deleted" {
-		if err := service.TrashPost(pageID); err != nil {
+		if err := svc.TrashPost(pageID); err != nil {
 			api.SendResponse(c, err, nil)
 			return
 		}
 	} else if r.Status == "restore" {
-		if err := service.RestorePost(pageID); err != nil {
+		if err := svc.RestorePost(pageID); err != nil {
 			api.SendResponse(c, err, nil)
 			return
 		}
 	} else {
-		if err := service.UpdatePage(&r); err != nil {
+		if err := svc.UpdatePage(&r); err != nil {
 			api.SendResponse(c, err, nil)
 			return
 		}
@@ -51,7 +53,7 @@ func Update(c *gin.Context) {
 	return
 }
 
-func checkUpdateParam(r *service.PageUpdateRequest, pageID uint64) error {
+func checkUpdateParam(svc *service.Service, r *service.PageUpdateRequest, pageID uint64) error {
 	if r.ID == 0 {
 		return errno.New(errno.ErrValidation, nil).Add("need id.")
 	}
@@ -69,7 +71,7 @@ func checkUpdateParam(r *service.PageUpdateRequest, pageID uint64) error {
 	}
 
 	if r.Status == "publish" || r.Status == "draft" {
-		if isExist := service.CheckPageSlugExist(r.ID, r.Slug); isExist == true {
+		if isExist := svc.CheckPageSlugExist(r.ID, r.Slug); isExist == true {
 			return errno.New(errno.ErrSlugExist, nil)
 		}
 	}

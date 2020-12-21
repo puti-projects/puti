@@ -47,10 +47,12 @@ func (d *Dao) GetOptionByName(optionName string) (*model.Option, error) {
 
 // GetAllOptions get all options by options name
 func (d *Dao) GetAllOptions(optionNames []string) ([]*model.Option, error) {
-	return model.GetAllOptions(d.db, optionNames)
+	option := &model.Option{}
+	return option.GetAll(d.db, optionNames)
 }
 
 // GetAutoLoadOptions get options need autoload
 func (d *Dao) GetAutoLoadOptions() ([]*model.Option, error) {
-	return model.GetAutoLoadOptions(d.db)
+	option := &model.Option{}
+	return option.GetAllAutoLoad(d.db)
 }

@@ -20,8 +20,9 @@ func Update(c *gin.Context) {
 	var s service.UserUpdateStatusRequest
 	var p service.UserUpdatePasswordRequest
 
+	svc := service.New(c.Request.Context())
 	if err := c.ShouldBindBodyWith(&r, binding.JSON); err == nil {
-		if err := service.UpdateUser(&r, userID); err != nil {
+		if err := svc.UpdateUser(&r, userID); err != nil {
 			api.SendResponse(c, err, nil)
 			return
 		}
@@ -29,7 +30,7 @@ func Update(c *gin.Context) {
 		api.SendResponse(c, nil, nil)
 		return
 	} else if errStatus := c.ShouldBindBodyWith(&s, binding.JSON); errStatus == nil {
-		if err := service.UpdateUserStatus(&s, userID); err != nil {
+		if err := svc.UpdateUserStatus(&s, userID); err != nil {
 			api.SendResponse(c, err, nil)
 			return
 		}
@@ -43,7 +44,7 @@ func Update(c *gin.Context) {
 			return
 		}
 
-		if err := service.UpdateUserPassword(&p, userID); err != nil {
+		if err := svc.UpdateUserPassword(&p, userID); err != nil {
 			api.SendResponse(c, err, nil)
 			return
 		}

@@ -13,7 +13,8 @@ import (
 func Delete(c *gin.Context) {
 	userID, _ := strconv.Atoi(c.Param("id"))
 
-	if err := service.DeleteUser(userID); err != nil {
+	svc := service.New(c.Request.Context())
+	if err := svc.DeleteUser(userID); err != nil {
 		api.SendResponse(c, err, nil)
 		return
 	}

@@ -10,7 +10,7 @@ import (
 	"github.com/puti-projects/puti/internal/admin/api/article"
 	"github.com/puti-projects/puti/internal/admin/api/auth"
 	"github.com/puti-projects/puti/internal/admin/api/knowledge"
-	"github.com/puti-projects/puti/internal/admin/api/knowledgeItem"
+	knowledgeItem "github.com/puti-projects/puti/internal/admin/api/knowledgeitem"
 	"github.com/puti-projects/puti/internal/admin/api/media"
 	"github.com/puti-projects/puti/internal/admin/api/option"
 	"github.com/puti-projects/puti/internal/admin/api/page"
@@ -30,6 +30,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// NewRouter new router
 func NewRouter(runmode string) *gin.Engine {
 	// Set gin mode before initialize the gin router
 	if "debug" == runmode {

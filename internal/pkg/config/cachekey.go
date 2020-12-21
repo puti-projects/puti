@@ -20,5 +20,5 @@ const (
 	// CacheKnowledgeItemListPrefix key prefix for knowledge item list
 	CacheKnowledgeItemListPrefix = "PUTI_KITEM_"
 	// CacheKnowledgeItemContentPrefix key prefix for knowledge item content
-	CacheKnowledgeItemContentPrefix = "PUTI_KITEM_CONTENT"
+	CacheKnowledgeItemContentPrefix = "PUTI_KITEM_CONTENT_"
 )

@@ -1,4 +1,4 @@
-package knowledgeItem
+package knowledgeitem
 
 import (
 	"strconv"
@@ -13,7 +13,8 @@ import (
 func Delete(c *gin.Context) {
 	kItemID, _ := strconv.Atoi(c.Param("id"))
 
-	if err := service.DeleteKnowledgeItem(uint64(kItemID)); err != nil {
+	svc := service.New(c.Request.Context())
+	if err := svc.DeleteKnowledgeItem(uint64(kItemID)); err != nil {
 		api.SendResponse(c, err, nil)
 		return
 	}

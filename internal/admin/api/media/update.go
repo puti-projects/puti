@@ -26,7 +26,8 @@ func Update(c *gin.Context) {
 		return
 	}
 
-	if err := service.UpdateMedia(&r, userID); err != nil {
+	svc := service.New(c.Request.Context())
+	if err := svc.UpdateMedia(&r, userID); err != nil {
 		api.SendResponse(c, err, nil)
 	}
 

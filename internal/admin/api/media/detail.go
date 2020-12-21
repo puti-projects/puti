@@ -15,8 +15,9 @@ func Detail(c *gin.Context) {
 	ID := c.Param("id")
 
 	// Get media info by id
+	svc := service.New(c.Request.Context())
 	mediaID, _ := strconv.Atoi(ID)
-	media, err := service.GetMediaDetail(uint64(mediaID))
+	media, err := svc.GetMediaDetail(uint64(mediaID))
 	if err != nil {
 		api.SendResponse(c, errno.ErrMediaNotFound, nil)
 		return

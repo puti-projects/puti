@@ -10,7 +10,8 @@ import (
 
 // Dashboard get some basic statistics
 func Dashboard(c *gin.Context) {
-	data, err := service.GetDashboardStatisticsData()
+	svc := service.New(c.Request.Context())
+	data, err := svc.GetDashboardStatisticsData()
 	if err != nil {
 		api.SendResponse(c, errno.ErrDatabase, nil)
 		return

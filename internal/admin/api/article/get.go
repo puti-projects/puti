@@ -14,7 +14,8 @@ import (
 func Get(c *gin.Context) {
 	articleID, _ := strconv.Atoi(c.Param("id"))
 
-	article, err := service.GetArticleDetail(uint64(articleID))
+	svc := service.New(c.Request.Context())
+	article, err := svc.GetArticleDetail(uint64(articleID))
 	if err != nil {
 		api.SendResponse(c, errno.ErrArticleNotFount, nil)
 		return

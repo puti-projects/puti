@@ -8,7 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// Create create term txonomy handler
+// Create create term taxonomy handler
 func Create(c *gin.Context) {
 	var r service.TaxonomyCreateRequest
 	if err := c.Bind(&r); err != nil {
@@ -16,20 +16,21 @@ func Create(c *gin.Context) {
 		return
 	}
 
+	svc := service.New(c.Request.Context())
 	// check params
-	if err := checkCreateParam(&r); err != nil {
+	if err := checkCreateParam(&r, &svc); err != nil {
 		api.SendResponse(c, err, nil)
 		return
 	}
 
-	if err := service.CreateTaxonomy(&r); err != nil {
+	if err := svc.CreateTaxonomy(&r); err != nil {
 		api.SendResponse(c, err, nil)
 	}
 
 	api.SendResponse(c, nil, nil)
 }
 
-func checkCreateParam(r *service.TaxonomyCreateRequest) error {
+func checkCreateParam(r *service.TaxonomyCreateRequest, svc *service.Service) error {
 	if r.Taxonomy != "category" && r.Taxonomy != "tag" {
 		return errno.New(errno.ErrValidation, nil).Add("error taxonomy.")
 	}
@@ -38,7 +39,7 @@ func checkCreateParam(r *service.TaxonomyCreateRequest) error {
 		return errno.New(errno.ErrValidation, nil).Add("name is empty.")
 	}
 
-	if ifExist := service.CheckTaxonomyNameExist(r.Name, r.Taxonomy); ifExist == true {
+	if ifExist := svc.CheckTaxonomyNameExist(r.Name, r.Taxonomy); ifExist == true {
 		return errno.New(errno.ErrTaxonomyNameExist, nil).Add(r.Name)
 	}
 

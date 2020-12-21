@@ -22,7 +22,8 @@ func Create(c *gin.Context) {
 		return
 	}
 
-	username, nickname, err := service.CreateUser(&r)
+	svc := service.New(c.Request.Context())
+	username, nickname, err := svc.CreateUser(&r)
 	if err != nil {
 		api.SendResponse(c, err, nil)
 	}

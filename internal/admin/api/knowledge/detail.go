@@ -19,7 +19,8 @@ func Detail(c *gin.Context) {
 		api.SendResponse(c, errno.ErrValidation, nil)
 	}
 
-	knowledge, err := service.GetKnowledgeInfo(uint64(kID))
+	svc := service.New(c.Request.Context())
+	knowledge, err := svc.GetKnowledgeInfo(uint64(kID))
 	if err != nil {
 		api.SendResponse(c, errno.ErrKnowledgeNotFount, nil)
 		return

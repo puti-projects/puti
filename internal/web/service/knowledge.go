@@ -22,8 +22,8 @@ type KnowledgeList struct {
 }
 
 // GetKnowledgeList get knowledge list, include note and doc
-func GetKnowledgeList() (map[string]map[uint64]*ShowKnowledgeList, error) {
-	res, err := dao.GetKnowledgeList()
+func (svc *Engine) GetKnowledgeList() (map[string]map[uint64]*ShowKnowledgeList, error) {
+	res, err := svc.dao.GetKnowledgeList()
 	if err != nil {
 		return nil, err
 	}
@@ -79,8 +79,8 @@ func GetKnowledgeList() (map[string]map[uint64]*ShowKnowledgeList, error) {
 }
 
 // GetKnowledgeBySlug get knowledge by slug
-func GetKnowledgeBySlug(kType, kSlug string) (*ShowKnowledgeInfo, error) {
-	k, err := dao.GetKnowledgeBySlug(kType, kSlug)
+func (svc *Engine) GetKnowledgeBySlug(kType, kSlug string) (*ShowKnowledgeInfo, error) {
+	k, err := svc.dao.GetKnowledgeBySlug(kType, kSlug)
 	if err != nil {
 		return nil, err
 	}
@@ -94,18 +94,18 @@ func GetKnowledgeBySlug(kType, kSlug string) (*ShowKnowledgeInfo, error) {
 }
 
 // GetKnowledgeItemList get knowledge item list in tree
-func GetKnowledgeItemList(kType, kSlug string, kID uint64) ([]*ShowKnowledgeItemTreeNode, error) {
-	res, err := dao.GetKnowledgeItemList(kID)
+func (svc *Engine) GetKnowledgeItemList(kType, kSlug string, kID uint64) ([]*ShowKnowledgeItemTreeNode, error) {
+	res, err := svc.dao.GetKnowledgeItemList(kID)
 	if err != nil {
 		return nil, err
 	}
 
 	urlPrefix := "/knowledge/" + kType + "/" + kSlug + "/"
-	tree := generateKnowledgeItemTree(res, 0, urlPrefix)
+	tree := svc.generateKnowledgeItemTree(res, 0, urlPrefix)
 	return tree, nil
 }
 
-func generateKnowledgeItemTree(ki []*dao.KnowledgeItemResult, pid uint64, urlPrefix string) []*ShowKnowledgeItemTreeNode {
+func (svc *Engine) generateKnowledgeItemTree(ki []*dao.KnowledgeItemResult, pid uint64, urlPrefix string) []*ShowKnowledgeItemTreeNode {
 	var tree []*ShowKnowledgeItemTreeNode
 
 	for _, v := range ki {
@@ -118,7 +118,7 @@ func generateKnowledgeItemTree(ki []*dao.KnowledgeItemResult, pid uint64, urlPre
 				Level:  v.Level,
 				Index:  v.Index,
 			}
-			treeNode.Children = generateKnowledgeItemTree(ki, v.ID, urlPrefix)
+			treeNode.Children = svc.generateKnowledgeItemTree(ki, v.ID, urlPrefix)
 			tree = append(tree, &treeNode)
 		}
 	}
@@ -126,8 +126,8 @@ func generateKnowledgeItemTree(ki []*dao.KnowledgeItemResult, pid uint64, urlPre
 }
 
 // GetKnowledgeItemContentBySymbol get knowledge item content by knowledge item symbol
-func GetKnowledgeItemContentBySymbol(kiSymbol string) (*ShowKnowledgeItemContent, error) {
-	result, err := dao.GetKnowledgeItemContentBySymbol(kiSymbol)
+func (svc *Engine) GetKnowledgeItemContentBySymbol(kiSymbol string) (*ShowKnowledgeItemContent, error) {
+	result, err := svc.dao.GetKnowledgeItemContentBySymbol(kiSymbol)
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil, err
 	}

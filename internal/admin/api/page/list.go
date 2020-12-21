@@ -23,7 +23,8 @@ func List(c *gin.Context) {
 		r.Number = constvar.DefaultLimit
 	}
 
-	infos, count, err := service.ListPage("page", &r)
+	svc := service.New(c.Request.Context())
+	infos, count, err := svc.ListPage("page", &r)
 	if err != nil {
 		api.SendResponse(c, err, nil)
 		return

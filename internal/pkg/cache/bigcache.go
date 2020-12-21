@@ -1,4 +1,4 @@
-// Cache basic cache package; use allegro/bigcache
+// Package cache basic cache package; use allegro/bigcache
 package cache
 
 import (
@@ -10,14 +10,16 @@ import (
 	"github.com/allegro/bigcache"
 )
 
+// Cache cache struct
 type Cache struct {
 	*bigcache.BigCache
 }
 
-// CacheInstance
+// Instance cache instance
 var Instance *Cache
 
 // LoadCache load cache
+// will be called in main firstly
 func LoadCache() error {
 	config := bigcache.Config{
 		// number of shards (must be a power of 2)

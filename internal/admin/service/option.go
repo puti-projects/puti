@@ -3,7 +3,6 @@ package service
 import (
 	"fmt"
 
-	"github.com/puti-projects/puti/internal/admin/dao"
 	"github.com/puti-projects/puti/internal/pkg/cache"
 	"github.com/puti-projects/puti/internal/pkg/config"
 	"github.com/puti-projects/puti/internal/pkg/errno"
@@ -22,13 +21,13 @@ type OptionListResponse struct {
 	ExtraData interface{}       `json:"extraData"`
 }
 
-// OptionListTheme the list of all theme
+// ListTheme the list of all theme
 type ListTheme struct {
 	Name      string `json:"name"`
 	Thumbnail string `json:"thumbnail"`
 }
 
-// optionSettingTypeMap option setting type that support
+// OptionSettingTypeMap option setting type that support
 var OptionSettingTypeMap = []string{
 	"general",
 	"property",
@@ -98,8 +97,8 @@ var OptionNamesMap = map[string][]string{
 	},
 }
 
-// GetDefaultOptionsByType get default setting's option name
-func GetDefaultOptionNamesByType(settingType string) []string {
+// GetDefaultOptionNamesByType get default setting's option name
+func (svc Service) GetDefaultOptionNamesByType(settingType string) []string {
 	if settingType != "" {
 		if v, ok := OptionNamesMap[settingType]; ok {
 			return v
@@ -109,9 +108,9 @@ func GetDefaultOptionNamesByType(settingType string) []string {
 }
 
 // ListOption get option list by setting type
-func ListOption(settingType string) (*OptionListResponse, error) {
+func (svc Service) ListOption(settingType string) (*OptionListResponse, error) {
 	// get options list
-	options, err := GetOptionsByType(settingType)
+	options, err := svc.GetOptionsByType(settingType)
 	if err != nil {
 		return nil, errno.New(errno.ErrDatabase, err)
 	}
@@ -149,9 +148,9 @@ func generalThemeExtra() []*ListTheme {
 }
 
 // GetOptionsByType get default options by setting type
-func GetOptionsByType(settingType string) (map[string]string, error) {
-	optionNames := GetDefaultOptionNamesByType(settingType)
-	options, err := dao.Engine.GetAllOptions(optionNames)
+func (svc Service) GetOptionsByType(settingType string) (map[string]string, error) {
+	optionNames := svc.GetDefaultOptionNamesByType(settingType)
+	options, err := svc.dao.GetAllOptions(optionNames)
 	if err != nil {
 		return nil, errno.New(errno.ErrDatabase, err)
 	}
@@ -165,9 +164,9 @@ func GetOptionsByType(settingType string) (map[string]string, error) {
 }
 
 // UpdateOptions update options
-func UpdateOptions(options map[string]interface{}) error {
+func (svc Service) UpdateOptions(options map[string]interface{}) error {
 	// update options
-	if err := dao.Engine.UpdateOptions(options); err != nil {
+	if err := svc.dao.UpdateOptions(options); err != nil {
 		return errno.New(errno.ErrDatabase, err)
 	}
 

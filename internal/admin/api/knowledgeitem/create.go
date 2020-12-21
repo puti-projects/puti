@@ -1,4 +1,4 @@
-package knowledgeItem
+package knowledgeitem
 
 import (
 	"github.com/gin-gonic/gin"
@@ -30,7 +30,8 @@ func Create(c *gin.Context) {
 		return
 	}
 
-	rsp, err := service.CreateKnowledgeItem(&r, userContext.ID)
+	svc := service.New(c.Request.Context())
+	rsp, err := svc.CreateKnowledgeItem(&r, userContext.ID)
 	if err != nil {
 		api.SendResponse(c, errno.ErrKnowledgeItemCreateFailed, nil)
 		return

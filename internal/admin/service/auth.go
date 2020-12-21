@@ -1,7 +1,6 @@
 package service
 
 import (
-	"github.com/puti-projects/puti/internal/admin/dao"
 	"github.com/puti-projects/puti/internal/pkg/auth"
 	"github.com/puti-projects/puti/internal/pkg/errno"
 	"github.com/puti-projects/puti/internal/pkg/token"
@@ -22,8 +21,8 @@ type Token struct {
 }
 
 // LoginAuth user login authentication
-func LoginAuth(c *gin.Context, username string, password string) (*Token, error) {
-	u, err := dao.Engine.GetUser(username)
+func (svc *Service) LoginAuth(c *gin.Context, username string, password string) (*Token, error) {
+	u, err := svc.dao.GetUser(username)
 	if err != nil {
 		return nil, errno.New(errno.ErrUserNotFound, err)
 	}

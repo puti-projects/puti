@@ -16,7 +16,8 @@ func List(c *gin.Context) {
 		return
 	}
 
-	infos, count, err := service.ListMedia(r.Limit, r.Page)
+	svc := service.New(c.Request.Context())
+	infos, count, err := svc.ListMedia(r.Limit, r.Page)
 	if err != nil {
 		api.SendResponse(c, err, nil)
 		return

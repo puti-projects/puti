@@ -15,15 +15,16 @@ func Update(c *gin.Context) {
 		api.SendResponse(c, errno.ErrBind, nil)
 		return
 	}
+	svc := service.New(c.Request.Context())
 
 	// check params
-	if err := checkUpdateParam(&r); err != nil {
+	if err := checkUpdateParam(&svc, &r); err != nil {
 		api.SendResponse(c, err, nil)
 		return
 	}
 
 	// Update changed fields.
-	if err := service.UpdateSubject(&r); err != nil {
+	if err := svc.UpdateSubject(&r); err != nil {
 		api.SendResponse(c, err, nil)
 		return
 	}
@@ -31,7 +32,7 @@ func Update(c *gin.Context) {
 	api.SendResponse(c, nil, nil)
 }
 
-func checkUpdateParam(r *service.SubjectUpdateRequest) error {
+func checkUpdateParam(svc *service.Service, r *service.SubjectUpdateRequest) error {
 	if r.Name == "" {
 		return errno.New(errno.ErrValidation, nil).Add("name is empty.")
 	}
@@ -40,7 +41,7 @@ func checkUpdateParam(r *service.SubjectUpdateRequest) error {
 		r.Slug = r.Name
 	}
 
-	if ifExist := service.CheckSubjectNameExist(r.ID, r.Name); ifExist == true {
+	if ifExist := svc.CheckSubjectNameExist(r.ID, r.Name); ifExist == true {
 		return errno.New(errno.ErrTaxonomyNameExist, nil).Add(r.Name)
 	}
 

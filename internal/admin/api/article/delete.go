@@ -14,7 +14,8 @@ import (
 func Delete(c *gin.Context) {
 	articleID, _ := strconv.Atoi(c.Param("id"))
 
-	if err := service.DeletePost("article", uint64(articleID)); err != nil {
+	svc := service.New(c.Request.Context())
+	if err := svc.DeletePost("article", uint64(articleID)); err != nil {
 		api.SendResponse(c, errno.ErrDatabase, nil)
 		return
 	}

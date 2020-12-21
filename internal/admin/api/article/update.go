@@ -24,6 +24,7 @@ func Update(c *gin.Context) {
 
 	articleID := uint64(ID)
 
+	svc := service.New(c.Request.Context())
 	// check params
 	if err := checkUpdateParam(&r, articleID); err != nil {
 		api.SendResponse(c, err, nil)
@@ -31,17 +32,17 @@ func Update(c *gin.Context) {
 	}
 
 	if r.Status == "deleted" {
-		if err := service.TrashPost(articleID); err != nil {
+		if err := svc.TrashPost(articleID); err != nil {
 			api.SendResponse(c, err, nil)
 			return
 		}
 	} else if r.Status == "restore" {
-		if err := service.RestorePost(articleID); err != nil {
+		if err := svc.RestorePost(articleID); err != nil {
 			api.SendResponse(c, err, nil)
 			return
 		}
 	} else {
-		if err := service.UpdateArticle(&r); err != nil {
+		if err := svc.UpdateArticle(&r); err != nil {
 			api.SendResponse(c, err, nil)
 			return
 		}

@@ -32,12 +32,13 @@ type KnowledgeUpdateRequest struct {
 	CoverImage  uint64 `json:"cover_image"`
 }
 
+// KnowledgeList knowledge list
 type KnowledgeList struct {
 	Lock    *sync.Mutex
 	TypeMap map[string][]*KnowledgeInfo
 }
 
-// KnowledgeList struct of knowledge list for output
+// KnowledgeInfo struct of knowledge list for output
 type KnowledgeInfo struct {
 	ID             uint64 `json:"id"`
 	Name           string `json:"name"`
@@ -51,7 +52,7 @@ type KnowledgeInfo struct {
 }
 
 // CheckKnowledgeType check knowledge type
-func CheckKnowledgeType(knowledgeType string) bool {
+func (svc *Service) CheckKnowledgeType(knowledgeType string) bool {
 	if knowledgeType != model.KnowledgeTypeDoc && knowledgeType != model.KnowledgeTypeNote {
 		return false
 	}
@@ -60,7 +61,7 @@ func CheckKnowledgeType(knowledgeType string) bool {
 }
 
 // CreateKnowledge create knowledge base
-func CreateKnowledge(r *KnowledgeCreateRequest) error {
+func (svc *Service) CreateKnowledge(r *KnowledgeCreateRequest) error {
 	k := &model.Knowledge{
 		Name:        r.Name,
 		Slug:        r.Slug,
@@ -69,7 +70,7 @@ func CreateKnowledge(r *KnowledgeCreateRequest) error {
 		CoverImage:  r.CoverImage,
 	}
 
-	if err := dao.Engine.CreateKnowledge(k); err != nil {
+	if err := svc.dao.CreateKnowledge(k); err != nil {
 		return errno.New(errno.ErrDatabase, err)
 	}
 
@@ -77,7 +78,7 @@ func CreateKnowledge(r *KnowledgeCreateRequest) error {
 }
 
 // UpdateKnowledge update knowledge base info
-func UpdateKnowledge(r *KnowledgeUpdateRequest) error {
+func (svc Service) UpdateKnowledge(r *KnowledgeUpdateRequest) error {
 	k := &model.Knowledge{
 		Model: model.Model{ID: r.ID},
 
@@ -88,18 +89,18 @@ func UpdateKnowledge(r *KnowledgeUpdateRequest) error {
 		CoverImage:  r.CoverImage,
 	}
 
-	if err := dao.Engine.UpdateKnowledge(k); err != nil {
+	if err := svc.dao.UpdateKnowledge(k); err != nil {
 		return errno.New(errno.ErrDatabase, err)
 	}
 
 	// update finished. clean cache.
-	SrvEngine.CleanCacheAfterUpdateKnowledge(k.Slug)
+	svc.CleanCacheAfterUpdateKnowledge(k.Slug)
 	return nil
 }
 
 // GetKnowledgeList get knowledge base list
-func GetKnowledgeList() (map[string][]*KnowledgeInfo, error) {
-	ks, err := dao.Engine.GetAllKnowledgeList()
+func (svc *Service) GetKnowledgeList() (map[string][]*KnowledgeInfo, error) {
+	ks, err := svc.dao.GetAllKnowledgeList()
 	if err != nil {
 		return nil, errno.New(errno.ErrDatabase, err)
 	}
@@ -144,8 +145,8 @@ func GetKnowledgeList() (map[string][]*KnowledgeInfo, error) {
 }
 
 // GetKnowledgeInfo get knowledge info by knowledge ID
-func GetKnowledgeInfo(kID uint64) (*KnowledgeInfo, error) {
-	k, err := dao.Engine.GetKnowledgeByID(kID)
+func (svc *Service) GetKnowledgeInfo(kID uint64) (*KnowledgeInfo, error) {
+	k, err := svc.dao.GetKnowledgeByID(kID)
 	if err != nil {
 		return nil, err
 	}
@@ -153,7 +154,7 @@ func GetKnowledgeInfo(kID uint64) (*KnowledgeInfo, error) {
 	var coverImageID uint64
 	var coverImageName, coverImageURL string
 	if k.CoverImage != 0 {
-		m, err := GetMediaByID(k.CoverImage)
+		m, err := svc.GetMediaByID(k.CoverImage)
 		if err != nil && errors.Is(err, gorm.ErrRecordNotFound) {
 			coverImageName = "Unknown File"
 		}

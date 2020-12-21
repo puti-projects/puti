@@ -12,7 +12,8 @@ func Avatar(c *gin.Context) {
 	userID := c.PostForm("userId")
 	file, _ := c.FormFile("img")
 
-	if err := service.UpdateUserAvatar(c, userID, file); err != nil {
+	svc := service.New(c.Request.Context())
+	if err := svc.UpdateUserAvatar(c, userID, file); err != nil {
 		api.SendResponse(c, err, nil)
 		return
 	}

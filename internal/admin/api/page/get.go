@@ -14,7 +14,8 @@ import (
 func Get(c *gin.Context) {
 	paegID, _ := strconv.Atoi(c.Param("id"))
 
-	page, err := service.GetPageDetail(uint64(paegID))
+	svc := service.New(c.Request.Context())
+	page, err := svc.GetPageDetail(uint64(paegID))
 	if err != nil {
 		api.SendResponse(c, errno.ErrPageNotFount, nil)
 		return

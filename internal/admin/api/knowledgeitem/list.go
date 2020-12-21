@@ -1,9 +1,10 @@
-package knowledgeItem
+package knowledgeitem
 
 import (
+	"strconv"
+
 	"github.com/puti-projects/puti/internal/admin/api"
 	"github.com/puti-projects/puti/internal/admin/service"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -13,7 +14,8 @@ func List(c *gin.Context) {
 	ID := c.Param("id")
 	kID, _ := strconv.Atoi(ID)
 
-	knowledgeItemList, err := service.GetKnowledgeItemList(kID)
+	svc := service.New(c.Request.Context())
+	knowledgeItemList, err := svc.GetKnowledgeItemList(kID)
 	if err != nil {
 		api.SendResponse(c, err, nil)
 		return
