@@ -200,6 +200,11 @@ Detailed changes for each release are documented in the [changelog file]((https:
 
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
+## 感谢
+Thanks to JetBrains for providing free Goland IDE based on JetBrains OS licenses.
+
+[![goland](./docs/images/icon-goland.svg)](https://www.jetbrains.com/?from=puti)
+
 ## License 
 
 Puti is under the GPL-3.0 license. See the [LICENSE](https://github.com/puti-projects/puti/blob/master/LICENSE) file for details.

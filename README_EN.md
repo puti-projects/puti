@@ -204,6 +204,12 @@ It is not necessary to use a WebServer such as Nginx, and supports automatic HTT
 
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
+## Thanks
+Thanks to JetBrains for providing free Goland IDE based on JetBrains OS licenses.
+
+[![goland](./docs/images/icon-goland.svg)](https://www.jetbrains.com/?from=puti)
+
+
 ## License 
 
 Puti is under the GPL-3.0 license. See the [LICENSE](https://github.com/puti-projects/puti/blob/master/LICENSE) file for details.
