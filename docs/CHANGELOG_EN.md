@@ -1,5 +1,16 @@
 # Changelog
 
+## v0.4.1 Fixed  [2021-03-23]
+
+### 功能和优化
+- Optimize Auto HTTPS and Health Check; currently, no redirection judgment is made, such as root domain name to www domain name, HTTP to HTTPS; a better practice is to add another layer of WebServer.
+- Theme supports a custom favicon.ico file now
+
+### Bug 修复
+- Fix a cache refresh problem
+
+---
+
 ## v0.4.0 Knowledge Base [2020-11-26]
 
 ### Feature and Enhancement

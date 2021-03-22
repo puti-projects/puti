@@ -10,9 +10,6 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/puti-projects/puti/internal/web/service"
-
-	"github.com/gin-gonic/gin"
 	"github.com/puti-projects/puti/internal/pkg/cache"
 	"github.com/puti-projects/puti/internal/pkg/config"
 	"github.com/puti-projects/puti/internal/pkg/counter"
@@ -21,6 +18,9 @@ import (
 	"github.com/puti-projects/puti/internal/pkg/theme"
 	v "github.com/puti-projects/puti/internal/pkg/version"
 	"github.com/puti-projects/puti/internal/routers"
+	"github.com/puti-projects/puti/internal/web/service"
+
+	"github.com/gin-gonic/gin"
 	"github.com/spf13/pflag"
 	"go.uber.org/zap"
 	"golang.org/x/crypto/acme/autocert"

@@ -32,12 +32,14 @@
 
 Puti 项目现在仍在开发中，目标是面向极客的下一代写作系统。
 
+目前在探究如何在后台管理中引入 Wasm，提高性能和开发效率（统一技术栈）。
+
 ## 环境依赖
 
 - Golang 1.13+ (Build using modules)
 - MySQL
   
-本项目使用了 Go Modules，所以建议使用 Go 1.13 以上版本；项目不依赖 Nginx 之类的 Web Server, 但是你可以配置并且使用 Nginx。
+本项目使用了 Go Modules，所以建议使用 Go 1.13 以上版本；项目不依赖 Nginx 之类的 Web Server，但是你可以配置并且使用 Nginx。
 
 ## 功能与计划
 
