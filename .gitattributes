@@ -1,3 +1,4 @@
-theme/*/public/* linguist-vendored
-assets/library/* linguist-vendored
-vendor/* linguist-vendored
+theme/* linguist-vendored
+assets/* linguist-vendored
+console/* linguist-vendored
+docs/* linguist-vendored
