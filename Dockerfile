@@ -1,7 +1,7 @@
 ############################
 # Builder image
 ############################
-ARG GOLANG_BUILDER_VERSION=1.15-alpine
+ARG GOLANG_BUILDER_VERSION=1.16-alpine
 FROM golang:${GOLANG_BUILDER_VERSION} AS builder
 
 RUN apk update && apk add --no-cache build-base git tzdata ca-certificates && update-ca-certificates
