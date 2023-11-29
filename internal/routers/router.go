@@ -33,9 +33,9 @@ import (
 // NewRouter new router
 func NewRouter(runmode string) *gin.Engine {
 	// Set gin mode before initialize the gin router
-	if "debug" == runmode {
+	if runmode == "debug" {
 		gin.SetMode(gin.DebugMode)
-	} else if "test" == runmode {
+	} else if runmode == "test" {
 		gin.SetMode(gin.TestMode)
 	} else {
 		gin.SetMode(gin.ReleaseMode)
@@ -90,6 +90,7 @@ func loadWeb(g *gin.Engine) {
 	// Group for web
 	// notice: page route is handle in NoRoute(), since the wildcard problem in root from httprouter
 	webGroup := g.Group("")
+	webGroup.Use(webMiddleware.RedirectToWWW)
 	webGroup.Use(webMiddleware.Renderer)
 	{
 		webGroup.GET("", view.ShowIndex)

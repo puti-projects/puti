@@ -20,6 +20,7 @@ import (
 	"github.com/puti-projects/puti/internal/routers"
 	"github.com/puti-projects/puti/internal/web/service"
 
+	"github.com/gin-gonic/contrib/secure"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/pflag"
 	"go.uber.org/zap"
@@ -109,7 +110,7 @@ func main() {
 func httpServe(router *gin.Engine) {
 	var srv *http.Server
 	// if open https
-	if true == config.Server.HttpsOpen {
+	if config.Server.HttpsOpen {
 		srv = httpsHandle(router)
 	} else {
 		srv = httpHandle(router)
@@ -144,13 +145,16 @@ func httpsHandle(router *gin.Engine) *http.Server {
 		Handler: router,
 	}
 
+	hostname := config.Server.PutiDomain
+
+	// serve
 	if config.Server.AutoCert {
 		// Open auto cert
 		// auto cert manager
 		m := &autocert.Manager{
-			Cache:      autocert.DirCache(config.StaticPath("configs/cert/")),
 			Prompt:     autocert.AcceptTOS,
-			HostPolicy: autocert.HostWhitelist(config.Server.PutiDomain...),
+			Cache:      autocert.DirCache(config.StaticPath("configs/cert/")),
+			HostPolicy: autocert.HostWhitelist(hostname),
 		}
 		// set auto cert config to tls config
 		srv.TLSConfig = m.TLSConfig()
@@ -166,17 +170,40 @@ func httpsHandle(router *gin.Engine) *http.Server {
 		// Listen and serve
 		serveTLS(srv, config.Server.TlsCert, config.Server.TlsKey)
 	}
+
+	// redirect http to https
+	httpToHttps(hostname)
+
 	return srv
 }
 
 // serveTLS serve https for all situation
 func serveTLS(srv *http.Server, certFile string, keyFile string) {
+	// listen and serve
 	go func() {
 		logger.Info("start to listening the incoming https requests", zap.String("port", config.Server.HttpsPort))
 		if err := srv.ListenAndServeTLS(certFile, keyFile); err != nil && err != http.ErrServerClosed {
 			logger.Fatalf("server.ListenAndServeTLS err: %v", err)
 		}
 	}()
+}
+
+// httpToHttps redirect http to https
+func httpToHttps(hostname string) {
+	r := gin.Default()
+	r.Use(secure.Secure(secure.Options{
+		AllowedHosts:          []string{hostname},
+		SSLRedirect:           true,
+		SSLHost:               hostname,
+		SSLProxyHeaders:       map[string]string{"X-Forwarded-Proto": "https"},
+		STSSeconds:            315360000,
+		STSIncludeSubdomains:  true,
+		FrameDeny:             true,
+		ContentTypeNosniff:    true,
+		BrowserXssFilter:      true,
+		ContentSecurityPolicy: "default-src 'self'",
+	}))
+	httpHandle(r)
 }
 
 // signalHandle graceful shutdown based on http.server.Shutdown
@@ -200,15 +227,18 @@ func signalHandle(srv *http.Server) {
 // pingServer pings the http server to make sure the service is working.
 func pingServer() {
 	var pingURL string
-	if true == config.Server.HttpsOpen {
+	// if open https
+	if config.Server.HttpsOpen {
 		if config.Server.AutoCert {
-			pingURL = "https://" + config.Server.PutiDomain[0] + "/check/health"
+			pingURL = "https://" + config.Server.PutiDomain + ":" + config.Server.HttpsPort
 		} else {
-			pingURL = "https://127.0.0.1:" + config.Server.HttpsPort + "/check/health"
+			pingURL = "https://127.0.0.1:" + config.Server.HttpsPort
 		}
 	} else {
-		pingURL = "http://127.0.0.1:" + config.Server.HttpPort + "/check/health"
+		pingURL = "http://127.0.0.1:" + config.Server.HttpPort
 	}
+	// health check route
+	pingURL += "/check/health"
 
 	for i := 0; i < 10; i++ {
 		// Ping the server by sending a GET request to `/health`.
@@ -225,5 +255,4 @@ func pingServer() {
 	}
 
 	logger.Error("cannot connect to the router! The router has no response, or it might took too long to start up.", zap.String("ping url", pingURL))
-	return
 }

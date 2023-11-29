@@ -8,8 +8,7 @@ server:
   auto_cert: true # 是否开启自动 https
   tls_cert: configs/server.crt # 如果不开启自动 https，配置的证书
   tls_key: configs/server.key # 如果不开启自动 https，配置的证书
-  puti_domain:  # puti 主应用绑定的域名；例如：example.com
-    - puti.com
+  puti_domain: puti.com  # puti 主应用绑定的域名；例如：example.com
 
 # safety
 safety:

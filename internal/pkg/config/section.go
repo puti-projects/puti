@@ -1,15 +1,15 @@
 package config
 
 type ServerConfig struct {
-	Runmode    string   `mapstructure:"runmode"`
-	Name       string   `mapstructure:"name"`
-	HttpPort   string   `mapstructure:"http_port"`
-	HttpsOpen  bool     `mapstructure:"https_open"`
-	HttpsPort  string   `mapstructure:"https_port"`
-	AutoCert   bool     `mapstructure:"auto_cert"`
-	TlsCert    string   `mapstructure:"tls_cert"`
-	TlsKey     string   `mapstructure:"tls_key"`
-	PutiDomain []string `mapstructure:"puti_domain"`
+	Runmode    string `mapstructure:"runmode"`
+	Name       string `mapstructure:"name"`
+	HttpPort   string `mapstructure:"http_port"`
+	HttpsOpen  bool   `mapstructure:"https_open"`
+	HttpsPort  string `mapstructure:"https_port"`
+	AutoCert   bool   `mapstructure:"auto_cert"`
+	TlsCert    string `mapstructure:"tls_cert"`
+	TlsKey     string `mapstructure:"tls_key"`
+	PutiDomain string `mapstructure:"puti_domain"`
 }
 
 type SafetyConfig struct {
