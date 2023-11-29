@@ -2,7 +2,7 @@
 
 ## v0.4.2 Go Version Upgrade [2023-11-30]
 
-# Feature and Enhancement
+### Feature and Enhancement
 - Go version updated to 1.21
 - Front-end of the knowledge base supports partial loading
 - Automatic HTTPS is enabled by default
@@ -10,7 +10,7 @@
 - DockerHub image push is replaced by Github Action
 - Jwt package is switched to [github.com/golang-jwt/jwt](https://github.com/golang-jwt/jwt)
 
-# Bug fixes
+### Bug fixes
 - Failure in gosu installation in dockerfile
 
 ---

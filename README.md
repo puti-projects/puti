@@ -39,7 +39,9 @@ Puti 项目现在仍在开发中，目标是面向极客的下一代写作系统
 - Golang 1.13+ (Build using modules)
 - MySQL
   
-本项目使用了 Go Modules，所以建议使用 Go 1.13 以上版本；项目不依赖 Nginx 之类的 Web Server，但是你可以配置并且使用 Nginx。
+本项目使用了 Go Modules，所以需使用 Go 1.13 以上版本。
+
+项目不依赖 Nginx 之类的 Web Server，默认启用自动HTTPS获取Let's Encrypt证书，但是你可以配置并且使用 Nginx。
 
 ## 功能与计划
 
@@ -102,19 +104,20 @@ Puti 项目现在仍在开发中，目标是面向极客的下一代写作系统
 Puti 的配置文件位于 `configs` 下的 `config.yaml`，初次使用可以从 `config.yaml.example` 初始化配置文件。  
 需要注意的配置：
 
-| 配置              | 说明                                  |
-| :---------------- | :------------------------------------ |
-| server.http_port  | HTTP 端口                             |
-| server.https_open | 是否开启 HTTPS                        |
-| server.auto_cert  | 是否开启自动 HTTPS                    |
-| server.https_port | HTTPS 端口                            |
-| server.tls_cert   | 如果不是自动 HTTPS，配置 SSL 证书路径 |
-| server.tls_key    | 如果不是自动 HTTPS，配置 SSL 私钥路径 |
-| safety.jwt_secret | Json web token 秘钥                   |
-| db.name           | 数据库名称                            |
-| db.addr           | 数据库 HOST:PORT                      |
-| db.username       | 数据库登录名                          |
-| db.password       | 数据库密码                            |
+| 配置              | 说明                                                                                     |
+| :---------------- | :--------------------------------------------------------------------------------------- |
+| server.http_port  | HTTP 端口                                                                                |
+| server.https_open | 是否开启 HTTPS                                                                           |
+| server.auto_cert  | 是否开启自动 HTTPS                                                                       |
+| server.https_port | HTTPS 端口                                                                               |
+| server.tls_cert   | 如果不是自动 HTTPS，配置 SSL 证书路径                                                    |
+| server.tls_key    | 如果不是自动 HTTPS，配置 SSL 私钥路径                                                    |
+| puti_domain       | 应用绑定的域名，如开启自动 HTTPS，将自动获取域名Let's Encrypt证书；例如：www.example.com |
+| safety.jwt_secret | Json web token 秘钥                                                                      |
+| db.name           | 数据库名称                                                                               |
+| db.addr           | 数据库 HOST:PORT                                                                         |
+| db.username       | 数据库登录名                                                                             |
+| db.password       | 数据库密码                                                                               |
 
 ### 安装
 

@@ -36,7 +36,9 @@ This project is still developing, and the goal is the next generation writing sy
 - Golang 1.13+ (Build using modules)
 - MySQL
   
-This project uses Go Modules, so it is recommended to use Go 1.13 or above; The project does not rely on Web Server such as Nginx, but you can configure and use Nginx.
+This project uses Go Modules, so it is recommended to use Go 1.13 or above.
+
+The project does not rely on Web Server such as Nginx, and automatic HTTPS is enabled by default to obtain Let's Encrypt certificates. Also you can configure and use Nginx.
 
 ## Features
 
@@ -102,19 +104,20 @@ The project plan implementation and the functions that have been implemented are
 Puti's configuration file is `config.yaml` under path `configs`, and the configuration file can be initialized from `config.yaml.example` when first used.  
 Configuration to be aware of：
 
-| Configuration     | Description                                           |
-| :---------------- | :---------------------------------------------------- |
-| server.http_port  | HTTP Port                                             |
-| server.https_open | Open HTTPS                                            |
-| server.auto_cert  | Open auto cert                                        |
-| server.https_port | HTTPS Port                                            |
-| server.tls_cert   | If it is not automatic cert，the SSL certificate path |
-| server.tls_key    | If it is not automatic cert，the SSL private key path |
-| safety.jwt_secret | Json web token secret key                             |
-| db.name           | Database name                                         |
-| db.addr           | Database HOST:PORT                                    |
-| db.username       | Database user                                         |
-| db.password       | Database password                                     |
+| Configuration     | Description                                                                                                                                                                       |
+| :---------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| server.http_port  | HTTP Port                                                                                                                                                                         |
+| server.https_open | Open HTTPS                                                                                                                                                                        |
+| server.auto_cert  | Open auto cert                                                                                                                                                                    |
+| server.https_port | HTTPS Port                                                                                                                                                                        |
+| server.tls_cert   | If it is not automatic cert，the SSL certificate path                                                                                                                             |
+| server.tls_key    | If it is not automatic cert，the SSL private key path                                                                                                                             |
+| puti_domain       | The domain name bound by the application, if automatic HTTPS is turned on, it will automatically obtain the domain name's Let's Encrypt certificate; for example: www.example.com |
+| safety.jwt_secret | Json web token secret key                                                                                                                                                         |
+| db.name           | Database name                                                                                                                                                                     |
+| db.addr           | Database HOST:PORT                                                                                                                                                                |
+| db.username       | Database user                                                                                                                                                                     |
+| db.password       | Database password                                                                                                                                                                 |
 
 ### Installation
 

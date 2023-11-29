@@ -3,7 +3,7 @@ server:
   runmode: debug                 # 开发模式, debug, release, test
   name: puti              # API Server 的名字
   http_port: 8000                  # HTTP 绑定端口
-  https_open: false # 是否开启 HTTPS
+  https_open: true # 是否开启 HTTPS
   https_port: 8080 # HTTPS 绑定端口
   auto_cert: true # 是否开启自动 https
   tls_cert: configs/server.crt # 如果不开启自动 https，配置的证书
