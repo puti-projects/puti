@@ -1,4 +1,5 @@
-theme/* linguist-vendored
-assets/* linguist-vendored
-console/* linguist-vendored
-docs/* linguist-documentation
+*.js linguist-language=go
+*.css linguist-language=go
+*.scss linguist-language=go
+*.less linguist-language=go
+*.html linguist-language=go
