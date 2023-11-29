@@ -6,8 +6,8 @@
     <em>:black_nib: Puti is a full-featured writing system written in Golang.</em>
 </p>
 <p align="center">
-    <a href="https://github.com/puti-projects/puti/actions?query=workflow%3Abuild">
-        <img src="https://github.com/puti-projects/puti/workflows/build/badge.svg" alt="Github Actions">
+   <a href="https://github.com/puti-projects/puti/actions/workflows/main.yml">
+        <img src="https://github.com/puti-projects/puti/actions/workflows/main.yml/badge.svg" alt="Github Actions">
     </a>
     <a href="https://codecov.io/gh/puti-projects/puti">
         <img src="https://codecov.io/gh/puti-projects/puti/branch/master/graph/badge.svg" />
@@ -102,19 +102,19 @@ The project plan implementation and the functions that have been implemented are
 Puti's configuration file is `config.yaml` under path `configs`, and the configuration file can be initialized from `config.yaml.example` when first used.  
 Configuration to be aware of：
 
-| Configuration | Description |
-| :----- | :----- |
-| server.http_port | HTTP Port |
-| server.https_open |  Open HTTPS  |
-| server.auto_cert |  Open auto cert  |
-| server.https_port |  HTTPS Port  |
-| server.tls_cert | If it is not automatic cert，the SSL certificate path   |
-| server.tls_key |  If it is not automatic cert，the SSL private key path  |
-| safety.jwt_secret |  Json web token secret key |
-| db.name |  Database name  |
-| db.addr |  Database HOST:PORT  |
-| db.username |  Database user  |
-| db.password |  Database password |
+| Configuration     | Description                                           |
+| :---------------- | :---------------------------------------------------- |
+| server.http_port  | HTTP Port                                             |
+| server.https_open | Open HTTPS                                            |
+| server.auto_cert  | Open auto cert                                        |
+| server.https_port | HTTPS Port                                            |
+| server.tls_cert   | If it is not automatic cert，the SSL certificate path |
+| server.tls_key    | If it is not automatic cert，the SSL private key path |
+| safety.jwt_secret | Json web token secret key                             |
+| db.name           | Database name                                         |
+| db.addr           | Database HOST:PORT                                    |
+| db.username       | Database user                                         |
+| db.password       | Database password                                     |
 
 ### Installation
 
@@ -177,19 +177,19 @@ Detailed changes for each release are documented in the [changelog file]((https:
 
 Thanks for these great open source libraries:
 
-| Dependency | About |
-| :----- | :----- | 
-| [gin-gonic/gin](https://github.com/gin-gonic/gin) |  HTTP web framework written in Go. |
-| [go-gorm/gorm](https://github.com/go-gorm/gorm)  | The ORM library for Golang. |
-| [allegro/bigcache](https://github.com/allegro/bigcache) | Efficient cache for gigabytes of data written in Go. |
-| [spf13/viper](https://github.com/spf13/viper) |  Complete configuration solution. |
-| [go.uber.org/zap](https://go.uber.org/zap) |  Fast, structured, leveled logging. |
-| [vuejs/vue](https://github.com/vuejs/vue) | JavaScript framework for building UI on the web. |
-| [ElemeFE/element](https://github.com/ElemeFE/element) | A Vue.js 2.0 UI Toolkit for Web.  |
-| [PanJiaChen/vue-element-admin](https://github.com/PanJiaChen/vue-element-admin) | A front-end management background integration solution. |
-| [hinesboy/mavonEditor](https://github.com/hinesboy/mavonEditor) (will be removed) | A markdown editor. |
-| [Vanessa219/vditor](https://github.com/Vanessa219/vditor) | An in-browser markdown editor. |
-| [88250/lute](https://github.com/88250/lute) | A structured Markdown engine that supports Go and JavaScript. |
+| Dependency                                                                        | About                                                         |
+| :-------------------------------------------------------------------------------- | :------------------------------------------------------------ |
+| [gin-gonic/gin](https://github.com/gin-gonic/gin)                                 | HTTP web framework written in Go.                             |
+| [go-gorm/gorm](https://github.com/go-gorm/gorm)                                   | The ORM library for Golang.                                   |
+| [allegro/bigcache](https://github.com/allegro/bigcache)                           | Efficient cache for gigabytes of data written in Go.          |
+| [spf13/viper](https://github.com/spf13/viper)                                     | Complete configuration solution.                              |
+| [go.uber.org/zap](https://go.uber.org/zap)                                        | Fast, structured, leveled logging.                            |
+| [vuejs/vue](https://github.com/vuejs/vue)                                         | JavaScript framework for building UI on the web.              |
+| [ElemeFE/element](https://github.com/ElemeFE/element)                             | A Vue.js 2.0 UI Toolkit for Web.                              |
+| [PanJiaChen/vue-element-admin](https://github.com/PanJiaChen/vue-element-admin)   | A front-end management background integration solution.       |
+| [hinesboy/mavonEditor](https://github.com/hinesboy/mavonEditor) (will be removed) | A markdown editor.                                            |
+| [Vanessa219/vditor](https://github.com/Vanessa219/vditor)                         | An in-browser markdown editor.                                |
+| [88250/lute](https://github.com/88250/lute)                                       | A structured Markdown engine that supports Go and JavaScript. |
 
 ## Description
 
@@ -200,7 +200,7 @@ It is not necessary to use a WebServer such as Nginx, and supports automatic HTT
 ## Contributors
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
 | [<img src="https://avatars3.githubusercontent.com/u/17734933?s=460&v=4" width="100px;"/><br /><sub>goozp</sub>](https://www.goozp.com)<br />[💻](https://github.com/puti-projects/puti/commits?author=goozp "Code commitor")[📚](https://github.com/dawnlabs/carbon/commits?author=briandennis "Documentation")[🎨](#design "Design") |
-| :---: |
+| :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
 
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 

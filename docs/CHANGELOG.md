@@ -1,12 +1,17 @@
 # Changelog
 
-## v0.4.2 Go Version Update [2023-11-28]
+## v0.4.2 Go Version Upgrade [2023-11-30]
 
 ### 功能和优化
+- Go 版本更新到 1.21
 - 知识库前端支持局部加载
+- 默认启用自动HTTPS
+- 增加默认跳转，非www到www，http到https
+- DockerHub 镜像推送改用 Github Action
+- Jwt包切换到 [github.com/golang-jwt/jwt](https://github.com/golang-jwt/jwt)
 
 ### Bug 修复
-
+- dockerfile gosu 安装失败
 
 ---
 
