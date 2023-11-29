@@ -5,16 +5,16 @@ import (
 	"fmt"
 	"time"
 
-	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt"
 	"github.com/puti-projects/puti/internal/pkg/config"
 )
 
 var (
 	// ErrMissingHeader means the `Authorization` header was empty.
-	ErrMissingHeader = errors.New("The length of the `Authorization` header is zero")
+	ErrMissingHeader = errors.New("the length of the `Authorization` header is zero")
 	// ErrMissingToken means the `token` params was empty.
-	ErrMissingToken = errors.New("Missing token")
+	ErrMissingToken = errors.New("missing token")
 )
 
 // Context is the context of the JSON view token.

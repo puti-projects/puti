@@ -6,10 +6,10 @@ require (
 	github.com/88250/lute v1.7.5
 	github.com/allegro/bigcache v1.2.1
 	github.com/bwmarrin/snowflake v0.3.0
-	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/fsnotify/fsnotify v1.7.0
 	github.com/gin-gonic/contrib v0.0.0-20221130124618-7e01895a63f2
 	github.com/gin-gonic/gin v1.9.1
+	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/google/uuid v1.4.0
 	github.com/json-iterator/go v1.1.12
 	github.com/shirou/gopsutil v3.21.11+incompatible
