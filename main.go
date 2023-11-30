@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
 
@@ -146,6 +147,13 @@ func httpsHandle(router *gin.Engine) *http.Server {
 	}
 
 	hostname := config.Server.PutiDomain
+	hostWhitelist := []string{hostname}
+	// check www or not
+	if strings.HasPrefix(hostname, "www.") {
+		hostWhitelist = append(hostWhitelist, hostname[4:])
+	} else {
+		hostWhitelist = append(hostWhitelist, "www."+hostname)
+	}
 
 	// serve
 	if config.Server.AutoCert {
@@ -154,7 +162,7 @@ func httpsHandle(router *gin.Engine) *http.Server {
 		m := &autocert.Manager{
 			Prompt:     autocert.AcceptTOS,
 			Cache:      autocert.DirCache(config.StaticPath("configs/cert/")),
-			HostPolicy: autocert.HostWhitelist(hostname),
+			HostPolicy: autocert.HostWhitelist(hostWhitelist...),
 		}
 		// set auto cert config to tls config
 		srv.TLSConfig = m.TLSConfig()
@@ -172,7 +180,20 @@ func httpsHandle(router *gin.Engine) *http.Server {
 	}
 
 	// redirect http to https
-	httpToHttps(hostname)
+	r := gin.Default()
+	r.Use(secure.Secure(secure.Options{
+		AllowedHosts:          hostWhitelist,
+		SSLRedirect:           true,
+		SSLHost:               hostname,
+		SSLProxyHeaders:       map[string]string{"X-Forwarded-Proto": "https"},
+		STSSeconds:            315360000,
+		STSIncludeSubdomains:  true,
+		FrameDeny:             true,
+		ContentTypeNosniff:    true,
+		BrowserXssFilter:      true,
+		ContentSecurityPolicy: "default-src 'self'",
+	}))
+	httpHandle(r)
 
 	return srv
 }
@@ -186,24 +207,6 @@ func serveTLS(srv *http.Server, certFile string, keyFile string) {
 			logger.Fatalf("server.ListenAndServeTLS err: %v", err)
 		}
 	}()
-}
-
-// httpToHttps redirect http to https
-func httpToHttps(hostname string) {
-	r := gin.Default()
-	r.Use(secure.Secure(secure.Options{
-		AllowedHosts:          []string{hostname},
-		SSLRedirect:           true,
-		SSLHost:               hostname,
-		SSLProxyHeaders:       map[string]string{"X-Forwarded-Proto": "https"},
-		STSSeconds:            315360000,
-		STSIncludeSubdomains:  true,
-		FrameDeny:             true,
-		ContentTypeNosniff:    true,
-		BrowserXssFilter:      true,
-		ContentSecurityPolicy: "default-src 'self'",
-	}))
-	httpHandle(r)
 }
 
 // signalHandle graceful shutdown based on http.server.Shutdown
